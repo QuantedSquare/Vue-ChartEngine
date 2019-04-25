@@ -30,6 +30,11 @@ export default new Router({
             path: '/bars',
             name: 'bars',
             component: () => import('./views/Bars.vue')
+        },
+        {
+            path: '/donut',
+            name: 'donut',
+            component: () => import('./views/Donut.vue')
         }
     ]
 })
