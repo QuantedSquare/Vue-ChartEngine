@@ -13,9 +13,10 @@
     </div>
 </template>
 <script>
-import { select, line, scaleLinear, min, max, axisLeft, axisBottom } from 'd3'
+import { select, scaleLinear, min, max, axisLeft, axisBottom } from 'd3'
+import * as shapes from 'd3-shape'
 
-let margin = { top: 20, right: 20, bottom: 20, left: 20 };
+let margin = { top: 20, right: 20, bottom: 20, left: 30 };
 
 export default {
     name: 'ChartLines',
@@ -31,6 +32,10 @@ export default {
         width: {
             type: Number,
             default: 720
+        },
+        curve: {
+            type: String,
+            default: 'curveBasis'
         }
     },
     data: function() {
@@ -39,9 +44,10 @@ export default {
         let xScale = scaleLinear(),
             yScale = scaleLinear();
 
-        let lineDrawer = line()
+        let lineDrawer = shapes.line()
             .x((d) => xScale(d.x))
-            .y((d) => yScale(d.y));
+            .y((d) => yScale(d.y))
+            .curve(shapes[this.curve]);
 
         xScale.range([0, this._width()]);
         xScale.domain([this.getMin('x'), this.getMax('x')]);
@@ -83,6 +89,9 @@ export default {
         yMin: function() {
             this.yScale.domain([this.getMin('y'), this.getMax('y')]);
             this.drawYAxis();
+        },
+        curve: function() {
+            this.lineDrawer.curve(shapes[this.curve]);
         }
     },
     methods: {

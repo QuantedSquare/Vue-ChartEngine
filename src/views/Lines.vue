@@ -2,7 +2,7 @@
     <div class="chart">
         <a @click="refreshData">Refresh Lines</a> |
         <a @click="refreshSize">Refresh Size</a>
-        <Chartlines :lines="randomData" :width="chartWidth" :height="chartHeight" />
+        <Chartlines :lines="randomData" :width="chartWidth" :height="chartHeight" curve="curveMonotoneX" />
     </div>
 </template>
 <script>
@@ -25,7 +25,10 @@ export default {
     },
     methods: {
         refreshData: function() {
-            this.randomData = collection();
+            let nbLines = Math.round(Math.random() * 2 + 2);
+            let nbPoints = Math.round(Math.random() * 15 + 3)
+
+            this.randomData = collection(nbLines, nbPoints, 0, 100);
         },
         refreshSize: function() {
             this.chartWidth = Math.round(Math.random() * 420 + 300);
