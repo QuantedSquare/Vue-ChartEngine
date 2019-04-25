@@ -71,7 +71,6 @@ export default {
         xMax: function() {
             this.xScale.domain([this.getMin('x'), this.getMax('x')]);
             this.drawXAxis()
-
         },
         yMax: function() {
             this.yScale.domain([this.getMin('y'), this.getMax('y')]);

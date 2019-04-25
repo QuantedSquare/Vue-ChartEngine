@@ -1,26 +1,26 @@
 <template>
     <div>
         <div>
-            <span>xMax: {{xMax}}, yMax: {{yMax}}, xMin: {{xMin}}, yMin: {{yMin}}</span>
+            <span>yMax: {{yMax}}, yMin: {{yMin}}</span>
         </div>
         <svg :height="height" :width="width">
             <g :transform="display">
                 <g id="xAxis" :transform="bottomTranslate"></g>
                 <g id="yAxis"></g>
-                <path class="line" v-for="line in lines" :d="lineDrawer(line)"></path>
+                <rect class="bar" v-for="point in bars" :x="xScale(point.x)" :y="_height() - yScale(point.y)" :width="xScale.bandwidth()" :height="yScale(point.y)"></rect>
             </g>
         </svg>
     </div>
 </template>
 <script>
-import { select, line, scaleLinear, min, max, axisLeft, axisBottom } from 'd3'
+import { select, scaleLinear, scaleBand, min, max, axisLeft, axisBottom } from 'd3'
 
-let margin = { top: 20, right: 20, bottom: 20, left: 20 };
+let margin = { top: 20, right: 20, bottom: 20, left: 30 };
 
 export default {
     name: 'ChartLines',
     props: {
-        lines: {
+        bars: {
             type: Array,
             required: true
         },
@@ -34,25 +34,21 @@ export default {
         }
     },
     data: function() {
-        console.log(this.lines);
+        console.log(this.bars);
 
-        let xScale = scaleLinear(),
+        let xScale = scaleBand(),
             yScale = scaleLinear();
 
-        let lineDrawer = line()
-            .x((d) => xScale(d.x))
-            .y((d) => yScale(d.y));
-
         xScale.range([0, this._width()]);
-        xScale.domain([this.getMin('x'), this.getMax('x')]);
+        xScale.domain(this.bars.map(point => point.x));
+        xScale.padding(0.2)
 
         yScale.range([this._height(), 0]);
         yScale.domain([this.getMin('y'), this.getMax('y')]);
 
         return {
             xScale: xScale,
-            yScale: yScale,
-            lineDrawer: lineDrawer
+            yScale: yScale
         }
     },
     mounted: function() {
@@ -68,18 +64,13 @@ export default {
             this.yScale.range([this._height(), 0]);
             this.drawYAxis();
         },
-        xMax: function() {
-            this.xScale.domain([this.getMin('x'), this.getMax('x')]);
-            this.drawXAxis()
-
+        'bars.length': function() {
+            this.xScale.domain(this.bars.map(point => point.x));
+            this.drawXAxis();
         },
         yMax: function() {
             this.yScale.domain([this.getMin('y'), this.getMax('y')]);
             this.drawYAxis();
-        },
-        xMin: function() {
-            this.xScale.domain([this.getMin('x'), this.getMax('x')]);
-            this.drawXAxis()
         },
         yMin: function() {
             this.yScale.domain([this.getMin('y'), this.getMax('y')]);
@@ -100,14 +91,10 @@ export default {
             return this.height - margin.top - margin.bottom;
         },
         getMax: function(axis) {
-            return max(this.lines.map(line => {
-                return max(line, (d) => d[axis]);
-            }));
+            return max(this.bars, (d) => d[axis]);
         },
         getMin: function(axis) {
-            return min(this.lines.map(line => {
-                return min(line, (d) => d[axis]);
-            }));
+            return min(this.bars, (d) => d[axis]);
         }
     },
     computed: {
@@ -117,14 +104,8 @@ export default {
         bottomTranslate: function() {
             return 'translate(0,' + this._height() + ')'
         },
-        xMax: function() {
-            return this.getMax('x');
-        },
         yMax: function() {
             return this.getMax('y');
-        },
-        xMin: function() {
-            return this.getMin('x');
         },
         yMin: function() {
             return this.getMin('y')
@@ -134,9 +115,9 @@ export default {
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-.line {
-    fill: none;
-    stroke: steelblue;
-    stroke-width: 1.5px;
+.bar {
+    fill: steelblue;
+    /*stroke: steelblue;*/
+    /*stroke-width: 1.5px;*/
 }
 </style>

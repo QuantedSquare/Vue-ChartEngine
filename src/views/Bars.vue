@@ -25,7 +25,7 @@ export default {
     },
     methods: {
         refreshData: function() {
-            this.randomData = points();
+            this.randomData = points(Math.round(Math.random() * 15 + 3));
         },
         refreshSize: function() {
             this.chartWidth = Math.round(Math.random() * 420 + 300);
