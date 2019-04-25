@@ -20,10 +20,16 @@ export default new Router({
             // which is lazy-loaded when the route is visited.
             component: () => import( /* webpackChunkName: "about" */ './views/About.vue')
         },
+        // Charts
         {
             path: '/lines',
             name: 'lines',
             component: () => import('./views/Lines.vue')
+        },
+        {
+            path: '/bars',
+            name: 'bars',
+            component: () => import('./views/Bars.vue')
         }
     ]
 })

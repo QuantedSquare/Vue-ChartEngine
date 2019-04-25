@@ -1,31 +1,31 @@
 <template>
     <div class="chart">
-        <a @click="refreshData">Refresh Lines</a> |
+        <a @click="refreshData">Refresh Bars</a> |
         <a @click="refreshSize">Refresh Size</a>
-        <Chartlines :lines="randomData" :width="chartWidth" :height="chartHeight" />
+        <ChartBars :bars="randomData" :width="chartWidth" :height="chartHeight" />
     </div>
 </template>
 <script>
-import { collection } from '@/modules/randomVals.js'
+import { points } from '@/modules/randomVals.js'
 
-import Chartlines from '@/components/ChartLines'
+import ChartBars from '@/components/ChartBars.vue'
 
 
 export default {
-    name: 'lines',
+    name: 'bars',
     components: {
-        Chartlines
+        ChartBars
     },
     data: function() {
         return {
-            randomData: collection(),
+            randomData: points(),
             chartWidth: 720,
             chartHeight: 480
         }
     },
     methods: {
         refreshData: function() {
-            this.randomData = collection();
+            this.randomData = points();
         },
         refreshSize: function() {
             this.chartWidth = Math.round(Math.random() * 420 + 300);
