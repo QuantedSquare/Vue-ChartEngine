@@ -18,7 +18,7 @@ import { select, scaleLinear, scaleBand, min, max, axisLeft, axisBottom } from '
 let margin = { top: 20, right: 20, bottom: 20, left: 30 };
 
 export default {
-    name: 'ChartLines',
+    name: 'ChartBars',
     props: {
         bars: {
             type: Array,
