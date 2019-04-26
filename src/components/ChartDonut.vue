@@ -46,30 +46,28 @@ export default {
 
     let radius = width / 2;
 
-    var parti = partition() // paramettrage size scale
+    var parti = partition()
       .size([2 * Math.PI, radius]);
 
     var root = hierarchy(this.data)
-      .sum(d => d.value) // sum values of children for attribute size for parents
-      .sort((a, b) => b.value - a.value); // sort by asc
+      .sum(d => d.value)
+      .sort((a, b) => b.value - a.value);
 
-    parti(root); // combine all data size on the size scale of partition
-
-    // console.log(root.descendants())
+    parti(root);
 
     var color = scaleOrdinal(
       quantize(interpolateRainbow, this.data.children.length + 1)
-    ); // create color scale
+    );
 
     var form = format(",d");
 
     var arcSlice = arc()
-      .startAngle(d => d.x0) // radian location for the start of the arc
-      .endAngle(d => d.x1) // radian location for the end of the arc
-      .padAngle(d => Math.min((d.x1 - d.x0) / 2, 0.005)) // padding left and right beetwen arcs
-      .padRadius(radius / 2) // padding beetwen arcs
-      .innerRadius(d => d.y0) // the radian location for the inside arc
-      .outerRadius(d => d.y1 - 1); // the radian location for the outside arc, (-1) for padding top and bottom beetwen arcs
+      .startAngle(d => d.x0)
+      .endAngle(d => d.x1)
+      .padAngle(d => Math.min((d.x1 - d.x0) / 2, 0.005))
+      .padRadius(radius / 2)
+      .innerRadius(d => d.y0)
+      .outerRadius(d => d.y1 - 1);
 
     this.donut.slice = root.descendants().map(d => {
       let coord = arcSlice(d);
@@ -95,8 +93,6 @@ export default {
         transform: transform
       };
     });
-
-    // console.log(this.donut);
   }
 
 }
