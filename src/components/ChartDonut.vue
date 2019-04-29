@@ -50,7 +50,6 @@ export default {
     );
 
     return {
-      // currentDepth: 0,
       targetIndex: 0,
       colorScale: color
     };
@@ -65,7 +64,6 @@ export default {
 
       function searchMaxDepth(p) {
         let maxDepth = 0;
-        // console.log("p", p);
         p.each(elem => {
           if (elem.children)
             elem.children.forEach(child => {
@@ -78,7 +76,6 @@ export default {
 
       if (this.targetIndex) {
         let p = root.descendants()[this.targetIndex];
-        // parent.datum(p.parent || root);
         let maxDepth = searchMaxDepth(p);
         let newPartY = (this.radius - 50) / (maxDepth - p.depth + 1);
         root.each(d => {
@@ -106,7 +103,6 @@ export default {
                 : d.data.name === p.data.name
                 ? newY0 + newPartY - 50
                 : newY0 + newPartY;
-          console.log(p.data.name, d.data.name, newX0, newX1, newY0, newY1);
           return (d.target = {
             x0: newX0,
             x1: newX1,
@@ -184,11 +180,6 @@ export default {
         };
       });
       return textData;
-    }
-  },
-  watch: {
-    root: function(val) {
-      console.log("new root", val);
     }
   },
   methods: {
