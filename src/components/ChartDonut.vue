@@ -38,7 +38,7 @@ import {
 export default {
   name: "ChartDonut",
   props: {
-    data: Object,
+    dataDonut: Object,
     width: {
       type: Number,
       default: 932
@@ -46,20 +46,78 @@ export default {
   },
   data: function() {
     let color = scaleOrdinal(
-      quantize(interpolateRainbow, this.data.children.length + 1)
+      quantize(interpolateRainbow, this.dataDonut.children.length + 1)
     );
 
     return {
+      // currentDepth: 0,
+      targetIndex: 0,
       colorScale: color
     };
   },
   computed: {
     root: function() {
-      let root = hierarchy(this.data)
+      let root = hierarchy(this.dataDonut)
         .sum(d => d.value)
         .sort((a, b) => b.value - a.value);
 
       this.partition(root);
+
+      function searchMaxDepth(p) {
+        let maxDepth = 0;
+        // console.log("p", p);
+        p.each(elem => {
+          if (elem.children)
+            elem.children.forEach(child => {
+              searchMaxDepth(child);
+            });
+          maxDepth = elem.depth;
+        });
+        return maxDepth;
+      }
+
+      if (this.targetIndex) {
+        let p = root.descendants()[this.targetIndex];
+        // parent.datum(p.parent || root);
+        let maxDepth = searchMaxDepth(p);
+        let newPartY = (this.radius - 50) / (maxDepth - p.depth + 1);
+        root.each(d => {
+          let newX0 =
+              Math.max(0, Math.min(1, (d.x0 - p.x0) / (p.x1 - p.x0))) *
+              2 *
+              Math.PI,
+            newX1 =
+              Math.max(0, Math.min(1, (d.x1 - p.x0) / (p.x1 - p.x0))) *
+              2 *
+              Math.PI,
+            newY0 =
+              newX1 - newX0 === 2 * Math.PI && d.data.name !== p.data.name
+                ? 0
+                : newX1 - newX0 === 0
+                ? 0
+                : d.data.name === p.data.name
+                ? 50
+                : (d.depth - p.depth) * newPartY,
+            newY1 =
+              newX1 - newX0 === 2 * Math.PI && d.data.name !== p.data.name
+                ? 50
+                : newX1 - newX0 === 0
+                ? 0
+                : d.data.name === p.data.name
+                ? newY0 + newPartY - 50
+                : newY0 + newPartY;
+
+          //                 y0: Math.max(0, d.y0 - p.depth),
+          //                 y1: Math.max(0, d.y1 - p.depth)
+          console.log(p.data.name, d.data.name, newX0, newX1, newY0, newY1);
+          return (d.target = {
+            x0: newX0,
+            x1: newX1,
+            y0: newY0,
+            y1: newY1
+          });
+        });
+      }
       return root;
     },
     radius: function() {
@@ -70,12 +128,24 @@ export default {
     },
     arcSlice: function() {
       let arcSlice = arc()
-        .startAngle(d => d.x0)
-        .endAngle(d => d.x1)
-        .padAngle(d => Math.min((d.x1 - d.x0) / 2, 0.005))
+        .startAngle(d => {
+          return d.target ? d.target.x0 : d.x0;
+        })
+        .endAngle(d => {
+          return d.target ? d.target.x1 : d.x1;
+        })
+        .padAngle(d => {
+          return d.target
+            ? Math.min((d.target.x1 - d.target.x0) / 2, 0.005)
+            : Math.min((d.x1 - d.x0) / 2, 0.005);
+        })
         .padRadius(this.radius / 2)
-        .innerRadius(d => d.y0)
-        .outerRadius(d => d.y1 - 1);
+        .innerRadius(d => {
+          return d.target ? d.target.y0 : d.y0;
+        })
+        .outerRadius(d => {
+          return d.target ? d.target.y1 - 1 : d.y1 - 1;
+        });
       return arcSlice;
     },
     slices: function() {
@@ -99,9 +169,13 @@ export default {
     },
     texts: function() {
       let textData = this.root.descendants().map(d => {
-        const x = (((d.x0 + d.x1) / 2) * 180) / Math.PI;
-        const y = (d.y0 + d.y1) / 2;
-        let display = ((d.y0 + d.y1) / 2) * (d.x1 - d.x0) > 10;
+        let x0 = d.target ? d.target.x0 : d.x0,
+          x1 = d.target ? d.target.x1 : d.x1,
+          y0 = d.target ? d.target.y0 : d.y0,
+          y1 = d.target ? d.target.y1 : d.y1;
+        const x = (((x0 + x1) / 2) * 180) / Math.PI;
+        const y = (y0 + y1) / 2;
+        let display = ((y0 + y1) / 2) * (x1 - x0) > 10;
         let transform = `rotate(${x - 90}) translate(${y},0) rotate(${
           x < 180 ? 0 : 180
         })`;
@@ -115,62 +189,15 @@ export default {
       return textData;
     }
   },
+  watch: {
+    root: function(val) {
+      console.log("new root", val);
+    }
+  },
   methods: {
-    // clicked(index) {
-    //     let p = this.rootDesc[index]
-    //     // parent.datum(p.parent || root);
-    //     this.rootPart.each(
-    //         d =>
-    //         (d.target = {
-    //             x0: Math.max(0, Math.min(1, (d.x0 - p.x0) / (p.x1 - p.x0))) *
-    //                 2 *
-    //                 Math.PI,
-    //             x1: Math.max(0, Math.min(1, (d.x1 - p.x0) / (p.x1 - p.x0))) *
-    //                 2 *
-    //                 Math.PI,
-    //             y0: Math.max(0, d.y0 - p.depth),
-    //             y1: Math.max(0, d.y1 - p.depth)
-    //         })
-    //     );
-    //     console.log(this.rootPart)
-    //     const t = selectAll('g').transition().duration(750);
-    //     // // Transition the data on all arcs, even the ones that aren’t visible,
-    //     // // so that if this transition is interrupted, entering arcs will start
-    //     // // the next transition from the desired position.
-    //     selectAll('path')
-    //         .data(this.data)
-    //         .transition(t)
-    //         .tween("data", d => {
-    //             console.log(d)
-    //             const i = interpolate(d.current, d.target);
-    //             return t => (d.current = i(t));
-    //         })
-    //         .filter(function(d) {
-    //             return +this.getAttribute("fill-opacity") || this.arcVisible(d.target);
-    //         })
-    //         .attr("fill-opacity", d =>
-    //             this.arcVisible(d.target) ? (d.children ? 0.6 : 0.4) : 0
-    //         )
-    //         .attrTween("d", d => () => arc(d.current));
-    //     // label
-    //     //   .filter(function(d) {
-    //     //     return +this.getAttribute("fill-opacity") || labelVisible(d.target);
-    //     //   })
-    //     //   .transition(t)
-    //     //   .attr("fill-opacity", d => +labelVisible(d.target))
-    //     //   .attrTween("transform", d => () => labelTransform(d.current));
-    // },
-    // arcVisible(d) {
-    //     return d.y1 <= 3 && d.y0 >= 1 && d.x1 > d.x0;
-    // },
-    // labelVisible(d) {
-    //     return d.y1 <= 3 && d.y0 >= 1 && (d.y1 - d.y0) * (d.x1 - d.x0) > 0.03;
-    // },
-    // labelTransform(d) {
-    //     const x = (((d.x0 + d.x1) / 2) * 180) / Math.PI;
-    //     const y = ((d.y0 + d.y1) / 2) * radius;
-    //     return `rotate(${x - 90}) translate(${y},0) rotate(${x < 180 ? 0 : 180})`;
-    // }
+    clicked(index) {
+      this.targetIndex = index;
+    }
   }
 };
 </script>

@@ -1,7 +1,7 @@
 <template>
     <div class="chart">
         <a @click="refreshSize">Refresh Size</a>
-        <ChartDonut :data="data" :width="chartWidth" />
+        <ChartDonut :dataDonut="dataDonut" :width="chartWidth" />
     </div>
 </template>
 <script>
@@ -15,7 +15,7 @@ export default {
     },
     data: function() {
         return {
-            data: dataDonut,
+            dataDonut: dataDonut,
             chartWidth: 400
         };
     },
