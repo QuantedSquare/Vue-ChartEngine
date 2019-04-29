@@ -106,9 +106,6 @@ export default {
                 : d.data.name === p.data.name
                 ? newY0 + newPartY - 50
                 : newY0 + newPartY;
-
-          //                 y0: Math.max(0, d.y0 - p.depth),
-          //                 y1: Math.max(0, d.y1 - p.depth)
           console.log(p.data.name, d.data.name, newX0, newX1, newY0, newY1);
           return (d.target = {
             x0: newX0,
@@ -175,7 +172,7 @@ export default {
           y1 = d.target ? d.target.y1 : d.y1;
         const x = (((x0 + x1) / 2) * 180) / Math.PI;
         const y = (y0 + y1) / 2;
-        let display = ((y0 + y1) / 2) * (x1 - x0) > 10;
+        let display = ((y0 + y1) / 2) * (x1 - x0) > 10 && y0 !== 0;
         let transform = `rotate(${x - 90}) translate(${y},0) rotate(${
           x < 180 ? 0 : 180
         })`;
