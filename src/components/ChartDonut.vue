@@ -32,7 +32,8 @@ import {
   arc,
   quantize,
   interpolateRainbow,
-  interpolate
+  interpolate,
+  scaleLinear
 } from "d3";
 
 export default {
@@ -62,6 +63,8 @@ export default {
 
       this.partition(root);
 
+      root.each(d => (d.current = d));
+
       function searchMaxDepth(p) {
         let maxDepth = 0;
         p.each(elem => {
@@ -77,7 +80,13 @@ export default {
       if (this.targetIndex) {
         let p = root.descendants()[this.targetIndex];
         let maxDepth = searchMaxDepth(p);
-        let newPartY = (this.radius - 50) / (maxDepth - p.depth + 1);
+        let newPartY = (this.radius - 30) / (maxDepth - p.depth + 1);
+        let r0Scale = scaleLinear();
+        let r1Scale = scaleLinear();
+
+        r0Scale.range([30, this.radius - newPartY]).domain([p.depth, maxDepth]);
+        r1Scale.range([newPartY + 30, this.radius]).domain([p.depth, maxDepth]);
+        // console.log(newPartY, p.depth, maxDepth);
         root.each(d => {
           let newX0 =
               Math.max(0, Math.min(1, (d.x0 - p.x0) / (p.x1 - p.x0))) *
@@ -90,19 +99,14 @@ export default {
             newY0 =
               newX1 - newX0 === 2 * Math.PI && d.data.name !== p.data.name
                 ? 0
-                : newX1 - newX0 === 0
-                ? 0
-                : d.data.name === p.data.name
-                ? 50
-                : (d.depth - p.depth) * newPartY,
+                : r0Scale(d.depth),
             newY1 =
               newX1 - newX0 === 2 * Math.PI && d.data.name !== p.data.name
-                ? 50
-                : newX1 - newX0 === 0
-                ? 0
-                : d.data.name === p.data.name
-                ? newY0 + newPartY - 50
-                : newY0 + newPartY;
+                ? 30
+                : r1Scale(d.depth);
+          // console.log(d.data.name);
+          // console.log("y0", r0Scale(d.depth), newY0, "y1", r1Scale(d.depth), newY1, d.depth);
+          // console.log("x0", newX0, "x1", newX1, "y0", newY0, "y1", newY1, d.depth);
           return (d.target = {
             x0: newX0,
             x1: newX1,
@@ -185,6 +189,25 @@ export default {
   methods: {
     clicked(index) {
       this.targetIndex = index;
+
+      //   selectAll("path")
+      //     .transition(t)
+      //     .tween("data", d => {
+      //       const i = d3.interpolate(d.current, d.target);
+      //       return t => {
+      //         console.log(d.current);
+      //         d.current = i(t);
+      //       };
+      //     })
+      //     .attrTween("d", d => () => arc(d.current));
+
+      //   label
+      //     .filter(function(d) {
+      //       return +this.getAttribute("fill-opacity") || labelVisible(d.target);
+      //     })
+      //     .transition(t)
+      //     .attr("fill-opacity", d => +labelVisible(d.target))
+      //     .attrTween("transform", d => () => labelTransform(d.current));
     }
   }
 };
