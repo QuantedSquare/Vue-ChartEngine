@@ -35,6 +35,7 @@ import {
   interpolate,
   scaleLinear
 } from "d3";
+var TWEEN = require('@tweenjs/tween.js');
 
 export default {
   name: "ChartDonut",
@@ -63,7 +64,7 @@ export default {
 
       this.partition(root);
 
-      root.each(d => (d.current = d));
+      root.each(d => (d.current = { x0: d.x0, x1: d.x1, y0: d.y0, y1: d.y1 }));
 
       function searchMaxDepth(p) {
         let maxDepth = 0;
@@ -75,6 +76,11 @@ export default {
           maxDepth = elem.depth;
         });
         return maxDepth;
+      }
+
+      function animate(time) {
+        requestAnimationFrame(animate);
+        TWEEN.update(time);
       }
 
       if (this.targetIndex) {
@@ -113,6 +119,23 @@ export default {
             y0: newY0,
             y1: newY1
           });
+        });
+
+        root.each(d => {
+          var tween = new TWEEN.Tween(d.current) // Create a new tween that modifies 'coords'.
+            .to(d.target, 1000) // Move to (300, 200) in 1 second.
+            .easing(TWEEN.Easing.Quadratic.Out) // Use an easing function to make the animation smooth.
+            // .onUpdate(function() {
+            //   // Called after tween.js updates 'coords'.
+            //   // Move 'box' to the position described by 'coords' with a CSS translation.
+            //   box.style.setProperty(
+            //     "transform",
+            //     "translate(" + coords.x + "px, " + coords.y + "px)"
+            //   );
+            // })
+            .start(); // Start the tween immediately.
+console.log(tween)
+          animate();
         });
       }
       return root;
@@ -189,25 +212,6 @@ export default {
   methods: {
     clicked(index) {
       this.targetIndex = index;
-
-      //   selectAll("path")
-      //     .transition(t)
-      //     .tween("data", d => {
-      //       const i = d3.interpolate(d.current, d.target);
-      //       return t => {
-      //         console.log(d.current);
-      //         d.current = i(t);
-      //       };
-      //     })
-      //     .attrTween("d", d => () => arc(d.current));
-
-      //   label
-      //     .filter(function(d) {
-      //       return +this.getAttribute("fill-opacity") || labelVisible(d.target);
-      //     })
-      //     .transition(t)
-      //     .attr("fill-opacity", d => +labelVisible(d.target))
-      //     .attrTween("transform", d => () => labelTransform(d.current));
     }
   }
 };
