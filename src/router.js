@@ -35,6 +35,12 @@ export default new Router({
             path: '/donut',
             name: 'donut',
             component: () => import('./views/Donut.vue')
+        },
+        ,
+        {
+            path: '/assemblee',
+            name: 'assemblee',
+            component: () => import('./views/Assemblee.vue')
         }
     ]
 })
