@@ -6,7 +6,7 @@
           v-for="(slice, index) in slices"
           :key="slice.id"
           :fill="colorScale(slice.parentName)"
-          :id="`index`+index"
+          :id="`slice`+index"
           :d="arcSlice(slice)"
           style="cursor: pointer;"
           @click="clicked(index)"
@@ -14,7 +14,8 @@
       </g>
       <g pointer-events="none" text-anchor="middle" transform="translate(500, 500)">
         <text
-          v-for="text in texts"
+          v-for="(text, index) in texts"
+          :id="`text`+index"
           :transform="text.transform"
           dy="0.35em"
         >{{text.display ? text.name : null}}</text>
@@ -56,8 +57,7 @@ export default {
       targetIndex: 0,
       colorScale: color,
       tweenedCoord: [],
-      targetCoords: [],
-      updateCoords: {}
+      targetCoords: []
     };
   },
   computed: {
@@ -129,22 +129,20 @@ export default {
     arcSlice: function() {
       let arcSlice = arc()
         .startAngle(d => {
-          return d.target ? d.target.x0 : d.x0;
+          return d.x0;
         })
         .endAngle(d => {
-          return d.target ? d.target.x1 : d.x1;
+          return d.x1;
         })
         .padAngle(d => {
-          return d.target
-            ? Math.min((d.target.x1 - d.target.x0) / 2, 0.005)
-            : Math.min((d.x1 - d.x0) / 2, 0.005);
+          return Math.min((d.x1 - d.x0) / 2, 0.005);
         })
         .padRadius(this.radius / 2)
         .innerRadius(d => {
-          return d.target ? d.target.y0 : d.y0;
+          return d.y0;
         })
         .outerRadius(d => {
-          return d.target ? d.target.y1 - 1 : d.y1 - 1;
+          return d.y1 - 1;
         });
       return arcSlice;
     },
@@ -175,6 +173,11 @@ export default {
       if (amppedSlices[0].target) {
         this.targetCoords = amppedSlices.map(elem => elem.target);
       }
+      if (this.targetIndex === 0) {
+        // console.log("index", this.targetIndex)
+        this.targetCoords = this.currentCoords;
+      }
+      // console.log("get slice")
       return amppedSlices;
     },
     texts: function() {
@@ -200,24 +203,30 @@ export default {
     }
   },
   watch: {
-    targetCoords: function(newSet) {
+    targetCoords: function(newSet, oldSet) {
+      // console.log(newSet, oldSet)
       function animate() {
         if (TWEEN.update()) {
-          console.log("here");
+          // console.log("here");
           requestAnimationFrame(animate);
         }
       }
       newSet.forEach((elem, i) => {
-        new TWEEN.Tween(this.currentCoords[i])
-        .to(elem, 1000)
-        .easing(TWEEN.Easing.Quadratic.Out)
-        .onUpdate(set => {
-          select('#index'+ i).attr('d', this.arcSlice(set));
-        })
-        .start();
+        new TWEEN.Tween(oldSet.length ? oldSet[i] : this.currentCoords[i])
+          .to(elem, 1000)
+          .easing(TWEEN.Easing.Quadratic.Out)
+          .onUpdate(set => {
+            const x = (((set.x0 + set.x1) / 2) * 180) / Math.PI;
+            const y = (set.y0 + set.y1) / 2;
+            select("#slice" + i).attr("d", this.arcSlice(set));
+            select("#text" + i).attr(
+              "transform",
+              `rotate(${x - 90}) translate(${y},0) rotate(${x < 180 ? 0 : 180})`
+            );
+          })
+          .start();
       });
       animate();
-
     }
   },
   methods: {
