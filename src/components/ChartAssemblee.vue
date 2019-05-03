@@ -1,27 +1,7 @@
 <template>
-  <div>
-    <svg height="1000" width="100%">
-      <!-- <g fill-opacity="0.6" transform="translate(500, 500)">
-        <path
-          v-for="(slice, index) in slices"
-          :key="slice.id"
-          :fill="colorScale(slice.parentName)"
-          :id="`slice`+index"
-          :d="arcSlice(slice)"
-          style="cursor: pointer;"
-          @click="clicked(index)"
-        ></path>
-      </g>
-      <g pointer-events="none" text-anchor="middle" transform="translate(500, 500)">
-        <text
-          v-for="(text, index) in texts"
-          :id="`text`+index"
-          :transform="text.transform"
-          dy="0.35em"
-        >{{text.display ? text.name : null}}</text>
-      </g>-->
-    </svg>
-  </div>
+<div v-if="isLoaded">
+  <ChartDonut :dataDonut="donutBudget" :width="width"/>
+</div>
 </template>
 <script>
 import {
@@ -39,9 +19,13 @@ import {
   dsv
 } from "d3";
 var TWEEN = require("@tweenjs/tween.js");
+import ChartDonut from "@/components/ChartDonut.vue";
 
 export default {
   name: "ChartAssemblee",
+  components: {
+    ChartDonut
+  },
   props: {
     width: {
       type: Number,
@@ -53,7 +37,8 @@ export default {
       donutBudget: {
         name: "Budget",
         children: []
-      }
+      },
+      isLoaded: false
     };
   },
   created: async function() {
@@ -69,11 +54,12 @@ export default {
     extractData.forEach((elem, i) => {
       let code = elem[""].split("/");
       let name = elem.Libellé;
+      let budget = parseInt(elem["Réalisé 2017"].replace(/\s/g, ""))
+      // console.log(typeof(budget), budget, elem["Réalisé 2017"])
       // elem["Budget 2012 avec budget supplémentaire SAIP mai 2012"]
-      console.log(code[0]);
-      if (code[0].length > 2) {
+      console.log(code[0][0], name)
+      if (code[0].length > 2 && code[0][0] !== "7" && code[0].slice(0, 2) !== "64" && code[0].slice(0, 2) !== "65") {
         if (name.match(/[A-ZÀ-ÖŒ'\.\s]/g).length === name.length) {
-          console.log("name", name);
           ++index_2;
           if (!this.donutBudget.children[index_1].children) {
             this.donutBudget.children[index_1]["children"] = [];
@@ -81,21 +67,28 @@ export default {
           this.donutBudget.children[index_1].children.push({
             name: name,
             code: code,
-            children: []
+            budget: budget
           });
-        } else {
-          console.log(index_1, index_2, this.donutBudget.children[index_1])
+        } else if (budget && this.donutBudget.children[index_1].children[index_2].budget !== budget) {
           if (!this.donutBudget.children[index_1].children[index_2].children) {
-            console.log("je passe la")
-            this.donutBudget.children[index_1].children[index_2]["children"] = [];
+            this.donutBudget.children[index_1].children[index_2][
+              "children"
+            ] = [];
           }
           this.donutBudget.children[index_1].children[index_2].children.push({
             name: name,
             code: code,
-            value: elem["Réalisé 2017"]
+            value: budget
           });
         }
-      } else if (code[0].length === 2) {
+        else if (this.donutBudget.children[index_1].children[index_2].budget === budget) {
+          if (this.donutBudget.children[index_1].children[index_2].budget === this.donutBudget.children[index_1].budget)
+            this.donutBudget.children[index_1]["value"] = budget;
+          else 
+            this.donutBudget.children[index_1].children[index_2]["value"] = budget;
+
+        }
+      } else if (code[0].length === 2 && code[0][0] !== "7" && code[0].slice(0, 2) !== "64" && code[0].slice(0, 2) !== "65") {
         ++index_1;
         index_2 = -1;
         if (!this.donutBudget.children) {
@@ -104,12 +97,12 @@ export default {
         this.donutBudget.children.push({
           name: name,
           code: code,
-          children: []
+          budget: budget
         });
       }
     });
-    console.log(this.donutBudget);
-    // console.log(Object.values(this.dataBudget[0]))
+    console.log("donut", this.donutBudget);
+    this.isLoaded = true
   }
 };
 </script>

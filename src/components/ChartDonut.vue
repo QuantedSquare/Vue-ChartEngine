@@ -63,10 +63,13 @@ export default {
   computed: {
     root: function() {
       let root = hierarchy(this.dataDonut)
-        .sum(d => d.value)
+        .sum(d =>{
+          // console.log(typeof(d.value + 0), parseInt(d.value))
+          return d.value})
         .sort((a, b) => b.value - a.value);
 
       this.partition(root);
+      console.log("root",root.descendants())
 
       function searchMaxDepth(p) {
         let maxDepth = 0;
@@ -81,6 +84,7 @@ export default {
       }
 
       if (this.targetIndex) {
+        console.log("je passe la")
         let p = root.descendants()[this.targetIndex];
         let maxDepth = searchMaxDepth(p);
         let newPartY = (this.radius - 30) / (maxDepth - p.depth + 1);
@@ -204,7 +208,7 @@ export default {
   },
   watch: {
     targetCoords: function(newSet, oldSet) {
-      // console.log(newSet, oldSet)
+      console.log("target", newSet, oldSet)
       function animate() {
         if (TWEEN.update()) {
           // console.log("here");
@@ -216,6 +220,7 @@ export default {
           .to(elem, 1000)
           .easing(TWEEN.Easing.Quadratic.Out)
           .onUpdate(set => {
+            // console.log("set",set)
             const x = (((set.x0 + set.x1) / 2) * 180) / Math.PI;
             const y = (set.y0 + set.y1) / 2;
             select("#slice" + i).attr("d", this.arcSlice(set));
