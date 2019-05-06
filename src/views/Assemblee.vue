@@ -1,6 +1,5 @@
 <template>
   <div class="chart">
-    <a @click="refreshSize">Refresh Size</a>
     <ChartAssemblee :width="chartWidth"/>
   </div>
 </template>
@@ -14,13 +13,8 @@ export default {
   },
   data: function() {
     return {
-      chartWidth: 950
+      chartWidth: 500
     };
-  },
-  methods: {
-    refreshSize: function() {
-      this.chartWidth = 900;
-    }
   }
 };
 </script>
