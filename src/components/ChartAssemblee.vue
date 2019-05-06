@@ -9,6 +9,7 @@
       curve="curveLinear"
       scale="time"
       :title="currentData.name"
+      :legends="legends"
     />
   </div>
 </template>
@@ -55,7 +56,10 @@ export default {
       },
       isLoaded: false,
       linesW: 500,
-      linesH: 200
+      linesH: 200,
+      legends: {
+        display: "frame",
+        names: ["Prévisions budgetaires","Dépenses réalisées"]}
     };
   },
   created: async function() {
