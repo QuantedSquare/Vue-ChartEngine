@@ -1,19 +1,22 @@
 <template>
     <div>
-        <div>
+        <div v-if="title">
+            <span>{{title}}</span>
+        </div>
+        <div v-else>
             <span>xMax: {{xMax}}, yMax: {{yMax}}, xMin: {{xMin}}, yMin: {{yMin}}</span>
         </div>
         <svg :height="height" :width="width">
             <g :transform="display">
                 <g id="xAxis" :transform="bottomTranslate"></g>
                 <g id="yAxis"></g>
-                <path class="line" v-for="line in lines" :d="lineDrawer(line)"></path>
+                <path class="line" v-for="(line, index) in lines" :d="lineDrawer(line)" :style="`stroke:`+ colorLine(index)"></path>
             </g>
         </svg>
     </div>
 </template>
 <script>
-import { select, scaleLinear, min, max, axisLeft, axisBottom } from 'd3'
+import { select, scaleLinear, min, max, axisLeft, axisBottom, scaleTime, schemeCategory10, scaleOrdinal } from 'd3'
 import * as shapes from 'd3-shape'
 
 let margin = { top: 20, right: 20, bottom: 20, left: 30 };
@@ -36,18 +39,28 @@ export default {
         curve: {
             type: String,
             default: 'curveBasis'
+        },
+        scale: {
+            type: String,
+            default: 'linear'
+        },
+        title: {
+            type: String,
+            default: null
         }
     },
     data: function() {
         console.log(this.lines);
 
-        let xScale = scaleLinear(),
+        let colorScale = scaleOrdinal(schemeCategory10);
+
+        let xScale = this.scale === "linear" ? scaleLinear() : scaleTime(),
             yScale = scaleLinear();
 
         let lineDrawer = shapes.line()
             .x((d) => xScale(d.x))
             .y((d) => yScale(d.y))
-            .curve(shapes[this.curve]);
+            .curve(shapes[this.curve])
 
         xScale.range([0, this._width()]);
         xScale.domain([this.getMin('x'), this.getMax('x')]);
@@ -58,7 +71,8 @@ export default {
         return {
             xScale: xScale,
             yScale: yScale,
-            lineDrawer: lineDrawer
+            lineDrawer: lineDrawer,
+            colorLine: colorScale
         }
     },
     mounted: function() {
