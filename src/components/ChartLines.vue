@@ -9,7 +9,9 @@
     <svg :height="height" :width="width + 200">
       <g :transform="display">
         <g id="xAxis" :transform="bottomTranslate"></g>
-        <g id="yAxis"></g>
+        <g id="yAxis">
+            <text transform="translate(40,-20)" y="6" dy=".71em" style="text-anchor: end;" fill="currentColor">Million d'euros</text>
+        </g>
         <g v-for="(line, index) in lines">
           <path class="line" :d="lineDrawer(line)" :style="`stroke:`+ colorLine(index)"></path>
           <text v-if="legends.display === `endLine`" :transform="legendTranslate(line)" x="3" dy=".35em">{{legends.names[index]}}</text>
