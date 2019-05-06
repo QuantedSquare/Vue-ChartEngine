@@ -1,7 +1,7 @@
 <template>
   <div>
-    <svg height="1000" width="100%">
-      <g fill-opacity="0.6" transform="translate(500, 500)">
+    <svg :height="width" :width="width">
+      <g fill-opacity="0.6" :transform="translate">
         <path
           v-for="(slice, index) in slices"
           :key="slice.id"
@@ -12,7 +12,7 @@
           @click="clicked(index)"
         ></path>
       </g>
-      <g pointer-events="none" text-anchor="middle" transform="translate(500, 500)">
+      <g pointer-events="none" text-anchor="middle" :transform="translate">
         <text
           v-for="(text, index) in texts"
           :id="`text`+index"
@@ -69,7 +69,7 @@ export default {
         .sort((a, b) => b.value - a.value);
 
       this.partition(root);
-      console.log("root",root.descendants())
+      // console.log("root",root.descendants())
 
       function searchMaxDepth(p) {
         let maxDepth = 0;
@@ -84,7 +84,7 @@ export default {
       }
 
       if (this.targetIndex) {
-        console.log("je passe la")
+        // console.log("je passe la")
         let p = root.descendants()[this.targetIndex];
         let maxDepth = searchMaxDepth(p);
         let newPartY = (this.radius - 30) / (maxDepth - p.depth + 1);
@@ -204,11 +204,12 @@ export default {
         };
       });
       return textData;
-    }
+    },
+    translate: function() { return `translate(${this.width/2}, ${this.width/2})`}
   },
   watch: {
     targetCoords: function(newSet, oldSet) {
-      console.log("target", newSet, oldSet)
+      // console.log("target", newSet, oldSet)
       function animate() {
         if (TWEEN.update()) {
           // console.log("here");
@@ -237,6 +238,7 @@ export default {
   methods: {
     clicked(index) {
       this.targetIndex = index;
+      this.$emit('onClick', this.root.descendants()[index])
     }
   }
 };
