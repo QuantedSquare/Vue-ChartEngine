@@ -318,6 +318,7 @@ export default {
       console.log("polygon",this.sequences.translatePolygon)
       let a = sequence.length * 10,
           b = a + 10
+      console.log("points", a, b, sequence, sequence.length)
       return "0,0 "+a+",0 "+b+",15 "+a+",30 0,30 10,15"
     },
 
@@ -337,7 +338,9 @@ export default {
       function setSequence(slice) {
         if (slice.parent && slice.parent.depth > 0) {
           a.push(slice.parent.data.name)
-          b.push(slice.parent.data.name.length * 10 + 2 + b[i - 1])
+          console.log("length",slice.parent.data.name.length)
+          let l = i === 1 ? slice.data.name.length * 10 + 2 : slice.data.name.length * 10 + 2 + b[i - 1]
+          b.push(l)
           i++
           setSequence(slice.parent);
         }
