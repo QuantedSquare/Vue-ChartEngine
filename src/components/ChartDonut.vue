@@ -1,26 +1,79 @@
 <template>
-  <div>
-    <svg :height="width" :width="width">
-      <g fill-opacity="0.6" :transform="translate">
-        <path
-          v-for="(slice, index) in slices"
-          :key="slice.id"
-          :fill="colorScale(slice.parentName)"
-          :id="`slice`+index"
-          :d="arcSlice(slice)"
-          style="cursor: pointer;"
-          @click="clicked(index)"
-        ></path>
-      </g>
-      <g pointer-events="none" text-anchor="middle" :transform="translate">
+  <div id="donutChart">
+    <div id="sequence" >
+      <svg width="750" height="50" id="trail">
         <text
-          v-for="(text, index) in texts"
-          :id="`text`+index"
-          :transform="text.transform"
+          id="endlabel"
+          x="429"
+          y="15"
           dy="0.35em"
-        >{{text.display ? text.name : null}}</text>
-      </g>
-    </svg>
+          text-anchor="middle"
+          style="fill: rgb(0, 0, 0);"
+        >0.201%</text>
+        <g v-for="(sequence, index) in sequences.seqNames" :transform="`translate(`+ sequences.translatePolygon[index] +`, 0)`">
+          <polygon :points="polygonPoints(sequence)" :fill="colorScale(sequences.colorName)"></polygon>
+          <text x="42.5" y="15" dy="0.35em" text-anchor="middle">{{sequence}}</text>
+        </g>
+      </svg>
+    </div>
+    <div id="chart">
+      <div>
+        <svg :height="width" :width="width" @mouseleave="mouseleave">
+          <g fill-opacity="0.6" :transform="translate">
+            <path
+              v-for="(slice, index) in slices"
+              :key="slice.id"
+              :fill="colorScale(slice.parentName)"
+              :id="`slice`+index"
+              :d="arcSlice(slice)"
+              style="cursor: pointer;"
+              @click="clicked(index)"
+              @mouseover="mLeave ? null : mouseover(index)"
+            ></path>
+          </g>
+          <g pointer-events="none" text-anchor="middle" :transform="translate">
+            <text
+              v-for="(text, index) in texts"
+              :id="`text`+index"
+              :transform="text.transform"
+              dy="0.35em"
+            >{{text.display ? text.name : null}}</text>
+          </g>
+        </svg>
+      </div>
+      <div id="sidebar">
+        <input type="checkbox" id="togglelegend"> Legend
+        <br>
+        <div id="legend" style>
+          <svg width="75" height="198">
+            <g transform="translate(0,0)">
+              <rect rx="3" ry="3" width="75" height="30" style="fill: rgb(86, 135, 209);"></rect>
+              <text x="37.5" y="15" dy="0.35em" text-anchor="middle">home</text>
+            </g>
+            <g transform="translate(0,33)">
+              <rect rx="3" ry="3" width="75" height="30" style="fill: rgb(123, 97, 92);"></rect>
+              <text x="37.5" y="15" dy="0.35em" text-anchor="middle">product</text>
+            </g>
+            <g transform="translate(0,66)">
+              <rect rx="3" ry="3" width="75" height="30" style="fill: rgb(222, 120, 59);"></rect>
+              <text x="37.5" y="15" dy="0.35em" text-anchor="middle">search</text>
+            </g>
+            <g transform="translate(0,99)">
+              <rect rx="3" ry="3" width="75" height="30" style="fill: rgb(106, 185, 117);"></rect>
+              <text x="37.5" y="15" dy="0.35em" text-anchor="middle">account</text>
+            </g>
+            <g transform="translate(0,132)">
+              <rect rx="3" ry="3" width="75" height="30" style="fill: rgb(161, 115, 209);"></rect>
+              <text x="37.5" y="15" dy="0.35em" text-anchor="middle">other</text>
+            </g>
+            <g transform="translate(0,165)">
+              <rect rx="3" ry="3" width="75" height="30" style="fill: rgb(187, 187, 187);"></rect>
+              <text x="37.5" y="15" dy="0.35em" text-anchor="middle">end</text>
+            </g>
+          </svg>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 <script>
@@ -46,6 +99,16 @@ export default {
     width: {
       type: Number,
       default: 932
+    },
+    display: {
+      type: Object,
+      default: {
+        nbRing: "all",
+        text: true,
+        zoomable: true,
+        hover: true,
+        legend: false
+      }
     }
   },
   data: function() {
@@ -57,15 +120,22 @@ export default {
       targetIndex: 0,
       colorScale: color,
       tweenedCoord: [],
-      targetCoords: []
+      targetCoords: [],
+      mLeave: false,
+      sequences: {
+        colorName: null,
+        seqNames: [],
+        translatePolygon: []
+      }
     };
   },
   computed: {
     root: function() {
       let root = hierarchy(this.dataDonut)
-        .sum(d =>{
+        .sum(d => {
           // console.log(typeof(d.value + 0), parseInt(d.value))
-          return d.value})
+          return d.value;
+        })
         .sort((a, b) => b.value - a.value);
 
       this.partition(root);
@@ -82,6 +152,12 @@ export default {
         });
         return maxDepth;
       }
+
+      let i = -1;
+      root.each(d => {
+        ++i;
+        return (d.position = i);
+      });
 
       if (this.targetIndex) {
         // console.log("je passe la")
@@ -205,7 +281,9 @@ export default {
       });
       return textData;
     },
-    translate: function() { return `translate(${this.width/2}, ${this.width/2})`}
+    translate: function() {
+      return `translate(${this.width / 2}, ${this.width / 2})`;
+    }
   },
   watch: {
     targetCoords: function(newSet, oldSet) {
@@ -236,9 +314,65 @@ export default {
     }
   },
   methods: {
+    polygonPoints(sequence) {
+      console.log("polygon",this.sequences.translatePolygon)
+      let a = sequence.length * 10,
+          b = a + 10
+      return "0,0 "+a+",0 "+b+",15 "+a+",30 0,30 10,15"
+    },
+
     clicked(index) {
       this.targetIndex = index;
-      this.$emit('onClick', this.root.descendants()[index])
+      this.$emit("onClick", this.root.descendants()[index]);
+    },
+
+    mouseover(index) {
+      function overParents(slice) {
+        if (slice.parent && slice.parent.depth > 0) {
+          select("#slice" + slice.parent.position).style("opacity", 1);
+          overParents(slice.parent);
+        }
+      }
+      let i = 1
+      function setSequence(slice) {
+        if (slice.parent && slice.parent.depth > 0) {
+          a.push(slice.parent.data.name)
+          b.push(slice.parent.data.name.length * 10 + 2 + b[i - 1])
+          i++
+          setSequence(slice.parent);
+        }
+      }
+
+      selectAll("#chart path").style("opacity", 0.3);
+      select("#slice" + index).style("opacity", 1);
+      overParents(this.root.descendants()[index]);
+      this.sequences.colorName = this.root.descendants()[index].parentName
+
+      let a = []
+      let b = []
+      a.push(this.root.descendants()[index].data.name)
+      b.push(0)
+      setSequence(this.root.descendants()[index])
+      // console.log("a", a)
+      this.sequences.seqNames = a
+      // console.log("b", b)
+      this.sequences.translatePolygon = b
+    },
+
+    mouseleave() {
+      this.mLeave = true;
+      const turnOnHover = () => {
+        this.mLeave = false;
+        this.sequences.seqNames = []
+      };
+
+      selectAll("#chart path")
+        .transition()
+        .duration(500)
+        .style("opacity", 1)
+        .on("end", function() {
+          turnOnHover();
+        });
     }
   }
 };
@@ -247,5 +381,8 @@ export default {
 <style>
 text {
   font: 10px sans-serif;
+}
+#chart {
+  display: flex;
 }
 </style>
