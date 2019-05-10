@@ -9,7 +9,7 @@
           dy="0.35em"
           text-anchor="middle"
           style="fill: rgb(0, 0, 0);"
-        >0.201%</text>
+        >6%</text>
         <g v-for="(sequence, index) in sequences.seqNames" :transform="`translate(`+ translatePolygon[index] +`, 0)`">
           <polygon :points="polygonPoints(sequence)" :fill="colorScale(sequences.colorName)"></polygon>
           <text :x="(sequence.length * pScale(sequence.length) + 10) / 2" y="15" dy="0.35em" text-anchor="middle">{{sequence}}</text>
@@ -127,8 +127,8 @@ export default {
       targetCoords: [],
       mLeave: false,
       sequences: {
-        colorName: null,
-        seqNames: []
+        colorName: "constructions",
+        seqNames: ["bloublou la famille tout, \nca tout ca", "hdjkhfkdjk", "jhilsdfjghkghd"]
       }
     };
   },
