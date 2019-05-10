@@ -10,9 +10,9 @@
           text-anchor="middle"
           style="fill: rgb(0, 0, 0);"
         >0.201%</text>
-        <g v-for="(sequence, index) in sequences.seqNames" :transform="`translate(`+ sequences.translatePolygon[index] +`, 0)`">
+        <g v-for="(sequence, index) in sequences.seqNames" :transform="`translate(`+ translatePolygon[index] +`, 0)`">
           <polygon :points="polygonPoints(sequence)" :fill="colorScale(sequences.colorName)"></polygon>
-          <text :x="(sequence.length * 10 + 10) / 2" y="15" dy="0.35em" text-anchor="middle">{{sequence}}</text>
+          <text :x="(sequence.length * pScale(sequence.length) + 10) / 2" y="15" dy="0.35em" text-anchor="middle">{{sequence}}</text>
         </g>
       </svg>
     </div>
@@ -116,16 +116,19 @@ export default {
       quantize(interpolateRainbow, this.dataDonut.children.length + 1)
     );
 
+    let pScale = scaleLinear();
+        pScale.range([10, 6]).domain([5, 91]);
+
     return {
       targetIndex: 0,
       colorScale: color,
+      pScale: pScale,
       tweenedCoord: [],
       targetCoords: [],
       mLeave: false,
       sequences: {
         colorName: null,
-        seqNames: [],
-        translatePolygon: []
+        seqNames: []
       }
     };
   },
@@ -133,7 +136,6 @@ export default {
     root: function() {
       let root = hierarchy(this.dataDonut)
         .sum(d => {
-          // console.log(typeof(d.value + 0), parseInt(d.value))
           return d.value;
         })
         .sort((a, b) => b.value - a.value);
@@ -160,7 +162,6 @@ export default {
       });
 
       if (this.targetIndex) {
-        // console.log("je passe la")
         let p = root.descendants()[this.targetIndex];
         let maxDepth = searchMaxDepth(p);
         let newPartY = (this.radius - 30) / (maxDepth - p.depth + 1);
@@ -169,7 +170,6 @@ export default {
 
         r0Scale.range([30, this.radius - newPartY]).domain([p.depth, maxDepth]);
         r1Scale.range([newPartY + 30, this.radius]).domain([p.depth, maxDepth]);
-        // console.log(newPartY, p.depth, maxDepth);
         root.each(d => {
           let newX0 =
               Math.max(0, Math.min(1, (d.x0 - p.x0) / (p.x1 - p.x0))) *
@@ -187,9 +187,6 @@ export default {
               newX1 - newX0 === 2 * Math.PI && d.data.name !== p.data.name
                 ? 30
                 : r1Scale(d.depth);
-          // console.log(d.data.name);
-          // console.log("y0", r0Scale(d.depth), newY0, "y1", r1Scale(d.depth), newY1, d.depth);
-          // console.log("x0", newX0, "x1", newX1, "y0", newY0, "y1", newY1, d.depth);
           return (d.target = {
             x0: newX0,
             x1: newX1,
@@ -236,7 +233,6 @@ export default {
       }
 
       let amppedSlices = this.root.descendants().map(slice => {
-        // console.log(slice)
         if (slice.parent) {
           slice.parentName = lookUpForParentName(slice);
         } else slice.parentName = "";
@@ -254,10 +250,8 @@ export default {
         this.targetCoords = amppedSlices.map(elem => elem.target);
       }
       if (this.targetIndex === 0) {
-        // console.log("index", this.targetIndex)
         this.targetCoords = this.currentCoords;
       }
-      // console.log("get slice")
       return amppedSlices;
     },
     texts: function() {
@@ -283,14 +277,26 @@ export default {
     },
     translate: function() {
       return `translate(${this.width / 2}, ${this.width / 2})`;
+    },
+    translatePolygon: function() {
+       let antL = 0
+       let b = []
+      this.sequences.seqNames.forEach((elem, i) => {
+        // console.log(elem, elem.length, this.pScale(elem.length))
+        let l = 0;
+        if (i !== 0)
+          l = antL * this.pScale(antL) + 2 + b[i - 1]
+        b.push(l)
+        antL = elem.length
+        i++
+      })
+      return b
     }
   },
   watch: {
     targetCoords: function(newSet, oldSet) {
-      // console.log("target", newSet, oldSet)
       function animate() {
         if (TWEEN.update()) {
-          // console.log("here");
           requestAnimationFrame(animate);
         }
       }
@@ -299,7 +305,6 @@ export default {
           .to(elem, 1000)
           .easing(TWEEN.Easing.Quadratic.Out)
           .onUpdate(set => {
-            // console.log("set",set)
             const x = (((set.x0 + set.x1) / 2) * 180) / Math.PI;
             const y = (set.y0 + set.y1) / 2;
             select("#slice" + i).attr("d", this.arcSlice(set));
@@ -315,10 +320,8 @@ export default {
   },
   methods: {
     polygonPoints(sequence) {
-      console.log("polygon",this.sequences.translatePolygon)
-      let a = sequence.length * 10,
+      let a = sequence.length * this.pScale(sequence.length),
           b = a + 10
-      console.log("points", a, b, sequence, sequence.length)
       return "0,0 "+a+",0 "+b+",15 "+a+",30 0,30 10,15"
     },
 
@@ -336,7 +339,7 @@ export default {
       }
       function setSequence(slice) {
         if (slice.parent && slice.parent.depth > 0) {
-          a.push(slice.parent.data.name)
+          a.push(slice.parent.data.name.toUpperCase())
           setSequence(slice.parent);
         }
       }
@@ -347,24 +350,10 @@ export default {
       this.sequences.colorName = this.root.descendants()[index].parentName
 
       let a = []
-      let b = []
-      a.push(this.root.descendants()[index].data.name)
+      a.push(this.root.descendants()[index].data.name.toUpperCase())
       setSequence(this.root.descendants()[index])
       a = a.reverse()
-      let antL = 0
-      a.forEach((elem, i) => {
-        console.log(elem, i)
-        let l = 0;
-        if (i !== 0)
-          l = antL * 10 + 2 + b[i - 1]
-        b.push(l)
-        antL = elem.length
-        i++
-      })
-      // console.log("a", a)
       this.sequences.seqNames = a
-      // console.log("b", b)
-      this.sequences.translatePolygon = b
     },
 
     mouseleave() {
