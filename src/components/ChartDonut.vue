@@ -12,7 +12,7 @@
         >0.201%</text>
         <g v-for="(sequence, index) in sequences.seqNames" :transform="`translate(`+ sequences.translatePolygon[index] +`, 0)`">
           <polygon :points="polygonPoints(sequence)" :fill="colorScale(sequences.colorName)"></polygon>
-          <text x="42.5" y="15" dy="0.35em" text-anchor="middle">{{sequence}}</text>
+          <text :x="(sequence.length * 10 + 10) / 2" y="15" dy="0.35em" text-anchor="middle">{{sequence}}</text>
         </g>
       </svg>
     </div>
@@ -334,14 +334,9 @@ export default {
           overParents(slice.parent);
         }
       }
-      let i = 1
       function setSequence(slice) {
         if (slice.parent && slice.parent.depth > 0) {
           a.push(slice.parent.data.name)
-          console.log("length",slice.parent.data.name.length)
-          let l = i === 1 ? slice.data.name.length * 10 + 2 : slice.data.name.length * 10 + 2 + b[i - 1]
-          b.push(l)
-          i++
           setSequence(slice.parent);
         }
       }
@@ -354,8 +349,18 @@ export default {
       let a = []
       let b = []
       a.push(this.root.descendants()[index].data.name)
-      b.push(0)
       setSequence(this.root.descendants()[index])
+      a = a.reverse()
+      let antL = 0
+      a.forEach((elem, i) => {
+        console.log(elem, i)
+        let l = 0;
+        if (i !== 0)
+          l = antL * 10 + 2 + b[i - 1]
+        b.push(l)
+        antL = elem.length
+        i++
+      })
       // console.log("a", a)
       this.sequences.seqNames = a
       // console.log("b", b)
