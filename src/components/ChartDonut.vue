@@ -1,18 +1,27 @@
 <template>
   <div id="donutChart">
-    <div id="sequence" >
+    <div id="sequence">
       <svg width="750" height="50" id="trail">
-        <text
+        <text v-if="sequences.seqNames.length"
           id="endlabel"
-          x="429"
+          :x="translatePolygon[translatePolygon.length - 1] + 30"
           y="15"
           dy="0.35em"
-          text-anchor="middle"
+          text-anchor="start"
           style="fill: rgb(0, 0, 0);"
-        >6%</text>
-        <g v-for="(sequence, index) in sequences.seqNames" :transform="`translate(`+ translatePolygon[index] +`, 0)`">
+        >{{sequences.labelBudget}} Millions d'euros</text>
+        <g
+          v-for="(sequence, index) in sequences.seqNames"
+          :transform="`translate(`+ translatePolygon[index] +`, 0)`"
+        >
           <polygon :points="polygonPoints(sequence)" :fill="colorScale(sequences.colorName)"></polygon>
-          <text :x="(sequence.length * pScale(sequence.length) + 10) / 2" y="15" dy="0.35em" text-anchor="middle">{{sequence}}</text>
+          <text
+            :id="`text_`+index"
+            :x="(sequence.length * pScale(sequence.length) + 10) / 2"
+            y="15"
+            dy="0.35em"
+            text-anchor="middle"
+          >{{sequence}}</text>
         </g>
       </svg>
     </div>
@@ -117,7 +126,7 @@ export default {
     );
 
     let pScale = scaleLinear();
-        pScale.range([10, 6]).domain([5, 91]);
+    pScale.range([10, 6]).domain([5, 91]);
 
     return {
       targetIndex: 0,
@@ -127,8 +136,9 @@ export default {
       targetCoords: [],
       mLeave: false,
       sequences: {
-        colorName: "constructions",
-        seqNames: ["bloublou la famille tout, \nca tout ca", "hdjkhfkdjk", "jhilsdfjghkghd"]
+        colorName: null,
+        seqNames: [],
+        labelBudget: null
       }
     };
   },
@@ -279,18 +289,18 @@ export default {
       return `translate(${this.width / 2}, ${this.width / 2})`;
     },
     translatePolygon: function() {
-       let antL = 0
-       let b = []
+      let antL = 0;
+      let b = [];
       this.sequences.seqNames.forEach((elem, i) => {
-        // console.log(elem, elem.length, this.pScale(elem.length))
         let l = 0;
-        if (i !== 0)
-          l = antL * this.pScale(antL) + 2 + b[i - 1]
-        b.push(l)
-        antL = elem.length
-        i++
-      })
-      return b
+        if (i !== 0) l = antL * this.pScale(antL) + 2 + b[i - 1];
+        b.push(l);
+        antL = elem.length;
+        i++;
+      });
+      // x label budget
+      b.push(antL * this.pScale(antL) + 2 + b[b.length - 1]);
+      return b;
     }
   },
   watch: {
@@ -321,8 +331,9 @@ export default {
   methods: {
     polygonPoints(sequence) {
       let a = sequence.length * this.pScale(sequence.length),
-          b = a + 10
-      return "0,0 "+a+",0 "+b+",15 "+a+",30 0,30 10,15"
+          b = a + 10;
+          // console.log(b)
+      return "0,0 " + a + ",0 " + b + ",15 " + a + ",30 0,30 10,15";
     },
 
     clicked(index) {
@@ -339,7 +350,7 @@ export default {
       }
       function setSequence(slice) {
         if (slice.parent && slice.parent.depth > 0) {
-          a.push(slice.parent.data.name.toUpperCase())
+          seqNames.push(slice.parent.data.name.toUpperCase());
           setSequence(slice.parent);
         }
       }
@@ -347,20 +358,25 @@ export default {
       selectAll("#chart path").style("opacity", 0.3);
       select("#slice" + index).style("opacity", 1);
       overParents(this.root.descendants()[index]);
-      this.sequences.colorName = this.root.descendants()[index].parentName
+      this.sequences.colorName = this.root.descendants()[index].parentName;
 
-      let a = []
-      a.push(this.root.descendants()[index].data.name.toUpperCase())
-      setSequence(this.root.descendants()[index])
-      a = a.reverse()
-      this.sequences.seqNames = a
+      let seqNames = [];
+      seqNames.push(this.root.descendants()[index].data.name.toUpperCase());
+      setSequence(this.root.descendants()[index]);
+      seqNames = seqNames.reverse();
+      this.sequences.seqNames = seqNames;
+      let budget = this.root.descendants()[index].data.value
+        ? this.root.descendants()[index].data.value / 1000000
+        : this.root.descendants()[index].data.budget / 1000000;
+      // console.log(this.root.descendants()[index], budget.toFixed(2));
+      this.sequences.labelBudget = budget.toFixed(2);
     },
 
     mouseleave() {
       this.mLeave = true;
       const turnOnHover = () => {
         this.mLeave = false;
-        this.sequences.seqNames = []
+        this.sequences.seqNames = [];
       };
 
       selectAll("#chart path")
@@ -381,5 +397,9 @@ text {
 }
 #chart {
   display: flex;
+}
+#endlabel {
+  font: 15px sans-serif;
+  /* font-weight: bold; */
 }
 </style>
