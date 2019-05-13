@@ -2,7 +2,8 @@
   <div id="donutChart">
     <div id="sequence">
       <svg width="750" height="50" id="trail">
-        <text v-if="sequences.seqNames.length"
+        <text
+          v-if="sequences.seqNames.length"
           id="endlabel"
           :x="translatePolygon[translatePolygon.length - 1] + 30"
           y="15"
@@ -14,14 +15,16 @@
           v-for="(sequence, index) in sequences.seqNames"
           :transform="`translate(`+ translatePolygon[index] +`, 0)`"
         >
-          <polygon :points="polygonPoints(sequence)" :fill="colorScale(sequences.colorName)"></polygon>
+          <polygon :points="polygonPoints(sequence)" :fill="colorScale(sequences.colorName)" fill-opacity="0.6"></polygon>
           <text
             :id="`text_`+index"
             :x="(sequence.length * pScale(sequence.length) + 10) / 2"
             y="15"
             dy="0.35em"
             text-anchor="middle"
-          >{{sequence}}</text>
+          >
+            <tspan>{{sequence}}</tspan>
+          </text>
         </g>
       </svg>
     </div>
@@ -51,33 +54,13 @@
         </svg>
       </div>
       <div id="sidebar">
-        <input type="checkbox" id="togglelegend"> Legend
+        Legend
         <br>
         <div id="legend" style>
-          <svg width="75" height="198">
-            <g transform="translate(0,0)">
-              <rect rx="3" ry="3" width="75" height="30" style="fill: rgb(86, 135, 209);"></rect>
-              <text x="37.5" y="15" dy="0.35em" text-anchor="middle">home</text>
-            </g>
-            <g transform="translate(0,33)">
-              <rect rx="3" ry="3" width="75" height="30" style="fill: rgb(123, 97, 92);"></rect>
-              <text x="37.5" y="15" dy="0.35em" text-anchor="middle">product</text>
-            </g>
-            <g transform="translate(0,66)">
-              <rect rx="3" ry="3" width="75" height="30" style="fill: rgb(222, 120, 59);"></rect>
-              <text x="37.5" y="15" dy="0.35em" text-anchor="middle">search</text>
-            </g>
-            <g transform="translate(0,99)">
-              <rect rx="3" ry="3" width="75" height="30" style="fill: rgb(106, 185, 117);"></rect>
-              <text x="37.5" y="15" dy="0.35em" text-anchor="middle">account</text>
-            </g>
-            <g transform="translate(0,132)">
-              <rect rx="3" ry="3" width="75" height="30" style="fill: rgb(161, 115, 209);"></rect>
-              <text x="37.5" y="15" dy="0.35em" text-anchor="middle">other</text>
-            </g>
-            <g transform="translate(0,165)">
-              <rect rx="3" ry="3" width="75" height="30" style="fill: rgb(187, 187, 187);"></rect>
-              <text x="37.5" y="15" dy="0.35em" text-anchor="middle">end</text>
+          <svg :width="legends.width * pScale(legends.width)" :height="legends.names.length * 33">
+            <g v-for="(legend, index) in legends.names" :transform="`translate(0, `+ 33 * index +`)`">
+              <rect rx="3" ry="3" width="18" height="18" :fill="colorScale(legend)" fill-opacity="0.6"></rect>
+              <text x="22" y="9" dy="0.35em">{{legend}}</text>
             </g>
           </svg>
         </div>
@@ -113,7 +96,7 @@ export default {
       type: Object,
       default: {
         nbRing: "all",
-        text: true,
+        textSlice: true,
         zoomable: true,
         hover: true,
         legend: false
@@ -136,9 +119,9 @@ export default {
       targetCoords: [],
       mLeave: false,
       sequences: {
-        colorName: null,
-        seqNames: [],
-        labelBudget: null
+        colorName: "constructions",
+        seqNames: ["hfjdkfhjkdshf", "hjfkdshfjksd", "iweirojkfsdj"],
+        labelBudget: 89
       }
     };
   },
@@ -151,7 +134,7 @@ export default {
         .sort((a, b) => b.value - a.value);
 
       this.partition(root);
-      // console.log("root",root.descendants())
+      console.log("root", root.descendants());
 
       function searchMaxDepth(p) {
         let maxDepth = 0;
@@ -301,6 +284,21 @@ export default {
       // x label budget
       b.push(antL * this.pScale(antL) + 2 + b[b.length - 1]);
       return b;
+    },
+    legends: function() {
+      let legendsNames = this.root.descendants().filter(elem => elem.depth === 1).map(elem => elem.data.name);
+      let longestName = 0
+
+      legendsNames.forEach(elem => {
+        console.log(elem.length)
+        if (longestName < elem.length)
+          longestName = elem.length
+      })
+      console.log(longestName)
+      return {
+        names: legendsNames,
+        width: longestName
+      }
     }
   },
   watch: {
@@ -331,8 +329,8 @@ export default {
   methods: {
     polygonPoints(sequence) {
       let a = sequence.length * this.pScale(sequence.length),
-          b = a + 10;
-          // console.log(b)
+        b = a + 10;
+      // console.log(b)
       return "0,0 " + a + ",0 " + b + ",15 " + a + ",30 0,30 10,15";
     },
 
@@ -368,7 +366,6 @@ export default {
       let budget = this.root.descendants()[index].data.value
         ? this.root.descendants()[index].data.value / 1000000
         : this.root.descendants()[index].data.budget / 1000000;
-      // console.log(this.root.descendants()[index], budget.toFixed(2));
       this.sequences.labelBudget = budget.toFixed(2);
     },
 
