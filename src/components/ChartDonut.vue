@@ -3,7 +3,7 @@
     <div id="sequence">
       <svg width="750" height="50" id="trail">
         <text
-          v-if="sequences.seqNames.length"
+          v-if="sequences.seqNames.length && notCenter(sequences.seqNames)"
           id="endlabel"
           :x="translatePolygon[translatePolygon.length - 1] + 30"
           y="15"
@@ -12,10 +12,15 @@
           style="fill: rgb(0, 0, 0);"
         >{{sequences.labelBudget}} Millions d'euros</text>
         <g
+          v-if="notCenter(sequences.seqNames)"
           v-for="(sequence, index) in sequences.seqNames"
           :transform="`translate(`+ translatePolygon[index] +`, 0)`"
         >
-          <polygon :points="polygonPoints(sequence)" :fill="colorScale(sequences.colorName)" fill-opacity="0.6"></polygon>
+          <polygon
+            :points="polygonPoints(sequence)"
+            :fill="colorScale(sequences.colorName)"
+            fill-opacity="0.6"
+          ></polygon>
           <text
             :id="`text_`+index"
             :x="(sequence.length * pScale(sequence.length) + 10) / 2"
@@ -35,15 +40,20 @@
             <path
               v-for="(slice, index) in slices"
               :key="slice.id"
-              :fill="colorScale(slice.parentName)"
+              :fill="index !== 0 ? colorScale(slice.parentName) : `white`"
               :id="`slice`+index"
               :d="arcSlice(slice)"
               style="cursor: pointer;"
               @click="clicked(index)"
-              @mouseover="mLeave ? null : mouseover(index)"
+              @mouseover="mLeave === 0 ? null : mouseover(index)"
             ></path>
           </g>
-          <g pointer-events="none" text-anchor="middle" :transform="translate">
+          <g
+            v-if="display.textSlice"
+            pointer-events="none"
+            text-anchor="middle"
+            :transform="translate"
+          >
             <text
               v-for="(text, index) in texts"
               :id="`text`+index"
@@ -53,13 +63,23 @@
           </g>
         </svg>
       </div>
-      <div id="sidebar">
+      <div id="sidebar" v-if="display.legend">
         Legend
         <br>
         <div id="legend" style>
           <svg :width="legends.width * pScale(legends.width)" :height="legends.names.length * 33">
-            <g v-for="(legend, index) in legends.names" :transform="`translate(0, `+ 33 * index +`)`">
-              <rect rx="3" ry="3" width="18" height="18" :fill="colorScale(legend)" fill-opacity="0.6"></rect>
+            <g
+              v-for="(legend, index) in legends.names"
+              :transform="`translate(0, `+ 33 * index +`)`"
+            >
+              <rect
+                rx="3"
+                ry="3"
+                width="18"
+                height="18"
+                :fill="colorScale(legend)"
+                fill-opacity="0.6"
+              ></rect>
               <text x="22" y="9" dy="0.35em">{{legend}}</text>
             </g>
           </svg>
@@ -119,9 +139,9 @@ export default {
       targetCoords: [],
       mLeave: false,
       sequences: {
-        colorName: "constructions",
-        seqNames: ["hfjdkfhjkdshf", "hjfkdshfjksd", "iweirojkfsdj"],
-        labelBudget: 89
+        colorName: null,
+        seqNames: [],
+        labelBudget: null
       }
     };
   },
@@ -134,7 +154,7 @@ export default {
         .sort((a, b) => b.value - a.value);
 
       this.partition(root);
-      console.log("root", root.descendants());
+      // console.log("root", root.descendants().slice(1));
 
       function searchMaxDepth(p) {
         let maxDepth = 0;
@@ -286,19 +306,19 @@ export default {
       return b;
     },
     legends: function() {
-      let legendsNames = this.root.descendants().filter(elem => elem.depth === 1).map(elem => elem.data.name);
-      let longestName = 0
+      let legendsNames = this.root
+        .descendants()
+        .filter(elem => elem.depth === 1)
+        .map(elem => elem.data.name);
+      let longestName = 0;
 
       legendsNames.forEach(elem => {
-        console.log(elem.length)
-        if (longestName < elem.length)
-          longestName = elem.length
-      })
-      console.log(longestName)
+        if (longestName < elem.length) longestName = elem.length;
+      });
       return {
         names: legendsNames,
         width: longestName
-      }
+      };
     }
   },
   watch: {
@@ -327,6 +347,12 @@ export default {
     }
   },
   methods: {
+    notCenter(names) {
+      if (names[0] === this.root.descendants()[0].data.name.toUpperCase()) {
+        return false
+      }
+      return true
+    },
     polygonPoints(sequence) {
       let a = sequence.length * this.pScale(sequence.length),
         b = a + 10;
@@ -340,10 +366,31 @@ export default {
     },
 
     mouseover(index) {
-      function overParents(slice) {
+      function mouseOnCenter(doc) {
+        doc.mLeave = true;
+        const turnOnHover = () => {
+          doc.mLeave = false;
+          doc.sequences.seqNames = [];
+        };
+
+        selectAll("#chart path")
+          .transition()
+          .duration(500)
+          .style("opacity", 1)
+          .on("end", function() {
+            turnOnHover();
+          });
+      }
+      function overParents(slice, doc) {
+        // if (doc.sequences.notCenter === false && slice.depth !== 0)
+        //   doc.sequences.notCenter = true
         if (slice.parent && slice.parent.depth > 0) {
+          // doc.sequences.notCenter = true
           select("#slice" + slice.parent.position).style("opacity", 1);
           overParents(slice.parent);
+        } else if (slice.depth === 0) {
+          // doc.sequences.notCenter = false
+          mouseOnCenter(doc);
         }
       }
       function setSequence(slice) {
@@ -355,7 +402,7 @@ export default {
 
       selectAll("#chart path").style("opacity", 0.3);
       select("#slice" + index).style("opacity", 1);
-      overParents(this.root.descendants()[index]);
+      overParents(this.root.descendants()[index], this);
       this.sequences.colorName = this.root.descendants()[index].parentName;
 
       let seqNames = [];

@@ -1,6 +1,6 @@
 <template>
   <div v-if="isLoaded" class="container">
-    <ChartDonut :dataDonut="donutBudget" :width="width" @onClick="searchYearsData"/>
+    <ChartDonut :dataDonut="donutBudget" :width="width" @onClick="searchYearsData" :display="display"/>
     <Chartlines
       v-if="currentData.yearsData.length"
       :lines="currentData.yearsData"
@@ -59,7 +59,15 @@ export default {
       linesH: 200,
       legends: {
         display: "frame",
-        names: ["Prévisions budgetaires","Dépenses réalisées"]}
+        names: ["Prévisions budgetaires","Dépenses réalisées"]
+      },
+      display: {
+        nbRing: "all",
+        textSlice: false,
+        zoomable: true,
+        hover: true,
+        legend: true
+      }
     };
   },
   created: async function() {
