@@ -1,16 +1,16 @@
 <template>
-  <div id="donutChart">
+  <div id="donutChart" :width="displaySunburst.sizes.sequenceW" height="auto">
     <div id="sequence">
-      <svg width="750" height="50" id="trail">
+      <svg :width="displaySunburst.sizes.sequenceW" height="50" id="trail">
         <text
-          v-if="sequences.seqNames.length && notCenter(sequences.seqNames)"
+          v-if="sequences.seqNames.length && notCenter(sequences.seqNames) && displaySunburst.sequence.endLabel.present"
           id="endlabel"
-          :x="translatePolygon[translatePolygon.length - 1] + 30"
+          :x="translatePolygon[translatePolygon.length - 1] + 15"
           y="15"
           dy="0.35em"
           text-anchor="start"
           style="fill: rgb(0, 0, 0);"
-        >{{sequences.labelBudget}} Millions d'euros</text>
+        >{{sequences.labelBudget}} {{displaySunburst.sequence.endLabel.unit}}</text>
         <g
           v-if="notCenter(sequences.seqNames)"
           v-for="(sequence, index) in sequences.seqNames"
@@ -35,12 +35,17 @@
     </div>
     <div id="chart">
       <div>
-        <svg :height="width" :width="width" @mouseleave="mouseleave">
-          <g fill-opacity="0.6" :transform="translate">
+        <svg
+          :height="width"
+          :width="width"
+          :style="`margin-right: `+displaySunburst.sizes.margin+`px;`"
+          @mouseleave="mouseleave"
+        >
+          <g fill-opacity="0.6" :transform="translateChart">
             <path
               v-for="(slice, index) in slices"
               :key="slice.id"
-              :fill="index !== 0 ? colorScale(slice.parentName) : `white`"
+              :fill="index === 0 && !displaySunburst.slices.center.visibility ? `white` : colorScale(slice.parentName)"
               :id="`slice`+index"
               :d="arcSlice(slice)"
               style="cursor: pointer;"
@@ -49,10 +54,10 @@
             ></path>
           </g>
           <g
-            v-if="display.textSlice"
+            v-if="displaySunburst.slices.text.present"
             pointer-events="none"
             text-anchor="middle"
-            :transform="translate"
+            :transform="translateChart"
           >
             <text
               v-for="(text, index) in texts"
@@ -63,7 +68,7 @@
           </g>
         </svg>
       </div>
-      <div id="sidebar" v-if="display.legend">
+      <div id="sidebar" v-if="displaySunburst.legends.present">
         Legend
         <br>
         <div id="legend" style>
@@ -80,7 +85,7 @@
                 :fill="colorScale(legend)"
                 fill-opacity="0.6"
               ></rect>
-              <text x="22" y="9" dy="0.35em">{{legend}}</text>
+              <text x="22" y="9" dy="0.35em">{{legend.toUpperCase()}}</text>
             </g>
           </svg>
         </div>
@@ -93,14 +98,14 @@ import {
   select,
   selectAll,
   scaleOrdinal,
+  scaleLinear,
   partition,
   hierarchy,
   format,
   arc,
   quantize,
   interpolateRainbow,
-  interpolate,
-  scaleLinear
+  interpolate
 } from "d3";
 var TWEEN = require("@tweenjs/tween.js");
 
@@ -112,16 +117,7 @@ export default {
       type: Number,
       default: 932
     },
-    display: {
-      type: Object,
-      default: {
-        nbRing: "all",
-        textSlice: true,
-        zoomable: true,
-        hover: true,
-        legend: false
-      }
-    }
+    displaySunburst: Object
   },
   data: function() {
     let color = scaleOrdinal(
@@ -288,7 +284,39 @@ export default {
       });
       return textData;
     },
-    translate: function() {
+    proportionTextSeq: function() {
+      if (this.sequences.seqNames.length) {
+        let array = this.sequences.seqNames.map(
+          elem => elem.length * this.pScale(elem.length) + 10
+        );
+
+        const reducer = (accumulator, currentValue) =>
+          accumulator + currentValue;
+
+        let endLabelW = 120,
+          endLabelP = 15;
+
+        let sumW = array.reduce(reducer);
+        console.log(
+          "width sequence",
+          this.displaySunburst.sizes.sequenceW - endLabelW - endLabelP
+        );
+        console.log("reduce", sumW);
+
+        if (
+          sumW >
+          this.displaySunburst.sizes.sequenceW - endLabelW - endLabelP
+        ) {
+          let wordAr = this.sequences.seqNames.map(elem => elem.split(/\s+/));
+          this.reduceNbW(wordAr,
+            this.displaySunburst.sizes.sequenceW,
+            endLabelW + endLabelP
+          );
+        }
+      }
+      return true;
+    },
+    translateChart: function() {
       return `translate(${this.width / 2}, ${this.width / 2})`;
     },
     translatePolygon: function() {
@@ -306,6 +334,7 @@ export default {
       return b;
     },
     legends: function() {
+      this.proportionTextSeq;
       let legendsNames = this.root
         .descendants()
         .filter(elem => elem.depth === 1)
@@ -347,16 +376,43 @@ export default {
     }
   },
   methods: {
+    reduceNbW(wordAr, sizeSeq, sizeLabel) {
+      let nbWords = wordAr.map(arrayW => arrayW.length);
+      let maxNbWords = Math.max(...nbWords);
+      wordAr = wordAr.map(elem => {
+        if (elem.length === maxNbWords) elem = elem.slice(0, elem.length - 1);
+        return elem;
+      });
+      let join = wordAr.join(" ");
+      let array = wordAr.map(
+        elem => elem.join(" ").length * this.pScale(elem.join(" ").length) + 10
+      );
+
+      const reducer = (accumulator, currentValue) => accumulator + currentValue;
+
+      let sumW = array.reduce(reducer);
+      console.log(join, sumW);
+      console.log(
+        join.length * this.pScale(join.length) + 30,
+        sizeSeq - sizeLabel
+      );
+      console.log(sumW);
+      if (sumW > sizeSeq - sizeLabel)
+        this.reduceNbW(wordAr, sizeSeq, sizeLabel)
+    },
     notCenter(names) {
-      if (names[0] === this.root.descendants()[0].data.name.toUpperCase()) {
-        return false
+      if (
+        names[0] === this.root.descendants()[0].data.name.toUpperCase() &&
+        !this.displaySunburst.slices.center.visibility
+      ) {
+        return false;
       }
-      return true
+      return true;
     },
     polygonPoints(sequence) {
       let a = sequence.length * this.pScale(sequence.length),
         b = a + 10;
-      // console.log(b)
+      console.log("b", b);
       return "0,0 " + a + ",0 " + b + ",15 " + a + ",30 0,30 10,15";
     },
 
@@ -381,15 +437,11 @@ export default {
             turnOnHover();
           });
       }
-      function overParents(slice, doc) {
-        // if (doc.sequences.notCenter === false && slice.depth !== 0)
-        //   doc.sequences.notCenter = true
+      function overParents(slice, doc, centerVisibility) {
         if (slice.parent && slice.parent.depth > 0) {
-          // doc.sequences.notCenter = true
           select("#slice" + slice.parent.position).style("opacity", 1);
           overParents(slice.parent);
-        } else if (slice.depth === 0) {
-          // doc.sequences.notCenter = false
+        } else if (slice.depth === 0 && !centerVisibility) {
           mouseOnCenter(doc);
         }
       }
@@ -402,7 +454,11 @@ export default {
 
       selectAll("#chart path").style("opacity", 0.3);
       select("#slice" + index).style("opacity", 1);
-      overParents(this.root.descendants()[index], this);
+      overParents(
+        this.root.descendants()[index],
+        this,
+        this.displaySunburst.slices.center.visibility
+      );
       this.sequences.colorName = this.root.descendants()[index].parentName;
 
       let seqNames = [];
@@ -443,7 +499,7 @@ text {
   display: flex;
 }
 #endlabel {
-  font: 15px sans-serif;
-  /* font-weight: bold; */
+  font: 12px sans-serif;
+  font-weight: bold;
 }
 </style>

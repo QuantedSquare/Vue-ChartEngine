@@ -1,6 +1,11 @@
 <template>
   <div v-if="isLoaded" class="container">
-    <ChartDonut :dataDonut="donutBudget" :width="width" @onClick="searchYearsData" :display="display"/>
+    <ChartDonut
+      :dataDonut="donutBudget"
+      :width="width"
+      @onClick="searchYearsData"
+      :displaySunburst="displaySunburst"
+    />
     <Chartlines
       v-if="currentData.yearsData.length"
       :lines="currentData.yearsData"
@@ -59,14 +64,53 @@ export default {
       linesH: 200,
       legends: {
         display: "frame",
-        names: ["Prévisions budgetaires","Dépenses réalisées"]
+        names: ["Prévisions budgetaires", "Dépenses réalisées"]
       },
-      display: {
+      displaySunburst: {
+        color: {
+          colorScale: Function,
+          opacity: 0.6,
+          childrenOpacity: {
+            present: false,
+            opacity: 0.6
+          }
+        },
         nbRing: "all",
-        textSlice: false,
-        zoomable: true,
-        hover: true,
-        legend: true
+        slices: {
+          zoomable: true,
+          text: {
+            present: false,
+            font: {
+              size: "10px",
+              family: "sans-serif"
+            },
+            rotation: "transform string"
+          },
+          joinSmallestSlices: true,
+          center: {
+            visibility: false
+          },
+          hover: true
+        },
+        sizes: {
+          margin: 30,
+          sunburstW: this.width,
+          legendW: 300,
+          sequenceW: this.width + 300 + 30
+        },
+        legends: {
+          present: true,
+          position: "right",
+          clickable: true
+        },
+        sequence: {
+          present: true,
+          position: "top",
+          endLabel: {
+            present: true,
+            unit: "Million d'euros"
+          }
+        }
       }
     };
   },
@@ -220,9 +264,7 @@ export default {
       this.currentData.yearsData = yearsData.data.budgetProgess
         ? yearsData.data.budgetProgess
         : [];
-      this.currentData.name = yearsData.data.name
-        ? yearsData.data.name
-        : null;
+      this.currentData.name = yearsData.data.name ? yearsData.data.name : null;
     }
   }
 };
