@@ -149,7 +149,7 @@ export default {
         .sort((a, b) => b.value - a.value);
 
       this.partition(root);
-      // console.log("root", root.descendants().slice(1));
+      console.log("root", root.descendants().slice(2), root.descendants());
 
       function searchMaxDepth(p) {
         let maxDepth = 0;
