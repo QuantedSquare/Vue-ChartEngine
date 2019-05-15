@@ -1,7 +1,7 @@
 <template>
   <div id="donutChart" :width="displaySunburst.sizes.sequenceW" height="auto">
     <div id="sequence">
-      <svg :width="displaySunburst.sizes.sequenceW" height="50" id="trail">
+      <svg :width="displaySunburst.sizes.sequenceW" height="80" id="trail">
         <text
           v-if="sequences.seqNames.length && notCenter(sequences.seqNames) && displaySunburst.sequence.endLabel.present"
           id="endlabel"
