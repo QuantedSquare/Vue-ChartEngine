@@ -17,18 +17,17 @@
           :transform="`translate(`+ translatePolygon[index] +`, 0)`"
         >
           <polygon
-            :points="polygonPoints(sequence)"
+            :points="polygonPoints(sequence[0], sequences.seqNames)"
             :fill="colorScale(sequences.colorName)"
             fill-opacity="0.6"
           ></polygon>
-          <text
-            :id="`text_`+index"
-            :x="(sequence.length * pScale(sequence.length) + 10) / 2"
-            y="15"
-            dy="0.35em"
-            text-anchor="middle"
-          >
-            <tspan>{{sequence}}</tspan>
+          <text :id="`text_`+index" text-anchor="middle">
+            <tspan
+              v-for="(name, index) in sequence"
+              :x="(sequence[0].length * pScale(sequence[0].length) + 10) / 2"
+              :y="ySpan(sequence, sequences.seqNames)"
+              :dy="sequence.length > 1 ? (index * 1.1) + `em` : `0.35em`"
+            >{{name}}</tspan>
           </text>
         </g>
       </svg>
@@ -284,38 +283,6 @@ export default {
       });
       return textData;
     },
-    proportionTextSeq: function() {
-      if (this.sequences.seqNames.length) {
-        let array = this.sequences.seqNames.map(
-          elem => elem.length * this.pScale(elem.length) + 10
-        );
-
-        const reducer = (accumulator, currentValue) =>
-          accumulator + currentValue;
-
-        let endLabelW = 120,
-          endLabelP = 15;
-
-        let sumW = array.reduce(reducer);
-        console.log(
-          "width sequence",
-          this.displaySunburst.sizes.sequenceW - endLabelW - endLabelP
-        );
-        console.log("reduce", sumW);
-
-        if (
-          sumW >
-          this.displaySunburst.sizes.sequenceW - endLabelW - endLabelP
-        ) {
-          let wordAr = this.sequences.seqNames.map(elem => elem.split(/\s+/));
-          this.reduceNbW(wordAr,
-            this.displaySunburst.sizes.sequenceW,
-            endLabelW + endLabelP
-          );
-        }
-      }
-      return true;
-    },
     translateChart: function() {
       return `translate(${this.width / 2}, ${this.width / 2})`;
     },
@@ -326,7 +293,7 @@ export default {
         let l = 0;
         if (i !== 0) l = antL * this.pScale(antL) + 2 + b[i - 1];
         b.push(l);
-        antL = elem.length;
+        antL = elem[0].length;
         i++;
       });
       // x label budget
@@ -334,7 +301,7 @@ export default {
       return b;
     },
     legends: function() {
-      this.proportionTextSeq;
+      this.proportionTextSeq();
       let legendsNames = this.root
         .descendants()
         .filter(elem => elem.depth === 1)
@@ -383,39 +350,129 @@ export default {
         if (elem.length === maxNbWords) elem = elem.slice(0, elem.length - 1);
         return elem;
       });
-      let join = wordAr.join(" ");
       let array = wordAr.map(
         elem => elem.join(" ").length * this.pScale(elem.join(" ").length) + 10
       );
 
       const reducer = (accumulator, currentValue) => accumulator + currentValue;
-
       let sumW = array.reduce(reducer);
-      console.log(join, sumW);
-      console.log(
-        join.length * this.pScale(join.length) + 30,
-        sizeSeq - sizeLabel
-      );
-      console.log(sumW);
       if (sumW > sizeSeq - sizeLabel)
-        this.reduceNbW(wordAr, sizeSeq, sizeLabel)
+        return this.reduceNbW(wordAr, sizeSeq, sizeLabel);
+
+      wordAr = wordAr.map(elem => elem.join(" "));
+      return wordAr;
+    },
+    reduceSecondLine: function(word, tspan, newSpan) {
+      let splitSpan = tspan.split(/\s+/);
+      let l = 0,
+        index = 0;
+      splitSpan.forEach((spanWord, i) => {
+        l += spanWord.length + 1;
+        if (l <= word.length + 1) index = i;
+      });
+      let newSpan1 = splitSpan.slice(0, index + 1).join(" ");
+      let newSpan2 = splitSpan.length > 1 ? splitSpan.slice(index + 1, splitSpan.length).join(" ") : null;
+      newSpan.push(newSpan1);
+
+      if (newSpan2 && newSpan2.length > word.length)
+        return this.reduceSecondLine(word, newSpan2, newSpan);
+      else if (newSpan2) newSpan.push(newSpan2);
+      console.log("array span", newSpan);
+      console.log("newSpan", newSpan1, newSpan1.length);
+      // console.log("newSpan", newSpan2, newSpan2.length);
+      console.log("tspan", tspan, tspan.length);
+      console.log("word", word, word.length);
+      return newSpan;
+    },
+    proportionTextSeq: function() {
+      let newSeqNames = this.sequences.seqNames;
+      console.log("first", this.sequences.seqNames);
+      if (this.sequences.seqNames.length) {
+        let array = this.sequences.seqNames.map(
+          elem => elem[0].length * this.pScale(elem[0].length) + 10
+        );
+
+        const reducer = (accumulator, currentValue) =>
+          accumulator + currentValue;
+
+        let endLabelW = 120,
+          endLabelP = 15;
+
+        let sumW = array.reduce(reducer);
+
+        if (
+          sumW >
+          this.displaySunburst.sizes.sequenceW - endLabelW - endLabelP
+        ) {
+          let wordAr = this.sequences.seqNames.map(elem =>
+            elem[0].split(/\s+/)
+          );
+          wordAr = this.reduceNbW(
+            wordAr,
+            this.displaySunburst.sizes.sequenceW,
+            endLabelW + endLabelP
+          );
+          console.log("word", wordAr);
+          newSeqNames = this.sequences.seqNames.map((elem, i) => {
+            if (elem[0] !== wordAr[i]) {
+              let tspan = elem[0].split(wordAr[i] + " ");
+              elem = [wordAr[i], tspan[1]];
+              if (wordAr[i].length < tspan[1].length) {
+                let newSpan = [];
+                newSpan = this.reduceSecondLine(wordAr[i], tspan[1], newSpan);
+                elem = [wordAr[i]].concat(newSpan);
+              }
+            }
+            return elem;
+          });
+          console.log("new", newSeqNames, wordAr);
+          newSeqNames.forEach(elem => console.log("elem", elem[0]));
+          this.sequences.seqNames = newSeqNames;
+        }
+      }
     },
     notCenter(names) {
       if (
-        names[0] === this.root.descendants()[0].data.name.toUpperCase() &&
+        names[0][0] === this.root.descendants()[0].data.name.toUpperCase() &&
         !this.displaySunburst.slices.center.visibility
       ) {
         return false;
       }
       return true;
     },
-    polygonPoints(sequence) {
+    polygonPoints(sequence, allNames) {
+      let allLength = allNames.map(elem => elem.length);
+      let maxL = Math.max(...allLength);
       let a = sequence.length * this.pScale(sequence.length),
-        b = a + 10;
-      console.log("b", b);
-      return "0,0 " + a + ",0 " + b + ",15 " + a + ",30 0,30 10,15";
+        b = a + 10,
+        c = maxL > 2 ? (maxL + 1) * 10 : 30,
+        d = maxL > 2 ? 5 + maxL * 5 : 15;
+      console.log("b", b, sequence, allLength);
+      return (
+        "0,0 " +
+        a +
+        ",0 " +
+        b +
+        "," +
+        d +
+        " " +
+        a +
+        "," +
+        c +
+        " 0," +
+        c +
+        " 10," +
+        d
+      );
     },
+    ySpan: function(sequence, allNames) {
+      let allLength = allNames.map(elem => elem.length);
+      let maxL = Math.max(...allLength);
 
+      let ySpanScale = scaleLinear()
+      ySpanScale.range([(maxL + 1) * 5, 15]).domain([1, maxL - 1]);
+      return sequence.length === maxL ? (maxL === 1 ? 15 : 13) : ySpanScale(sequence.length)
+    },
     clicked(index) {
       this.targetIndex = index;
       this.$emit("onClick", this.root.descendants()[index]);
@@ -465,7 +522,12 @@ export default {
       seqNames.push(this.root.descendants()[index].data.name.toUpperCase());
       setSequence(this.root.descendants()[index]);
       seqNames = seqNames.reverse();
-      this.sequences.seqNames = seqNames;
+      this.sequences.seqNames = seqNames.map(elem => {
+        let arrayName = [];
+        arrayName.push(elem);
+        return arrayName;
+      });
+      console.log("seq", this.sequences.seqNames);
       let budget = this.root.descendants()[index].data.value
         ? this.root.descendants()[index].data.value / 1000000
         : this.root.descendants()[index].data.budget / 1000000;
