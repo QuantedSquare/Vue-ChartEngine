@@ -151,7 +151,7 @@ export default {
         .sort((a, b) => b.value - a.value);
 
       this.partition(root);
-      // console.log("root", root.descendants());
+      console.log("root", root.descendants());
 
       function searchMaxDepth(p) {
         let maxDepth = 0;
@@ -174,28 +174,28 @@ export default {
       if (this.targetIndex) {
         let p = root.descendants()[this.targetIndex];
         let maxDepth = searchMaxDepth(p);
-        let newPartY = (this.radius - 30) / (maxDepth - p.depth + 1);
+        let newPartY = (this.radius - 50) / /*(maxDepth - p.depth + 1)*/ (2);
         let r0Scale = scaleLinear();
         let r1Scale = scaleLinear();
-
-        r0Scale.range([30, this.radius - newPartY]).domain([p.depth, maxDepth]);
-        r1Scale.range([newPartY + 30, this.radius]).domain([p.depth, maxDepth]);
+        console.log(maxDepth, p.depth , this.currentRing)
+        r0Scale.range([50, this.radius - newPartY]).domain([p.depth, this.currentRing + 1]);
+        r1Scale.range([newPartY + 50, this.radius]).domain([p.depth, this.currentRing + 1]);
         root.each(d => {
-          let newX0 =
+          let newX0 = d.depth > this.currentRing + 1 ? 0 : 
               Math.max(0, Math.min(1, (d.x0 - p.x0) / (p.x1 - p.x0))) *
               2 *
               Math.PI,
-            newX1 =
+            newX1 = d.depth > this.currentRing + 1 ? 0 : 
               Math.max(0, Math.min(1, (d.x1 - p.x0) / (p.x1 - p.x0))) *
               2 *
               Math.PI,
-            newY0 =
+            newY0 = d.depth > this.currentRing + 1 ? 0 : 
               newX1 - newX0 === 2 * Math.PI && d.data.name !== p.data.name
                 ? 0
                 : r0Scale(d.depth),
-            newY1 =
+            newY1 = d.depth > this.currentRing + 1 ? 0 : 
               newX1 - newX0 === 2 * Math.PI && d.data.name !== p.data.name
-                ? 30
+                ? 50
                 : r1Scale(d.depth);
           return (d.target = {
             x0: newX0,
@@ -247,11 +247,12 @@ export default {
         if (slice.parent) {
           slice.parentName = lookUpForParentName(slice);
         } else slice.parentName = "";
+        console.log(this.currentRing)
         slice.current = {
-          x0: slice.x0,
-          x1: slice.x1,
-          y0: slice.y0,
-          y1: slice.y1 + 100
+          x0: slice.depth > this.currentRing + 1 ? 0 : slice.x0,
+          x1: slice.depth > this.currentRing + 1 ? 0 : slice.x1,
+          y0: slice.depth > this.currentRing + 1 ? 0 : slice.y0,
+          y1: slice.depth > this.currentRing + 1 ? 0 : this.radius
         };
         return slice;
       });
@@ -259,15 +260,10 @@ export default {
       if (amppedSlices[0].target) {
         this.targetCoords = amppedSlices.map(elem => elem.target);
       }
-      if (this.targetIndex === 0) {
-        // nb d'anneaux au sunburst
-        // amppedSlices = amppedSlices.filter(slice => slice.depth === 1 || slice.depth === 0)
-        // this.currentCoords = amppedSlices.map(slice => slice.current);
+      if (this.targetIndex === 0) 
         this.targetCoords = this.currentCoords;
-        
-      }
-      
-
+      // nb d'anneaux au sunburst
+      amppedSlices = amppedSlices.filter(slice => slice.depth <= this.currentRing + 1)
       return amppedSlices;
     },
     texts: function() {
@@ -355,8 +351,8 @@ export default {
     visibleArc(index, depth) {
       if (index === 0 && !this.displaySunburst.slices.center.visibility)
         return 0
-      else if (depth > this.currentRing + 1)
-        return 0
+      // else if (depth > this.currentRing + 1)
+      //   return 0
       return  0.6
     },
     reduceNbW(wordAr, sizeSeq, sizeLabel) {
