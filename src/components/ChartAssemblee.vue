@@ -75,11 +75,11 @@ export default {
             opacity: 0.6
           }
         },
-        nbRing: "all",
+        nbRing: 2,
         slices: {
           zoomable: true,
           text: {
-            present: false,
+            present: true,
             font: {
               size: "10px",
               family: "sans-serif"

@@ -358,13 +358,14 @@ export default {
     },
     texts: function() {
       let textData = this.root.descendants().map(d => {
-        let x0 = d.target ? d.target.x0 : d.x0,
-          x1 = d.target ? d.target.x1 : d.x1,
-          y0 = d.target ? d.target.y0 : d.y0,
-          y1 = d.target ? d.target.y1 : d.y1;
+        let x0 = d.target ? d.target.x0 : d.current.x0,
+          x1 = d.target ? d.target.x1 : d.current.x1,
+          y0 = d.target ? d.target.y0 : d.current.y0,
+          y1 = d.target ? d.target.y1 : d.current.y1;
         const x = (((x0 + x1) / 2) * 180) / Math.PI;
         const y = (y0 + y1) / 2;
         let display = ((y0 + y1) / 2) * (x1 - x0) > 10 && y0 !== 0;
+        // console.log(((y0 + y1) / 2) * (x1 - x0),  y0, d)
         let transform = `rotate(${x - 90}) translate(${y},0) rotate(${
           x < 180 ? 0 : 180
         })`;
@@ -480,16 +481,10 @@ export default {
       if (newSpan2 && newSpan2.length > word.length)
         return this.reduceSecondLine(word, newSpan2, newSpan);
       else if (newSpan2) newSpan.push(newSpan2);
-      // console.log("array span", newSpan);
-      // console.log("newSpan", newSpan1, newSpan1.length);
-      // console.log("newSpan", newSpan2, newSpan2.length);
-      // console.log("tspan", tspan, tspan.length);
-      // console.log("word", word, word.length);
       return newSpan;
     },
     proportionTextSeq: function() {
       let newSeqNames = this.sequences.seqNames;
-      // console.log("first", this.sequences.seqNames);
       if (this.sequences.seqNames.length) {
         let array = this.sequences.seqNames.map(
           elem => elem[0].length * this.pScale(elem[0].length) + 10
@@ -515,7 +510,6 @@ export default {
             this.displaySunburst.sizes.sequenceW,
             endLabelW + endLabelP
           );
-          // console.log("word", wordAr);
           newSeqNames = this.sequences.seqNames.map((elem, i) => {
             if (elem[0] !== wordAr[i]) {
               let tspan = elem[0].split(wordAr[i] + " ");
@@ -528,8 +522,6 @@ export default {
             }
             return elem;
           });
-          // console.log("new", newSeqNames, wordAr);
-          // newSeqNames.forEach(elem => console.log("elem", elem[0]));
           this.sequences.seqNames = newSeqNames;
         }
       }
@@ -550,7 +542,6 @@ export default {
         b = a + 10,
         c = maxL > 2 ? (maxL + 1) * 10 : 30,
         d = maxL > 2 ? 5 + maxL * 5 : 15;
-      // console.log("b", b, sequence, allLength);
       return (
         "0,0 " +
         a +
