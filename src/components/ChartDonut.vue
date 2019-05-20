@@ -149,7 +149,7 @@ export default {
         .sort((a, b) => b.value - a.value);
 
       this.partition(root);
-      console.log("root", root.descendants().slice(2), root.descendants());
+      console.log("root", root.descendants());
 
       function searchMaxDepth(p) {
         let maxDepth = 0;
@@ -248,7 +248,7 @@ export default {
           x0: slice.x0,
           x1: slice.x1,
           y0: slice.y0,
-          y1: slice.y1
+          y1: slice.y1 + 100
         };
 
         return slice;
@@ -258,8 +258,12 @@ export default {
         this.targetCoords = amppedSlices.map(elem => elem.target);
       }
       if (this.targetIndex === 0) {
+        amppedSlices = amppedSlices.filter(slice => slice.depth === 1 || slice.depth === 0)
         this.targetCoords = this.currentCoords;
+        
       }
+      
+
       return amppedSlices;
     },
     texts: function() {
@@ -377,16 +381,16 @@ export default {
       if (newSpan2 && newSpan2.length > word.length)
         return this.reduceSecondLine(word, newSpan2, newSpan);
       else if (newSpan2) newSpan.push(newSpan2);
-      console.log("array span", newSpan);
-      console.log("newSpan", newSpan1, newSpan1.length);
+      // console.log("array span", newSpan);
+      // console.log("newSpan", newSpan1, newSpan1.length);
       // console.log("newSpan", newSpan2, newSpan2.length);
-      console.log("tspan", tspan, tspan.length);
-      console.log("word", word, word.length);
+      // console.log("tspan", tspan, tspan.length);
+      // console.log("word", word, word.length);
       return newSpan;
     },
     proportionTextSeq: function() {
       let newSeqNames = this.sequences.seqNames;
-      console.log("first", this.sequences.seqNames);
+      // console.log("first", this.sequences.seqNames);
       if (this.sequences.seqNames.length) {
         let array = this.sequences.seqNames.map(
           elem => elem[0].length * this.pScale(elem[0].length) + 10
@@ -412,7 +416,7 @@ export default {
             this.displaySunburst.sizes.sequenceW,
             endLabelW + endLabelP
           );
-          console.log("word", wordAr);
+          // console.log("word", wordAr);
           newSeqNames = this.sequences.seqNames.map((elem, i) => {
             if (elem[0] !== wordAr[i]) {
               let tspan = elem[0].split(wordAr[i] + " ");
@@ -425,8 +429,8 @@ export default {
             }
             return elem;
           });
-          console.log("new", newSeqNames, wordAr);
-          newSeqNames.forEach(elem => console.log("elem", elem[0]));
+          // console.log("new", newSeqNames, wordAr);
+          // newSeqNames.forEach(elem => console.log("elem", elem[0]));
           this.sequences.seqNames = newSeqNames;
         }
       }
@@ -447,7 +451,7 @@ export default {
         b = a + 10,
         c = maxL > 2 ? (maxL + 1) * 10 : 30,
         d = maxL > 2 ? 5 + maxL * 5 : 15;
-      console.log("b", b, sequence, allLength);
+      // console.log("b", b, sequence, allLength);
       return (
         "0,0 " +
         a +
@@ -527,7 +531,7 @@ export default {
         arrayName.push(elem);
         return arrayName;
       });
-      console.log("seq", this.sequences.seqNames);
+      // console.log("seq", this.sequences.seqNames);
       let budget = this.root.descendants()[index].data.value
         ? this.root.descendants()[index].data.value / 1000000
         : this.root.descendants()[index].data.budget / 1000000;
