@@ -75,7 +75,7 @@ export default {
             opacity: 0.6
           }
         },
-        nbRing: "all",
+        nbRing: 2,
         slices: {
           zoomable: true,
           text: {
