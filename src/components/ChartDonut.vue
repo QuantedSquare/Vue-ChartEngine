@@ -44,7 +44,8 @@
             <path
               v-for="(slice, index) in slices"
               :key="slice.id"
-              :fill="index === 0 && !displaySunburst.slices.center.visibility ? `white` : colorScale(slice.parentName)"
+              :fill="colorScale(slice.parentName)"
+              :fill-opacity="visibleArc(index, slice.depth)"
               :id="`slice`+index"
               :d="arcSlice(slice)"
               style="cursor: pointer;"
@@ -128,6 +129,7 @@ export default {
 
     return {
       targetIndex: 0,
+      currentRing: 0,
       colorScale: color,
       pScale: pScale,
       tweenedCoord: [],
@@ -149,7 +151,7 @@ export default {
         .sort((a, b) => b.value - a.value);
 
       this.partition(root);
-      console.log("root", root.descendants());
+      // console.log("root", root.descendants());
 
       function searchMaxDepth(p) {
         let maxDepth = 0;
@@ -240,6 +242,7 @@ export default {
         }
       }
 
+      // console.log("je passe la")
       let amppedSlices = this.root.descendants().map(slice => {
         if (slice.parent) {
           slice.parentName = lookUpForParentName(slice);
@@ -250,7 +253,6 @@ export default {
           y0: slice.y0,
           y1: slice.y1 + 100
         };
-
         return slice;
       });
       this.currentCoords = amppedSlices.map(slice => slice.current);
@@ -258,7 +260,9 @@ export default {
         this.targetCoords = amppedSlices.map(elem => elem.target);
       }
       if (this.targetIndex === 0) {
-        amppedSlices = amppedSlices.filter(slice => slice.depth === 1 || slice.depth === 0)
+        // nb d'anneaux au sunburst
+        // amppedSlices = amppedSlices.filter(slice => slice.depth === 1 || slice.depth === 0)
+        // this.currentCoords = amppedSlices.map(slice => slice.current);
         this.targetCoords = this.currentCoords;
         
       }
@@ -328,6 +332,7 @@ export default {
           requestAnimationFrame(animate);
         }
       }
+      // console.log(newSet)
       newSet.forEach((elem, i) => {
         new TWEEN.Tween(oldSet.length ? oldSet[i] : this.currentCoords[i])
           .to(elem, 1000)
@@ -347,6 +352,13 @@ export default {
     }
   },
   methods: {
+    visibleArc(index, depth) {
+      if (index === 0 && !this.displaySunburst.slices.center.visibility)
+        return 0
+      else if (depth > this.currentRing + 1)
+        return 0
+      return  0.6
+    },
     reduceNbW(wordAr, sizeSeq, sizeLabel) {
       let nbWords = wordAr.map(arrayW => arrayW.length);
       let maxNbWords = Math.max(...nbWords);
@@ -479,6 +491,7 @@ export default {
     },
     clicked(index) {
       this.targetIndex = index;
+      this.currentRing = this.root.descendants()[index].depth
       this.$emit("onClick", this.root.descendants()[index]);
     },
 
