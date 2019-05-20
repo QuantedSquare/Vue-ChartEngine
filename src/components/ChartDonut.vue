@@ -45,7 +45,7 @@
               v-for="(slice, index) in slices"
               :key="slice.id"
               :fill="colorScale(slice.parentName)"
-              :fill-opacity="visibleArc(index, slice.depth)"
+              :fill-opacity="visibleArc(index, slice)"
               :id="`slice`+index"
               :d="arcSlice(slice)"
               style="cursor: pointer;"
@@ -199,7 +199,7 @@ export default {
         .sort((a, b) => b.value - a.value);
 
       this.partition(root);
-      console.log("root", root.descendants());
+      // console.log("root", root.descendants());
 
       function searchMaxDepth(p) {
         let maxDepth = 0;
@@ -222,8 +222,12 @@ export default {
       if (this.targetIndex) {
         let p = root.descendants()[this.targetIndex];
         let maxDepth = searchMaxDepth(p);
-        let radiusDivider = this.displaySunburst.nbRing === "all" ? (maxDepth - p.depth + 1) : 2;
-        let maxDomain = this.displaySunburst.nbRing === "all" ? maxDepth : this.currentRing + 1;
+        let radiusDivider =
+          this.displaySunburst.nbRing === "all" ? maxDepth - p.depth + 1 : 2;
+        let maxDomain =
+          this.displaySunburst.nbRing === "all"
+            ? maxDepth
+            : this.currentRing + 1;
         let newPartY = (this.radius - 50) / radiusDivider;
         let r0Scale = scaleLinear();
         let r1Scale = scaleLinear();
@@ -236,25 +240,29 @@ export default {
           .domain([p.depth, maxDomain]);
         root.each(d => {
           let newX0 =
-              d.depth > this.currentRing + 1 && this.displaySunburst.nbRing !== "all"
+              d.depth > this.currentRing + 1 &&
+              this.displaySunburst.nbRing !== "all"
                 ? 0
                 : Math.max(0, Math.min(1, (d.x0 - p.x0) / (p.x1 - p.x0))) *
                   2 *
                   Math.PI,
             newX1 =
-              d.depth > this.currentRing + 1 && this.displaySunburst.nbRing !== "all"
+              d.depth > this.currentRing + 1 &&
+              this.displaySunburst.nbRing !== "all"
                 ? 0
                 : Math.max(0, Math.min(1, (d.x1 - p.x0) / (p.x1 - p.x0))) *
                   2 *
                   Math.PI,
             newY0 =
-              d.depth > this.currentRing + 1 && this.displaySunburst.nbRing !== "all"
+              d.depth > this.currentRing + 1 &&
+              this.displaySunburst.nbRing !== "all"
                 ? 0
                 : newX1 - newX0 === 2 * Math.PI && d.data.name !== p.data.name
                 ? 0
                 : r0Scale(d.depth),
             newY1 =
-              d.depth > this.currentRing + 1 && this.displaySunburst.nbRing !== "all"
+              d.depth > this.currentRing + 1 &&
+              this.displaySunburst.nbRing !== "all"
                 ? 0
                 : newX1 - newX0 === 2 * Math.PI && d.data.name !== p.data.name
                 ? 50
@@ -311,10 +319,28 @@ export default {
         } else slice.parentName = "";
         // console.log(this.currentRing);
         slice.current = {
-          x0: slice.depth > this.currentRing + 1 && this.displaySunburst.nbRing !== "all" ? 0 : slice.x0,
-          x1: slice.depth > this.currentRing + 1 && this.displaySunburst.nbRing !== "all" ? 0 : slice.x1,
-          y0: slice.depth > this.currentRing + 1 && this.displaySunburst.nbRing !== "all" ? 0 : slice.y0,
-          y1: slice.depth > this.currentRing + 1 && this.displaySunburst.nbRing !== "all" ? 0 : this.displaySunburst.nbRing === "all" ? slice.y1 : this.radius
+          x0:
+            slice.depth > this.currentRing + 1 &&
+            this.displaySunburst.nbRing !== "all"
+              ? 0
+              : slice.x0,
+          x1:
+            slice.depth > this.currentRing + 1 &&
+            this.displaySunburst.nbRing !== "all"
+              ? 0
+              : slice.x1,
+          y0:
+            slice.depth > this.currentRing + 1 &&
+            this.displaySunburst.nbRing !== "all"
+              ? 0
+              : slice.y0,
+          y1:
+            slice.depth > this.currentRing + 1 &&
+            this.displaySunburst.nbRing !== "all"
+              ? 0
+              : this.displaySunburst.nbRing === "all"
+              ? slice.y1
+              : this.radius
         };
         return slice;
       });
@@ -412,12 +438,10 @@ export default {
     }
   },
   methods: {
-    visibleArc(index, depth) {
+    visibleArc(index, slice) {
       if (index === 0 && !this.displaySunburst.slices.center.visibility)
         return 0;
-      // else if (depth > this.currentRing + 1)
-      //   return 0
-      return 0.6;
+      return slice.children ? 0.6 : 0.4;
     },
     reduceNbW(wordAr, sizeSeq, sizeLabel) {
       let nbWords = wordAr.map(arrayW => arrayW.length);
