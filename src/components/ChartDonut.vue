@@ -71,7 +71,7 @@
               dy="0.35em"
               :style="font"
             >
-              <tspan v-for="(name, index) in text.name" :x="0" :y="0" :dy="name.length > 1 ? (-0.50 - index) + `em` : `0.35em`">{{text.display ? name : null}}</tspan>
+              <tspan v-for="(name, index) in text.name" :x="0" :y="0" :dy="text.name.length > 1 ? (-0.50 + index) + `em` : `0.35em`">{{text.display ? name : null}}</tspan>
               <!-- <tspan :x="0" :y="0" :dy="`0.50em`">{{text.display ? text.name : null}}</tspan> -->
             </text>
           </g>
@@ -196,6 +196,7 @@ export default {
       majW: null,
       minW: null,
       mixW: null,
+      fontHeight: null,
       font:
         "font: " +
         this.displaySunburst.slices.text.font.size +
@@ -207,6 +208,7 @@ export default {
     this.majW = document.getElementById("maj").offsetWidth / 30;
     this.minW = document.getElementById("min").offsetWidth / 30;
     this.mixW = document.getElementById("mix").offsetWidth / 30;
+    this.fontHeight = document.getElementById("mix").offsetHeight
   },
   computed: {
     root: function() {
@@ -382,7 +384,7 @@ export default {
           y1 = d.target ? d.target.y1 : d.current.y1;
         const x = (((x0 + x1) / 2) * 180) / Math.PI;
         const y = (y0 + y1) / 2;
-        let display = ((y0 + y1) / 2) * (x1 - x0) > 10 && y0 !== 0;
+        
         let transform = `rotate(${x - 90}) translate(${y},0) rotate(${
           x < 180 ? 0 : 180
         })`;
@@ -391,13 +393,12 @@ export default {
         // console.log(name.length * this.majW, y1 - y0, name, d.depth, this.currentRing, this.targetIndex, i);
         if (name[0].length * this.majW > y1 - y0 && y1 - y0 !== 0) {
           let wordAr = name[0].split(/\s+/);
-          // console.log(wordAr);
           let strArr = []
           this.reduceSliceText(wordAr, y1 - y0, strArr);
           name = strArr
-          console.log("here",strArr);
         }
-        console.log(name)
+        console.log(name.length * this.fontHeight, ((y0 + y1) / 2) * (x1 - x0), y0)
+        let display = ((y0 + y1) / 2) * (x1 - x0) > 10 && y0 !== 0 && ((y0 + y1) / 2) * (x1 - x0) > name.length * this.fontHeight;
         return {
           display: display,
           name: name,
