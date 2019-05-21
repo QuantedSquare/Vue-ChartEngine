@@ -32,7 +32,7 @@ export default {
           text: {
             present: true,
             font: {
-              size: "10px",
+              size: 10,
               family: "sans-serif"
             },
             rotation: "transform string"

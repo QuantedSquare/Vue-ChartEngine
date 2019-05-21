@@ -1,14 +1,11 @@
 <template>
   <div id="donutChart" :width="displaySunburst.sizes.sequenceW" height="auto">
-    <div
-      class="width_text"
-      :style="`font-size:`+displaySunburst.slices.text.font.size+`; font-family:`+displaySunburst.slices.text.font.family+`; color: transparent`"
-    >
-      <span id="maj">BLABLA</span>
-      <span id="min">blabla</span>
-      <span id="mix">Blabla</span>
+    <div class="width_text" :style="font+`;color: transparent;`">
+      <span id="maj">ACHATS DE BIENS ET FOURNITURES</span>
+      <span id="min">achats de biens et fournitures</span>
+      <span id="mix">Achats de biens et fournitures</span>
     </div>
-    <div id="sequence">
+    <div id="sequence" v-if="displaySunburst.sequence.present">
       <svg :width="displaySunburst.sizes.sequenceW" height="80" id="trail">
         <text
           v-if="sequences.seqNames.length && notCenter(sequences.seqNames) && displaySunburst.sequence.endLabel.present"
@@ -17,7 +14,7 @@
           y="15"
           dy="0.35em"
           text-anchor="start"
-          style="fill: rgb(0, 0, 0);"
+          fill="rgb(0, 0, 0);"
         >{{sequences.labelBudget}} {{displaySunburst.sequence.endLabel.unit}}</text>
         <g
           v-if="notCenter(sequences.seqNames)"
@@ -29,7 +26,7 @@
             :fill="colorScale(sequences.colorName)"
             fill-opacity="0.6"
           ></polygon>
-          <text :id="`text_`+index" text-anchor="middle">
+          <text :id="`text_`+index" text-anchor="middle" :style="font">
             <tspan
               v-for="(name, index) in sequence"
               :x="((sequence[0].length * majW + 10) / 2)+10"
@@ -72,7 +69,11 @@
               :id="`text`+index"
               :transform="text.transform"
               dy="0.35em"
-            >{{text.display ? text.name : null}}</text>
+              :style="font"
+            >
+              <tspan v-for="(name, index) in text.name" :x="0" :y="0" :dy="name.length > 1 ? (-0.50 - index) + `em` : `0.35em`">{{text.display ? name : null}}</tspan>
+              <!-- <tspan :x="0" :y="0" :dy="`0.50em`">{{text.display ? text.name : null}}</tspan> -->
+            </text>
           </g>
         </svg>
       </div>
@@ -93,7 +94,7 @@
                 :fill="colorScale(legend)"
                 fill-opacity="0.6"
               ></rect>
-              <text x="22" y="9" dy="0.35em">{{legend.toUpperCase()}}</text>
+              <text x="22" y="9" dy="0.35em" :style="font">{{legend.toUpperCase()}}</text>
             </g>
           </svg>
         </div>
@@ -142,7 +143,7 @@ export default {
           text: {
             present: false,
             font: {
-              size: "10px",
+              size: 10,
               family: "sans-serif"
             },
             rotation: "transform string"
@@ -194,13 +195,18 @@ export default {
       },
       majW: null,
       minW: null,
-      mixW: null
+      mixW: null,
+      font:
+        "font: " +
+        this.displaySunburst.slices.text.font.size +
+        "px " +
+        this.displaySunburst.slices.text.font.family
     };
   },
   mounted: function() {
-    this.majW = document.getElementById('maj').offsetWidth / 6;
-    this.minW = document.getElementById('min').offsetWidth / 6;
-    this.mixW = document.getElementById('mix').offsetWidth / 6;
+    this.majW = document.getElementById("maj").offsetWidth / 30;
+    this.minW = document.getElementById("min").offsetWidth / 30;
+    this.mixW = document.getElementById("mix").offsetWidth / 30;
   },
   computed: {
     root: function() {
@@ -369,7 +375,7 @@ export default {
       return amppedSlices;
     },
     texts: function() {
-      let textData = this.root.descendants().map(d => {
+      let textData = this.root.descendants().map((d, i) => {
         let x0 = d.target ? d.target.x0 : d.current.x0,
           x1 = d.target ? d.target.x1 : d.current.x1,
           y0 = d.target ? d.target.y0 : d.current.y0,
@@ -377,11 +383,21 @@ export default {
         const x = (((x0 + x1) / 2) * 180) / Math.PI;
         const y = (y0 + y1) / 2;
         let display = ((y0 + y1) / 2) * (x1 - x0) > 10 && y0 !== 0;
-        // console.log(((y0 + y1) / 2) * (x1 - x0),  y0, d)
         let transform = `rotate(${x - 90}) translate(${y},0) rotate(${
           x < 180 ? 0 : 180
         })`;
-        let name = d.data.name;
+        let name = []
+        name.push(d.data.name);
+        // console.log(name.length * this.majW, y1 - y0, name, d.depth, this.currentRing, this.targetIndex, i);
+        if (name[0].length * this.majW > y1 - y0 && y1 - y0 !== 0) {
+          let wordAr = name[0].split(/\s+/);
+          // console.log(wordAr);
+          let strArr = []
+          this.reduceSliceText(wordAr, y1 - y0, strArr);
+          name = strArr
+          console.log("here",strArr);
+        }
+        console.log(name)
         return {
           display: display,
           name: name,
@@ -398,7 +414,7 @@ export default {
       let b = [];
       this.sequences.seqNames.forEach((elem, i) => {
         let l = 0;
-        console.log(this.majW)
+        // console.log(this.majW)
         if (i !== 0) l = antL * this.majW + 2 + b[i - 1] + 20;
         b.push(l);
         antL = elem[0].length;
@@ -457,16 +473,34 @@ export default {
         return 0;
       return slice.children ? 0.6 : 0.4;
     },
+    reduceSliceText(wordAr, ringSize, strArr) {
+      let str = "";
+      let a = 0
+      wordAr.forEach((word, i) => {
+        if (str.concat(' ', word).length * this.majW < ringSize) {
+          str = str.concat(' ', word)
+          a = i
+        }
+      })
+      wordAr = wordAr.slice(a+1)
+      if (str) strArr.push(str)
+      console.log(str, wordAr, wordAr.join(" ").length)
+      if (wordAr.join(" ").length * this.majW > ringSize) {
+        this.reduceSliceText(wordAr, ringSize, strArr)
+      }
+      else {
+        if (wordAr.length) strArr.push(wordAr.join(" "))
+      }
+    },
     reduceNbW(wordAr, sizeSeq, sizeLabel) {
+      console.log(wordAr);
       let nbWords = wordAr.map(arrayW => arrayW.length);
       let maxNbWords = Math.max(...nbWords);
       wordAr = wordAr.map(elem => {
         if (elem.length === maxNbWords) elem = elem.slice(0, elem.length - 1);
         return elem;
       });
-      let array = wordAr.map(
-        elem => elem.join(" ").length * this.majW
-      );
+      let array = wordAr.map(elem => elem.join(" ").length * this.majW);
 
       const reducer = (accumulator, currentValue) => accumulator + currentValue;
       let sumW = array.reduce(reducer);
@@ -549,13 +583,12 @@ export default {
       return true;
     },
     polygonPoints(sequence, allNames) {
-      let allLength = allNames.map(name => name.length);
-      let maxL = Math.max(...allLength);
-      console.log(maxL)
-      let a = sequence.length * this.majW  + 20, //padding
+      let nbSpanText = allNames.map(span => span.length);
+      let maxL = Math.max(...nbSpanText);
+      let a = sequence.length * this.majW + 20, //padding
         b = a + 10, //pointe
-        c = maxL > 2 ? ((maxL + 1) * 10) : 30,
-        d = maxL > 2 ? (5 + maxL * 5) : 15;
+        c = maxL > 2 ? (maxL + 1) * 10 : 30,
+        d = maxL > 2 ? 5 + maxL * 5 : 15;
       return (
         "0,0 " +
         a +
@@ -667,9 +700,9 @@ export default {
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
-text {
+/* text {
   font: 10px sans-serif;
-}
+} */
 #chart {
   display: flex;
 }
