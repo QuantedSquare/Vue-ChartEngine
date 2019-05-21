@@ -1,5 +1,13 @@
 <template>
   <div id="donutChart" :width="displaySunburst.sizes.sequenceW" height="auto">
+    <div
+      class="width_text"
+      :style="`font-size:`+displaySunburst.slices.text.font.size+`; font-family:`+displaySunburst.slices.text.font.family+`; color: transparent`"
+    >
+      <span id="maj">BLABLA</span>
+      <span id="min">blabla</span>
+      <span id="mix">Blabla</span>
+    </div>
     <div id="sequence">
       <svg :width="displaySunburst.sizes.sequenceW" height="80" id="trail">
         <text
@@ -24,7 +32,7 @@
           <text :id="`text_`+index" text-anchor="middle">
             <tspan
               v-for="(name, index) in sequence"
-              :x="(sequence[0].length * pScale(sequence[0].length) + 10) / 2"
+              :x="((sequence[0].length * majW + 10) / 2)+10"
               :y="ySpan(sequence, sequences.seqNames)"
               :dy="sequence.length > 1 ? (index * 1.1) + `em` : `0.35em`"
             >{{name}}</tspan>
@@ -72,7 +80,7 @@
         Legend
         <br>
         <div id="legend" style>
-          <svg :width="legends.width * pScale(legends.width)" :height="legends.names.length * 33">
+          <svg :width="legends.width * majW" :height="legends.names.length * 33">
             <g
               v-for="(legend, index) in legends.names"
               :transform="`translate(0, `+ 33 * index +`)`"
@@ -172,14 +180,10 @@ export default {
       quantize(interpolateRainbow, this.dataDonut.children.length + 1)
     );
 
-    let pScale = scaleLinear();
-    pScale.range([10, 6]).domain([5, 91]);
-
     return {
       targetIndex: 0,
       currentRing: 0,
       colorScale: color,
-      pScale: pScale,
       tweenedCoord: [],
       targetCoords: [],
       mLeave: false,
@@ -187,8 +191,16 @@ export default {
         colorName: null,
         seqNames: [],
         labelBudget: null
-      }
+      },
+      majW: null,
+      minW: null,
+      mixW: null
     };
+  },
+  mounted: function() {
+    this.majW = document.getElementById('maj').offsetWidth / 6;
+    this.minW = document.getElementById('min').offsetWidth / 6;
+    this.mixW = document.getElementById('mix').offsetWidth / 6;
   },
   computed: {
     root: function() {
@@ -386,13 +398,14 @@ export default {
       let b = [];
       this.sequences.seqNames.forEach((elem, i) => {
         let l = 0;
-        if (i !== 0) l = antL * this.pScale(antL) + 2 + b[i - 1];
+        console.log(this.majW)
+        if (i !== 0) l = antL * this.majW + 2 + b[i - 1] + 20;
         b.push(l);
         antL = elem[0].length;
         i++;
       });
       // x label budget
-      b.push(antL * this.pScale(antL) + 2 + b[b.length - 1]);
+      b.push(antL * this.majW + 2 + b[b.length - 1] + 20);
       return b;
     },
     legends: function() {
@@ -452,7 +465,7 @@ export default {
         return elem;
       });
       let array = wordAr.map(
-        elem => elem.join(" ").length * this.pScale(elem.join(" ").length) + 10
+        elem => elem.join(" ").length * this.majW
       );
 
       const reducer = (accumulator, currentValue) => accumulator + currentValue;
@@ -487,7 +500,7 @@ export default {
       let newSeqNames = this.sequences.seqNames;
       if (this.sequences.seqNames.length) {
         let array = this.sequences.seqNames.map(
-          elem => elem[0].length * this.pScale(elem[0].length) + 10
+          elem => elem[0].length * this.majW + 10
         );
 
         const reducer = (accumulator, currentValue) =>
@@ -536,12 +549,13 @@ export default {
       return true;
     },
     polygonPoints(sequence, allNames) {
-      let allLength = allNames.map(elem => elem.length);
+      let allLength = allNames.map(name => name.length);
       let maxL = Math.max(...allLength);
-      let a = sequence.length * this.pScale(sequence.length),
-        b = a + 10,
-        c = maxL > 2 ? (maxL + 1) * 10 : 30,
-        d = maxL > 2 ? 5 + maxL * 5 : 15;
+      console.log(maxL)
+      let a = sequence.length * this.majW  + 20, //padding
+        b = a + 10, //pointe
+        c = maxL > 2 ? ((maxL + 1) * 10) : 30,
+        d = maxL > 2 ? (5 + maxL * 5) : 15;
       return (
         "0,0 " +
         a +
@@ -662,5 +676,8 @@ text {
 #endlabel {
   font: 12px sans-serif;
   font-weight: bold;
+}
+.width_text {
+  height: 0px;
 }
 </style>
