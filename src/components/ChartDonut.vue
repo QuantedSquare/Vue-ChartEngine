@@ -1,9 +1,9 @@
 <template>
   <div id="donutChart" :width="displaySunburst.sizes.sequenceW" height="auto">
     <div class="width_text" :style="fontSlices+`;color: transparent;`">
-      <span id="maj">ACHATS DE BIENS ET FOURNITURES</span>
-      <span id="min">achats de biens et fournitures</span>
-      <span id="mix">Achats de biens et fournitures</span>
+      <span id="maj">ACHATS DE</span>
+      <span id="min">achats de</span>
+      <span id="mix">Achats de</span>
     </div>
     <div id="sequence" v-if="displaySunburst.sequence.present">
       <svg :width="displaySunburst.sizes.sequenceW" height="80" id="trail">
@@ -233,9 +233,9 @@ export default {
     };
   },
   mounted: function() {
-    this.majW = document.getElementById("maj").offsetWidth / 30;
-    this.minW = document.getElementById("min").offsetWidth / 30;
-    this.mixW = document.getElementById("mix").offsetWidth / 30;
+    this.majW = document.getElementById("maj").offsetWidth / 9;
+    this.minW = document.getElementById("min").offsetWidth / 9;
+    this.mixW = document.getElementById("mix").offsetWidth / 9;
     this.fontHeight = document.getElementById("mix").offsetHeight;
   },
   computed: {
@@ -247,7 +247,7 @@ export default {
         .sort((a, b) => b.value - a.value);
 
       this.partition(root);
-      // console.log("root", root.descendants());
+      console.log("root", root.descendants());
 
       function searchMaxDepth(p) {
         let maxDepth = 0;
@@ -270,51 +270,58 @@ export default {
       if (this.targetIndex) {
         let p = root.descendants()[this.targetIndex];
         let maxDepth = searchMaxDepth(p);
+        // console.log(maxDepth - p.depth + 1, this.displaySunburst.nbRing)
         let radiusDivider =
-          this.displaySunburst.nbRing === "all" ? maxDepth - p.depth + 1 : 2;
+          this.displaySunburst.nbRing === "all" || maxDepth - p.depth + 1 <= this.displaySunburst.nbRing ? maxDepth - p.depth + 1 : this.displaySunburst.nbRing;
         let maxDomain =
-          this.displaySunburst.nbRing === "all"
+          this.displaySunburst.nbRing === "all" || p.depth >= this.displaySunburst.nbRing
             ? maxDepth
-            : this.currentRing + 1;
+            : this.displaySunburst.nbRing;
         let newPartY = (this.radius - 50) / radiusDivider;
         let r0Scale = scaleLinear();
         let r1Scale = scaleLinear();
-        // console.log(maxDepth, p.depth, this.currentRing);
         r0Scale
           .range([50, this.radius - newPartY])
           .domain([p.depth, maxDomain]);
         r1Scale
           .range([newPartY + 50, this.radius])
           .domain([p.depth, maxDomain]);
+        console.log(radiusDivider, maxDomain, maxDepth, p.depth, this.currentRing, newPartY + 50, r0Scale(1), r1Scale(1), r0Scale(2), r1Scale(2), r0Scale(3), r1Scale(3));
         root.each(d => {
           let newX0 =
-              d.depth > this.currentRing + 1 &&
+              d.depth > maxDomain &&
               this.displaySunburst.nbRing !== "all"
                 ? 0
                 : Math.max(0, Math.min(1, (d.x0 - p.x0) / (p.x1 - p.x0))) *
                   2 *
                   Math.PI,
             newX1 =
-              d.depth > this.currentRing + 1 &&
+              d.depth > maxDomain &&
               this.displaySunburst.nbRing !== "all"
                 ? 0
                 : Math.max(0, Math.min(1, (d.x1 - p.x0) / (p.x1 - p.x0))) *
                   2 *
                   Math.PI,
             newY0 =
-              d.depth > this.currentRing + 1 &&
+              d.depth > maxDomain &&
               this.displaySunburst.nbRing !== "all"
                 ? 0
                 : newX1 - newX0 === 2 * Math.PI && d.data.name !== p.data.name
                 ? 0
                 : r0Scale(d.depth),
             newY1 =
-              d.depth > this.currentRing + 1 &&
+              d.depth > maxDomain &&
               this.displaySunburst.nbRing !== "all"
                 ? 0
                 : newX1 - newX0 === 2 * Math.PI && d.data.name !== p.data.name
                 ? 50
                 : r1Scale(d.depth);
+                console.log({
+            x0: newX0,
+            x1: newX1,
+            y0: newY0,
+            y1: newY1
+          })
           return (d.target = {
             x0: newX0,
             x1: newX1,
@@ -360,12 +367,10 @@ export default {
         }
       }
 
-      // console.log("je passe la")
       let amppedSlices = this.root.descendants().map(slice => {
         if (slice.parent) {
           slice.parentName = lookUpForParentName(slice);
         } else slice.parentName = "";
-        // console.log(this.currentRing);
         slice.current = {
           x0:
             slice.depth > this.currentRing + 1 &&
@@ -400,7 +405,7 @@ export default {
       // nb d'anneaux au sunburst
       if (this.displaySunburst.nbRing !== "all")
         amppedSlices = amppedSlices.filter(
-          slice => slice.depth <= this.currentRing + 1
+          slice => slice.depth <= this.currentRing + this.displaySunburst.nbRing - 1
         );
       return amppedSlices;
     },
@@ -425,11 +430,12 @@ export default {
           this.reduceSliceText(wordAr, y1 - y0, strArr);
           name = strArr;
         }
-        console.log(
-          name.length * this.fontHeight,
-          ((y0 + y1) / 2) * (x1 - x0),
-          y0
-        );
+        // console.log(
+        //   name.length * this.fontHeight,
+        //   ((y0 + y1) / 2) * (x1 - x0),
+        //   y0,
+        //   name
+        // );
         let display =
           ((y0 + y1) / 2) * (x1 - x0) > 10 &&
           y0 !== 0 &&
@@ -509,26 +515,36 @@ export default {
         return 0;
       return slice.children ? 0.6 : 0.4;
     },
+    sizeWords(wordAr, ringSize) {
+      let sizeOk = true;
+      wordAr.forEach(word => {
+        if (word.length * this.majW > ringSize) sizeOk = false;
+      });
+      return sizeOk;
+    },
     reduceSliceText(wordAr, ringSize, strArr) {
       let str = "";
       let a = 0;
-      wordAr.forEach((word, i) => {
-        if (str.concat(" ", word).length * this.majW < ringSize) {
-          str = str.concat(" ", word);
-          a = i;
+
+      if (this.sizeWords(wordAr, ringSize)) {
+        wordAr.forEach((word, i) => {
+          if (str.concat(" ", word).length * this.majW < ringSize) {
+            str = str.concat(" ", word);
+            a = i;
+          }
+        });
+        wordAr = wordAr.slice(a + 1);
+        if (str) strArr.push(str);
+        // console.log("ici", str, wordAr, wordAr.join(" ").length);
+        if (wordAr.join(" ").length * this.majW > ringSize) {
+          this.reduceSliceText(wordAr, ringSize, strArr);
+        } else {
+          if (wordAr.length) strArr.push(wordAr.join(" "));
         }
-      });
-      wordAr = wordAr.slice(a + 1);
-      if (str) strArr.push(str);
-      console.log(str, wordAr, wordAr.join(" ").length);
-      if (wordAr.join(" ").length * this.majW > ringSize) {
-        this.reduceSliceText(wordAr, ringSize, strArr);
-      } else {
-        if (wordAr.length) strArr.push(wordAr.join(" "));
       }
     },
     reduceNbW(wordAr, sizeSeq, sizeLabel) {
-      console.log(wordAr);
+      // console.log(wordAr);
       let nbWords = wordAr.map(arrayW => arrayW.length);
       let maxNbWords = Math.max(...nbWords);
       wordAr = wordAr.map(elem => {

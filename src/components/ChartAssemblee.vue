@@ -75,7 +75,7 @@ export default {
             opacity: 0.6
           }
         },
-        nbRing: 2,
+        nbRing: 3,
         radiusCenter: 100,
         slices: {
           zoomable: true,
