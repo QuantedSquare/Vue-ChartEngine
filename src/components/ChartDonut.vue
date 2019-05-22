@@ -247,19 +247,7 @@ export default {
         .sort((a, b) => b.value - a.value);
 
       this.partition(root);
-      console.log("root", root.descendants());
-
-      function searchMaxDepth(p) {
-        let maxDepth = 0;
-        p.each(elem => {
-          if (elem.children)
-            elem.children.forEach(child => {
-              searchMaxDepth(child);
-            });
-          maxDepth = elem.depth;
-        });
-        return maxDepth;
-      }
+      // console.log("root", root.descendants());
 
       let i = -1;
       root.each(d => {
@@ -269,7 +257,7 @@ export default {
 
       if (this.targetIndex) {
         let p = root.descendants()[this.targetIndex];
-        let maxDepth = searchMaxDepth(p);
+        let maxDepth = this.searchMaxDepth(p);
         // console.log(maxDepth - p.depth + 1, this.displaySunburst.nbRing)
         let radiusDivider =
           this.displaySunburst.nbRing === "all" || maxDepth - p.depth + 1 <= this.displaySunburst.nbRing ? maxDepth - p.depth + 1 : this.displaySunburst.nbRing;
@@ -277,16 +265,16 @@ export default {
           this.displaySunburst.nbRing === "all" || p.depth >= this.displaySunburst.nbRing
             ? maxDepth
             : this.displaySunburst.nbRing;
-        let newPartY = (this.radius - 50) / radiusDivider;
+        let newPartY = (this.radius - this.displaySunburst.radiusCenter) / radiusDivider;
         let r0Scale = scaleLinear();
         let r1Scale = scaleLinear();
         r0Scale
-          .range([50, this.radius - newPartY])
+          .range([this.displaySunburst.radiusCenter, this.radius - newPartY])
           .domain([p.depth, maxDomain]);
         r1Scale
-          .range([newPartY + 50, this.radius])
+          .range([newPartY + this.displaySunburst.radiusCenter, this.radius])
           .domain([p.depth, maxDomain]);
-        console.log(radiusDivider, maxDomain, maxDepth, p.depth, this.currentRing, newPartY + 50, r0Scale(1), r1Scale(1), r0Scale(2), r1Scale(2), r0Scale(3), r1Scale(3));
+        // console.log(radiusDivider, maxDomain, maxDepth, p.depth, this.currentRing, newPartY + this.displaySunburst.radiusCenter, r0Scale(1), r1Scale(1), r0Scale(2), r1Scale(2), r0Scale(3), r1Scale(3));
         root.each(d => {
           let newX0 =
               d.depth > maxDomain &&
@@ -314,14 +302,8 @@ export default {
               this.displaySunburst.nbRing !== "all"
                 ? 0
                 : newX1 - newX0 === 2 * Math.PI && d.data.name !== p.data.name
-                ? 50
+                ? this.displaySunburst.radiusCenter
                 : r1Scale(d.depth);
-                console.log({
-            x0: newX0,
-            x1: newX1,
-            y0: newY0,
-            y1: newY1
-          })
           return (d.target = {
             x0: newX0,
             x1: newX1,
@@ -367,6 +349,18 @@ export default {
         }
       }
 
+        let maxDepth = this.searchMaxDepth(this.root);
+        // console.log(maxDepth - p.depth + 1, this.displaySunburst.nbRing)
+        let newPartY = (this.radius - this.displaySunburst.radiusCenter) / maxDepth;
+        let r0Scale = scaleLinear();
+        let r1Scale = scaleLinear();
+        r0Scale
+          .range([this.displaySunburst.radiusCenter, this.radius - newPartY])
+          .domain([1, maxDepth]);
+        r1Scale
+          .range([newPartY + this.displaySunburst.radiusCenter, this.radius])
+          .domain([1, maxDepth]);
+
       let amppedSlices = this.root.descendants().map(slice => {
         if (slice.parent) {
           slice.parentName = lookUpForParentName(slice);
@@ -383,17 +377,20 @@ export default {
               ? 0
               : slice.x1,
           y0:
-            slice.depth > this.currentRing + 1 &&
-            this.displaySunburst.nbRing !== "all"
-              ? 0
-              : slice.y0,
-          y1:
-            slice.depth > this.currentRing + 1 &&
-            this.displaySunburst.nbRing !== "all"
+            (slice.depth > this.currentRing + 1 &&
+            this.displaySunburst.nbRing !== "all") || slice.depth === 0
               ? 0
               : this.displaySunburst.nbRing === "all"
-              ? slice.y1
-              : this.radius
+              ? r0Scale(slice.depth)// all rings at the begining
+              : slice.y0 + this.displaySunburst.radiusCenter / 2, // if just 1 ring at the begining
+          y1:
+            (slice.depth > this.currentRing + 1 &&
+            this.displaySunburst.nbRing !== "all") || slice.depth === 0
+              ? 0
+              : this.displaySunburst.nbRing === "all"
+              ? r1Scale(slice.depth)
+              //slice.y1 + this.displaySunburst.radiusCenter / 2 // all rings at the begining
+              : this.radius // if just 1 ring at the begining
         };
         return slice;
       });
@@ -510,6 +507,17 @@ export default {
     }
   },
   methods: {
+    searchMaxDepth(p) {
+        let maxDepth = 0;
+        p.each(elem => {
+          if (elem.children)
+            elem.children.forEach(child => {
+              this.searchMaxDepth(child);
+            });
+          maxDepth = elem.depth;
+        });
+        return maxDepth;
+      },
     visibleArc(index, slice) {
       if (index === 0 && !this.displaySunburst.slices.center.visibility)
         return 0;
