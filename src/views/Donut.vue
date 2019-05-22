@@ -27,10 +27,11 @@ export default {
           }
         },
         nbRing: "all",
+        radiusCenter: 100,
         slices: {
           zoomable: true,
           text: {
-            present: true,
+            present: false,
             font: {
               size: 10,
               family: "sans-serif"
@@ -56,8 +57,17 @@ export default {
         },
         sequence: {
           present: true,
+          font: {
+            size: 10,
+            family: "sans-serif"
+          },
           position: "top",
           endLabel: {
+            font: {
+              size: 12,
+              family: "sans-serif",
+              weight: "bold"
+            },
             present: true,
             unit: "Million d'euros"
           }

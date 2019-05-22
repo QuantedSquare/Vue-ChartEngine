@@ -1,6 +1,6 @@
 <template>
   <div id="donutChart" :width="displaySunburst.sizes.sequenceW" height="auto">
-    <div class="width_text" :style="font+`;color: transparent;`">
+    <div class="width_text" :style="fontSlices+`;color: transparent;`">
       <span id="maj">ACHATS DE BIENS ET FOURNITURES</span>
       <span id="min">achats de biens et fournitures</span>
       <span id="mix">Achats de biens et fournitures</span>
@@ -15,6 +15,7 @@
           dy="0.35em"
           text-anchor="start"
           fill="rgb(0, 0, 0);"
+          :style="fontEndLabel"
         >{{sequences.labelBudget}} {{displaySunburst.sequence.endLabel.unit}}</text>
         <g
           v-if="notCenter(sequences.seqNames)"
@@ -26,7 +27,7 @@
             :fill="colorScale(sequences.colorName)"
             fill-opacity="0.6"
           ></polygon>
-          <text :id="`text_`+index" text-anchor="middle" :style="font">
+          <text :id="`text_`+index" text-anchor="middle" :style="fontSeq">
             <tspan
               v-for="(name, index) in sequence"
               :x="((sequence[0].length * majW + 10) / 2)+10"
@@ -69,9 +70,14 @@
               :id="`text`+index"
               :transform="text.transform"
               dy="0.35em"
-              :style="font"
+              :style="fontSlices"
             >
-              <tspan v-for="(name, index) in text.name" :x="0" :y="0" :dy="text.name.length > 1 ? (-0.50 + index) + `em` : `0.35em`">{{text.display ? name : null}}</tspan>
+              <tspan
+                v-for="(name, index) in text.name"
+                :x="0"
+                :y="0"
+                :dy="text.name.length > 1 ? (-0.50 + index) + `em` : `0.35em`"
+              >{{text.display ? name : null}}</tspan>
               <!-- <tspan :x="0" :y="0" :dy="`0.50em`">{{text.display ? text.name : null}}</tspan> -->
             </text>
           </g>
@@ -94,7 +100,7 @@
                 :fill="colorScale(legend)"
                 fill-opacity="0.6"
               ></rect>
-              <text x="22" y="9" dy="0.35em" :style="font">{{legend.toUpperCase()}}</text>
+              <text x="22" y="9" dy="0.35em" :style="fontSlices">{{legend.toUpperCase()}}</text>
             </g>
           </svg>
         </div>
@@ -138,6 +144,7 @@ export default {
           }
         },
         nbRing: "all",
+        radiusCenter: 100,
         slices: {
           zoomable: true,
           text: {
@@ -167,8 +174,17 @@ export default {
         },
         sequence: {
           present: true,
+          font: {
+            size: 10,
+            family: "sans-serif"
+          },
           position: "top",
           endLabel: {
+            font: {
+              size: 12,
+              family: "sans-serif",
+              weight: "bold"
+            },
             present: true,
             unit: "Million d'euros"
           }
@@ -197,18 +213,30 @@ export default {
       minW: null,
       mixW: null,
       fontHeight: null,
-      font:
+      fontSlices:
         "font: " +
         this.displaySunburst.slices.text.font.size +
         "px " +
-        this.displaySunburst.slices.text.font.family
+        this.displaySunburst.slices.text.font.family,
+      fontEndLabel:
+        "font: " +
+        this.displaySunburst.sequence.endLabel.font.size +
+        "px " +
+        this.displaySunburst.sequence.endLabel.font.family +
+        "; font-weight:" +
+        this.displaySunburst.sequence.endLabel.font.weight,
+      fontSeq:
+        "font: " +
+        this.displaySunburst.sequence.font.size +
+        "px " +
+        this.displaySunburst.sequence.font.family
     };
   },
   mounted: function() {
     this.majW = document.getElementById("maj").offsetWidth / 30;
     this.minW = document.getElementById("min").offsetWidth / 30;
     this.mixW = document.getElementById("mix").offsetWidth / 30;
-    this.fontHeight = document.getElementById("mix").offsetHeight
+    this.fontHeight = document.getElementById("mix").offsetHeight;
   },
   computed: {
     root: function() {
@@ -384,21 +412,28 @@ export default {
           y1 = d.target ? d.target.y1 : d.current.y1;
         const x = (((x0 + x1) / 2) * 180) / Math.PI;
         const y = (y0 + y1) / 2;
-        
+
         let transform = `rotate(${x - 90}) translate(${y},0) rotate(${
           x < 180 ? 0 : 180
         })`;
-        let name = []
+        let name = [];
         name.push(d.data.name);
         // console.log(name.length * this.majW, y1 - y0, name, d.depth, this.currentRing, this.targetIndex, i);
         if (name[0].length * this.majW > y1 - y0 && y1 - y0 !== 0) {
           let wordAr = name[0].split(/\s+/);
-          let strArr = []
+          let strArr = [];
           this.reduceSliceText(wordAr, y1 - y0, strArr);
-          name = strArr
+          name = strArr;
         }
-        console.log(name.length * this.fontHeight, ((y0 + y1) / 2) * (x1 - x0), y0)
-        let display = ((y0 + y1) / 2) * (x1 - x0) > 10 && y0 !== 0 && ((y0 + y1) / 2) * (x1 - x0) > name.length * this.fontHeight;
+        console.log(
+          name.length * this.fontHeight,
+          ((y0 + y1) / 2) * (x1 - x0),
+          y0
+        );
+        let display =
+          ((y0 + y1) / 2) * (x1 - x0) > 10 &&
+          y0 !== 0 &&
+          ((y0 + y1) / 2) * (x1 - x0) > name.length * this.fontHeight;
         return {
           display: display,
           name: name,
@@ -476,21 +511,20 @@ export default {
     },
     reduceSliceText(wordAr, ringSize, strArr) {
       let str = "";
-      let a = 0
+      let a = 0;
       wordAr.forEach((word, i) => {
-        if (str.concat(' ', word).length * this.majW < ringSize) {
-          str = str.concat(' ', word)
-          a = i
+        if (str.concat(" ", word).length * this.majW < ringSize) {
+          str = str.concat(" ", word);
+          a = i;
         }
-      })
-      wordAr = wordAr.slice(a+1)
-      if (str) strArr.push(str)
-      console.log(str, wordAr, wordAr.join(" ").length)
+      });
+      wordAr = wordAr.slice(a + 1);
+      if (str) strArr.push(str);
+      console.log(str, wordAr, wordAr.join(" ").length);
       if (wordAr.join(" ").length * this.majW > ringSize) {
-        this.reduceSliceText(wordAr, ringSize, strArr)
-      }
-      else {
-        if (wordAr.length) strArr.push(wordAr.join(" "))
+        this.reduceSliceText(wordAr, ringSize, strArr);
+      } else {
+        if (wordAr.length) strArr.push(wordAr.join(" "));
       }
     },
     reduceNbW(wordAr, sizeSeq, sizeLabel) {
@@ -707,10 +741,10 @@ export default {
 #chart {
   display: flex;
 }
-#endlabel {
-  font: 12px sans-serif;
+/* #endlabel {
+  font: 12px sans-serif bold;
   font-weight: bold;
-}
+} */
 .width_text {
   height: 0px;
 }
