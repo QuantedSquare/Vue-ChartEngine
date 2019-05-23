@@ -40,6 +40,10 @@
     </div>
     <div id="chart">
       <div>
+        <div id="explanation">
+          {{sequences.currentHover.toUpperCase()}}<br><br>
+          <span>{{sequences.labelBudget}} {{displaySunburst.sequence.endLabel.unit}}</span>
+        </div>
         <svg
           :height="width"
           :width="width"
@@ -207,7 +211,8 @@ export default {
       sequences: {
         colorName: null,
         seqNames: [],
-        labelBudget: null
+        labelBudget: null,
+        currentHover: null
       },
       majW: null,
       minW: null,
@@ -722,6 +727,7 @@ export default {
         this.displaySunburst.slices.center.visibility
       );
       this.sequences.colorName = this.root.descendants()[index].parentName;
+      this.sequences.currentHover = this.root.descendants()[index].data.name;
 
       let seqNames = [];
       seqNames.push(this.root.descendants()[index].data.name.toUpperCase());
@@ -759,17 +765,19 @@ export default {
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
-/* text {
-  font: 10px sans-serif;
-} */
 #chart {
   display: flex;
 }
-/* #endlabel {
-  font: 12px sans-serif bold;
-  font-weight: bold;
-} */
 .width_text {
   height: 0px;
+}
+#explanation {
+  position: absolute;
+    top: 295px;
+    left: 190px;
+    width: 140px;
+    text-align: center;
+    color: #666;
+    z-index: -1;
 }
 </style>
