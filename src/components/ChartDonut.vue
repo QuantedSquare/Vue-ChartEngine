@@ -737,19 +737,21 @@ export default {
             turnOnHover();
           });
       }
-      function overParents(slice, doc, centerVisibility, explanations) {
+      function overParents(slice, doc, display) {
         if (
           slice.parent &&
           slice.parent.depth > 0 &&
           slice.parent.target &&
           slice.parent.target.y0 !== 0 &&
-          explanations
+          display.explanationsCenter.present || 
+          display.nbRing === "all" && slice.parent && !slice.parent.target && 
+          slice.parent.depth > 0
         ) {
           select("#slice" + slice.parent.position).style("opacity", 1);
-          overParents(slice.parent, doc, centerVisibility, explanations);
+          overParents(slice.parent, doc, display);
         } else if (
-          (slice.depth === 0 && !centerVisibility) ||
-          (explanations && slice.target && slice.target.y0 === 0)
+          (slice.depth === 0 && !display.slices.center.visibility) ||
+          (display.explanationsCenter.present && slice.target && slice.target.y0 === 0)
         ) {
           mouseOnCenter(doc);
         }
@@ -766,8 +768,7 @@ export default {
       overParents(
         this.root.descendants()[index],
         this,
-        this.displaySunburst.slices.center.visibility,
-        this.displaySunburst.explanationsCenter.present
+        this.displaySunburst
       );
       this.sequences.colorName = this.root.descendants()[index].parentName;
       this.sequences.currentHover =
