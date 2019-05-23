@@ -90,7 +90,6 @@
                 :y="0"
                 :dy="text.name.length > 1 ? (-0.50 + index) + `em` : `0.35em`"
               >{{text.display ? name : null}}</tspan>
-              <!-- <tspan :x="0" :y="0" :dy="`0.50em`">{{text.display ? text.name : null}}</tspan> -->
             </text>
           </g>
         </svg>
@@ -102,7 +101,7 @@
           <svg :width="legends.width * majW" :height="legends.names.length * 33">
             <g
               v-for="(legend, index) in legends.names"
-              :transform="`translate(0, `+ 33 * index +`)`"
+              :transform="`translate(0, `+ 33 * index +`)`" @click="clicked(index + 1)" style="cursor: pointer;"
             >
               <rect
                 rx="3"
@@ -719,6 +718,9 @@ export default {
       this.currentRing = this.root.descendants()[index].depth;
       this.$emit("onClick", this.root.descendants()[index]);
     },
+    // clickedLegend(index) {
+
+    // }
 
     mouseover(index) {
       function mouseOnCenter(doc) {
