@@ -76,9 +76,9 @@ export default {
           }
         },
         nbRing: 3,
-        radiusCenter: 100,
+        radiusCenter: 150,
         explanationsCenter: {
-          present: true,
+          present: false,
           width: 140,
           font: {
             size: 15,

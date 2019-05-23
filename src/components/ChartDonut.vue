@@ -40,9 +40,17 @@
     </div>
     <div id="chart">
       <div>
-        <div id="explanation" :style="fontExplanations" v-if="displaySunburst.explanationsCenter.present && sequences.seqNames.length">
-          {{sequences.currentHover.toUpperCase()}}<br><br>
-          <span id="labelBugdet" >{{sequences.labelBudget}} {{displaySunburst.sequence.endLabel.unit}}</span>
+        <div
+          id="explanation"
+          :style="fontExplanations"
+          v-if="displaySunburst.explanationsCenter.present && sequences.currentHover"
+        >
+          {{sequences.currentHover.toUpperCase()}}
+          <br>
+          <br>
+          <span
+            id="labelBugdet"
+          >{{sequences.labelBudget}} {{displaySunburst.sequence.endLabel.unit}}</span>
         </div>
         <svg
           :height="width"
@@ -278,12 +286,17 @@ export default {
         let maxDepth = this.searchMaxDepth(p);
         // console.log(maxDepth - p.depth + 1, this.displaySunburst.nbRing)
         let radiusDivider =
-          this.displaySunburst.nbRing === "all" || maxDepth - p.depth + 1 <= this.displaySunburst.nbRing ? maxDepth - p.depth + 1 : this.displaySunburst.nbRing;
+          this.displaySunburst.nbRing === "all" ||
+          maxDepth - p.depth + 1 <= this.displaySunburst.nbRing
+            ? maxDepth - p.depth + 1
+            : this.displaySunburst.nbRing;
         let maxDomain =
-          this.displaySunburst.nbRing === "all" || p.depth >= this.displaySunburst.nbRing
+          this.displaySunburst.nbRing === "all" ||
+          p.depth >= this.displaySunburst.nbRing
             ? maxDepth
             : this.displaySunburst.nbRing;
-        let newPartY = (this.radius - this.displaySunburst.radiusCenter) / radiusDivider;
+        let newPartY =
+          (this.radius - this.displaySunburst.radiusCenter) / radiusDivider;
         let r0Scale = scaleLinear();
         let r1Scale = scaleLinear();
         r0Scale
@@ -295,29 +308,25 @@ export default {
         // console.log(radiusDivider, maxDomain, maxDepth, p.depth, this.currentRing, newPartY + this.displaySunburst.radiusCenter, r0Scale(1), r1Scale(1), r0Scale(2), r1Scale(2), r0Scale(3), r1Scale(3));
         root.each(d => {
           let newX0 =
-              d.depth > maxDomain &&
-              this.displaySunburst.nbRing !== "all"
+              d.depth > maxDomain && this.displaySunburst.nbRing !== "all"
                 ? 0
                 : Math.max(0, Math.min(1, (d.x0 - p.x0) / (p.x1 - p.x0))) *
                   2 *
                   Math.PI,
             newX1 =
-              d.depth > maxDomain &&
-              this.displaySunburst.nbRing !== "all"
+              d.depth > maxDomain && this.displaySunburst.nbRing !== "all"
                 ? 0
                 : Math.max(0, Math.min(1, (d.x1 - p.x0) / (p.x1 - p.x0))) *
                   2 *
                   Math.PI,
             newY0 =
-              d.depth > maxDomain &&
-              this.displaySunburst.nbRing !== "all"
+              d.depth > maxDomain && this.displaySunburst.nbRing !== "all"
                 ? 0
                 : newX1 - newX0 === 2 * Math.PI && d.data.name !== p.data.name
                 ? 0
                 : r0Scale(d.depth),
             newY1 =
-              d.depth > maxDomain &&
-              this.displaySunburst.nbRing !== "all"
+              d.depth > maxDomain && this.displaySunburst.nbRing !== "all"
                 ? 0
                 : newX1 - newX0 === 2 * Math.PI && d.data.name !== p.data.name
                 ? this.displaySunburst.radiusCenter
@@ -367,17 +376,18 @@ export default {
         }
       }
 
-        let maxDepth = this.searchMaxDepth(this.root);
-        // console.log(maxDepth - p.depth + 1, this.displaySunburst.nbRing)
-        let newPartY = (this.radius - this.displaySunburst.radiusCenter) / maxDepth;
-        let r0Scale = scaleLinear();
-        let r1Scale = scaleLinear();
-        r0Scale
-          .range([this.displaySunburst.radiusCenter, this.radius - newPartY])
-          .domain([1, maxDepth]);
-        r1Scale
-          .range([newPartY + this.displaySunburst.radiusCenter, this.radius])
-          .domain([1, maxDepth]);
+      let maxDepth = this.searchMaxDepth(this.root);
+      // console.log(maxDepth - p.depth + 1, this.displaySunburst.nbRing)
+      let newPartY =
+        (this.radius - this.displaySunburst.radiusCenter) / maxDepth;
+      let r0Scale = scaleLinear();
+      let r1Scale = scaleLinear();
+      r0Scale
+        .range([this.displaySunburst.radiusCenter, this.radius - newPartY])
+        .domain([1, maxDepth]);
+      r1Scale
+        .range([newPartY + this.displaySunburst.radiusCenter, this.radius])
+        .domain([1, maxDepth]);
 
       let amppedSlices = this.root.descendants().map(slice => {
         if (slice.parent) {
@@ -396,19 +406,21 @@ export default {
               : slice.x1,
           y0:
             (slice.depth > this.currentRing + 1 &&
-            this.displaySunburst.nbRing !== "all") || slice.depth === 0
+              this.displaySunburst.nbRing !== "all") ||
+            slice.depth === 0
               ? 0
               : this.displaySunburst.nbRing === "all"
-              ? r0Scale(slice.depth)// all rings at the begining
+              ? r0Scale(slice.depth) // all rings at the begining
               : slice.y0 + this.displaySunburst.radiusCenter / 2, // if just 1 ring at the begining
           y1:
             (slice.depth > this.currentRing + 1 &&
-            this.displaySunburst.nbRing !== "all") || slice.depth === 0
+              this.displaySunburst.nbRing !== "all") ||
+            slice.depth === 0
               ? 0
               : this.displaySunburst.nbRing === "all"
               ? r1Scale(slice.depth)
-              //slice.y1 + this.displaySunburst.radiusCenter / 2 // all rings at the begining
-              : this.radius // if just 1 ring at the begining
+              : //slice.y1 + this.displaySunburst.radiusCenter / 2 // all rings at the begining
+                this.radius // if just 1 ring at the begining
         };
         return slice;
       });
@@ -420,7 +432,8 @@ export default {
       // nb d'anneaux au sunburst
       if (this.displaySunburst.nbRing !== "all")
         amppedSlices = amppedSlices.filter(
-          slice => slice.depth <= this.currentRing + this.displaySunburst.nbRing - 1
+          slice =>
+            slice.depth <= this.currentRing + this.displaySunburst.nbRing - 1
         );
       return amppedSlices;
     },
@@ -526,18 +539,23 @@ export default {
   },
   methods: {
     searchMaxDepth(p) {
-        let maxDepth = 0;
-        p.each(elem => {
-          if (elem.children)
-            elem.children.forEach(child => {
-              this.searchMaxDepth(child);
-            });
-          maxDepth = elem.depth;
-        });
-        return maxDepth;
-      },
+      let maxDepth = 0;
+      p.each(elem => {
+        if (elem.children)
+          elem.children.forEach(child => {
+            this.searchMaxDepth(child);
+          });
+        maxDepth = elem.depth;
+      });
+      return maxDepth;
+    },
     visibleArc(index, slice) {
-      if (index === 0 && !this.displaySunburst.slices.center.visibility)
+      if (
+        (index === 0 && !this.displaySunburst.slices.center.visibility) ||
+        (this.root.descendants()[index].target &&
+          this.root.descendants()[index].target.y0 === 0 &&
+          this.displaySunburst.explanationsCenter.present)
+      )
         return 0;
       return slice.children ? 0.6 : 0.4;
     },
@@ -707,6 +725,7 @@ export default {
         const turnOnHover = () => {
           doc.mLeave = false;
           doc.sequences.seqNames = [];
+          doc.sequences.currentHover = null;
         };
 
         selectAll("#chart path")
@@ -717,11 +736,17 @@ export default {
             turnOnHover();
           });
       }
-      function overParents(slice, doc, centerVisibility) {
-        if (slice.parent && slice.parent.depth > 0) {
+      function overParents(slice, doc, centerVisibility, explanations) {
+        if (slice.parent && slice.parent.depth > 0 && slice.parent.target.y0 !== 0 && explanations) {
+          console.log(slice.parent.target.y0, slice.target.y0, explanations)
+          
+            console.log("je passe ici")
           select("#slice" + slice.parent.position).style("opacity", 1);
-          overParents(slice.parent);
-        } else if (slice.depth === 0 && !centerVisibility) {
+          overParents(slice.parent, doc, centerVisibility, explanations);
+          
+        } else if ((slice.depth === 0 && !centerVisibility) || (explanations && slice.target &&
+        slice.target.y0 === 0)) {
+          console.log("je passe la", slice.depth, centerVisibility, explanations, slice)
           mouseOnCenter(doc);
         }
       }
@@ -737,10 +762,17 @@ export default {
       overParents(
         this.root.descendants()[index],
         this,
-        this.displaySunburst.slices.center.visibility
+        this.displaySunburst.slices.center.visibility,
+        this.displaySunburst.explanationsCenter.present
       );
       this.sequences.colorName = this.root.descendants()[index].parentName;
-      this.sequences.currentHover = this.root.descendants()[index].data.name;
+      this.sequences.currentHover =
+        index &&
+        (this.root.descendants()[index].target &&
+        this.root.descendants()[index].target.y0 !== 0) || !this.root.descendants()[index].target
+          ? this.root.descendants()[index].data.name
+          : null;
+      console.log(this.root.descendants()[index])
 
       let seqNames = [];
       seqNames.push(this.root.descendants()[index].data.name.toUpperCase());
@@ -763,6 +795,7 @@ export default {
       const turnOnHover = () => {
         this.mLeave = false;
         this.sequences.seqNames = [];
+        this.sequences.currentHover = null;
       };
 
       selectAll("#chart path")
@@ -786,14 +819,14 @@ export default {
 }
 #explanation {
   position: absolute;
-    top: 295px;
-    left: 190px;
-    width: 140px;
-    text-align: center;
-    color: rgb(94, 94, 94);
-    z-index: -1;
+  top: 285px;
+  left: 190px;
+  width: 140px;
+  text-align: center;
+  color: rgb(94, 94, 94);
+  z-index: -1;
 }
 #labelBugdet {
-  font-weight: bold
+  font-weight: bold;
 }
 </style>
