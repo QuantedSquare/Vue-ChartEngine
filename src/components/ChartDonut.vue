@@ -305,7 +305,6 @@ export default {
         r1Scale
           .range([newPartY + this.displaySunburst.radiusCenter, this.radius])
           .domain([p.depth, maxDomain]);
-        // console.log(radiusDivider, maxDomain, maxDepth, p.depth, this.currentRing, newPartY + this.displaySunburst.radiusCenter, r0Scale(1), r1Scale(1), r0Scale(2), r1Scale(2), r0Scale(3), r1Scale(3));
         root.each(d => {
           let newX0 =
               d.depth > maxDomain && this.displaySunburst.nbRing !== "all"
@@ -572,7 +571,9 @@ export default {
 
       if (this.sizeWords(wordAr, ringSize)) {
         wordAr.forEach((word, i) => {
-          if (str.concat(" ", word).length * this.majW < ringSize) {
+          if (i === 0 && str.concat("", word).length * this.majW < ringSize) {
+            str = str.concat("", word);
+          } else if (str.concat(" ", word).length * this.majW < ringSize) {
             str = str.concat(" ", word);
             a = i;
           }
@@ -737,16 +738,19 @@ export default {
           });
       }
       function overParents(slice, doc, centerVisibility, explanations) {
-        if (slice.parent && slice.parent.depth > 0 && slice.parent.target.y0 !== 0 && explanations) {
-          console.log(slice.parent.target.y0, slice.target.y0, explanations)
-          
-            console.log("je passe ici")
+        if (
+          slice.parent &&
+          slice.parent.depth > 0 &&
+          slice.parent.target &&
+          slice.parent.target.y0 !== 0 &&
+          explanations
+        ) {
           select("#slice" + slice.parent.position).style("opacity", 1);
           overParents(slice.parent, doc, centerVisibility, explanations);
-          
-        } else if ((slice.depth === 0 && !centerVisibility) || (explanations && slice.target &&
-        slice.target.y0 === 0)) {
-          console.log("je passe la", slice.depth, centerVisibility, explanations, slice)
+        } else if (
+          (slice.depth === 0 && !centerVisibility) ||
+          (explanations && slice.target && slice.target.y0 === 0)
+        ) {
           mouseOnCenter(doc);
         }
       }
@@ -767,12 +771,12 @@ export default {
       );
       this.sequences.colorName = this.root.descendants()[index].parentName;
       this.sequences.currentHover =
-        index &&
-        (this.root.descendants()[index].target &&
-        this.root.descendants()[index].target.y0 !== 0) || !this.root.descendants()[index].target
+        (index &&
+          (this.root.descendants()[index].target &&
+            this.root.descendants()[index].target.y0 !== 0)) ||
+        !this.root.descendants()[index].target
           ? this.root.descendants()[index].data.name
           : null;
-      console.log(this.root.descendants()[index])
 
       let seqNames = [];
       seqNames.push(this.root.descendants()[index].data.name.toUpperCase());
@@ -819,7 +823,7 @@ export default {
 }
 #explanation {
   position: absolute;
-  top: 285px;
+  top: 275px;
   left: 190px;
   width: 140px;
   text-align: center;

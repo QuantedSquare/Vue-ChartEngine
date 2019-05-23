@@ -75,10 +75,10 @@ export default {
             opacity: 0.6
           }
         },
-        nbRing: 3,
+        nbRing: "all",
         radiusCenter: 150,
         explanationsCenter: {
-          present: false,
+          present: true,
           width: 140,
           font: {
             size: 15,
