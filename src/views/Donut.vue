@@ -28,6 +28,14 @@ export default {
         },
         nbRing: "all",
         radiusCenter: 100,
+        explanationsCenter: {
+          present: true,
+          width: 140,
+          font: {
+            size: 15,
+            family: "sans-serif"
+          }
+        },
         slices: {
           zoomable: true,
           text: {

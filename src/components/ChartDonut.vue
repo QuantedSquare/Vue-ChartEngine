@@ -40,9 +40,9 @@
     </div>
     <div id="chart">
       <div>
-        <div id="explanation">
+        <div id="explanation" :style="fontExplanations" v-if="displaySunburst.explanationsCenter.present && sequences.seqNames.length">
           {{sequences.currentHover.toUpperCase()}}<br><br>
-          <span>{{sequences.labelBudget}} {{displaySunburst.sequence.endLabel.unit}}</span>
+          <span id="labelBugdet" >{{sequences.labelBudget}} {{displaySunburst.sequence.endLabel.unit}}</span>
         </div>
         <svg
           :height="width"
@@ -149,6 +149,14 @@ export default {
         },
         nbRing: "all",
         radiusCenter: 100,
+        explanationsCenter: {
+          present: true,
+          width: 140,
+          font: {
+            size: 15,
+            family: "sans-serif"
+          }
+        },
         slices: {
           zoomable: true,
           text: {
@@ -234,7 +242,12 @@ export default {
         "font: " +
         this.displaySunburst.sequence.font.size +
         "px " +
-        this.displaySunburst.sequence.font.family
+        this.displaySunburst.sequence.font.family,
+      fontExplanations:
+        "font: " +
+        this.displaySunburst.explanationsCenter.font.size +
+        "px " +
+        this.displaySunburst.explanationsCenter.font.family
     };
   },
   mounted: function() {
@@ -777,7 +790,10 @@ export default {
     left: 190px;
     width: 140px;
     text-align: center;
-    color: #666;
+    color: rgb(94, 94, 94);
     z-index: -1;
+}
+#labelBugdet {
+  font-weight: bold
 }
 </style>
