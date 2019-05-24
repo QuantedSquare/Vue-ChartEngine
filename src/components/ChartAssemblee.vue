@@ -6,6 +6,12 @@
       @onClick="searchYearsData"
       :displaySunburst="displaySunburst"
     />
+    <ChartDonut
+      :dataDonut="donutBudget"
+      :width="width"
+      @onClick="searchYearsData"
+      :displaySunburst="displaySunburst"
+    />
     <Chartlines
       v-if="currentData.yearsData.length"
       :lines="currentData.yearsData"
@@ -52,6 +58,10 @@ export default {
   data: function() {
     return {
       donutBudget: {
+        name: "Budget",
+        children: []
+      },
+      PartBudget: {
         name: "Budget",
         children: []
       },
@@ -148,72 +158,28 @@ export default {
       let budget = parseInt(elem["Réalisé 2017"].replace(/\s/g, ""));
       let budgetProgess = [[], []];
 
-      budgetProgess[0].push(
-        {
-          x: new Date(2012, 0),
-          y:
-            parseInt(
-              elem[
-                "Budget 2012 avec budget supplémentaire SAIP mai 2012"
-              ].replace(/\s/g, "")
-            ) / 1000000
-        },
-        {
-          x: new Date(2013, 0),
-          y: parseInt(elem["Budget 2013"].replace(/\s/g, "")) / 1000000
-        },
-        {
-          x: new Date(2014, 0),
-          y: parseInt(elem["Budget 2014"].replace(/\s/g, "")) / 1000000
-        },
-        {
-          x: new Date(2015, 0),
-          y: parseInt(elem["Budget 2015"].replace(/\s/g, "")) / 1000000
-        },
-        {
-          x: new Date(2016, 0),
-          y: parseInt(elem["Budget 2016"].replace(/\s/g, "")) / 1000000
-        },
-        {
-          x: new Date(2017, 0),
-          y: parseInt(elem["Budget 2017"].replace(/\s/g, "")) / 1000000
-        }
-      );
-      budgetProgess[1].push(
-        {
-          x: new Date(2012, 0),
-          y: parseInt(elem["Réalisé 2012"].replace(/\s/g, "")) / 1000000
-        },
-        {
-          x: new Date(2013, 0),
-          y: parseInt(elem["Réalisé 2013"].replace(/\s/g, "")) / 1000000
-        },
-        {
-          x: new Date(2014, 0),
-          y: parseInt(elem["Réalisé 2014"].replace(/\s/g, "")) / 1000000
-        },
-        {
-          x: new Date(2015, 0),
-          y: parseInt(elem["Réalisé 2015"].replace(/\s/g, "")) / 1000000
-        },
-        {
-          x: new Date(2016, 0),
-          y: parseInt(elem["Réalisé 2016"].replace(/\s/g, "")) / 1000000
-        },
-        {
-          x: new Date(2017, 0),
-          y: parseInt(elem["Réalisé 2017"].replace(/\s/g, "")) / 1000000
-        }
-      );
-      // console.log(budgetProgess)
-      // console.log(typeof(budget), budget, elem["Réalisé 2017"])
-      // elem["Budget 2012 avec budget supplémentaire SAIP mai 2012"]
-      // console.log(code[0][0], name)
+      Object.keys(elem)
+        .filter(key => key.search("Budget") >= 0)
+        .forEach(budget => {
+          budgetProgess[0].push({
+            x: new Date(parseInt(budget.match(/20\d\d/)[0]), 0),
+            y: parseInt(elem[budget].replace(/\s/g, "")) / 1000000
+          });
+        });
+      Object.keys(elem)
+        .filter(key => key.search("Réalisé") >= 0)
+        .forEach(budget => {
+          budgetProgess[1].push({
+            x: new Date(parseInt(budget.match(/20\d\d/)[0]), 0),
+            y: parseInt(elem[budget].replace(/\s/g, "")) / 1000000
+          });
+        });
       if (
         code[0].length > 2 &&
-        code[0][0] !== "7" &&
+        code[0][0] !==
+          "7" /*&&
         code[0].slice(0, 2) !== "64" &&
-        code[0].slice(0, 2) !== "65"
+        code[0].slice(0, 2) !== "65"*/
       ) {
         if (name.match(/[A-ZÀ-ÖŒ'\.\s]/g).length === name.length) {
           ++index_2;
@@ -256,9 +222,10 @@ export default {
         }
       } else if (
         code[0].length === 2 &&
-        code[0][0] !== "7" &&
+        code[0][0] !==
+          "7" /*&&
         code[0].slice(0, 2) !== "64" &&
-        code[0].slice(0, 2) !== "65"
+        code[0].slice(0, 2) !== "65"*/
       ) {
         ++index_1;
         index_2 = -1;
@@ -274,6 +241,7 @@ export default {
       }
     });
     console.log("donut", this.donutBudget);
+
     this.isLoaded = true;
   },
   methods: {

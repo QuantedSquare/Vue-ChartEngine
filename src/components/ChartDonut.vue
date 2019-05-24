@@ -66,8 +66,8 @@
               :fill-opacity="visibleArc(index, slice)"
               :id="`slice`+index"
               :d="arcSlice(slice)"
-              style="cursor: pointer;"
-              @click="clicked(index)"
+              :style="!displaySunburst.slices.zoomable ? null : `cursor: pointer;`"
+              @click="!displaySunburst.slices.zoomable ? null : clicked(index)"
               @mouseover="mLeave === 0 ? null : mouseover(index)"
             ></path>
           </g>
@@ -101,7 +101,9 @@
           <svg :width="legends.width * majW" :height="legends.names.length * 33">
             <g
               v-for="(legend, index) in legends.names"
-              :transform="`translate(0, `+ 33 * index +`)`" @click="clicked(index + 1)" style="cursor: pointer;"
+              :transform="`translate(0, `+ 33 * index +`)`"
+              @click="!displaySunburst.legends.clickable ? null : clicked(index + 1)"
+              :style="!displaySunburst.legends.clickable ? null : `cursor: pointer;`"
             >
               <rect
                 rx="3"
@@ -741,19 +743,23 @@ export default {
       }
       function overParents(slice, doc, display) {
         if (
-          slice.parent &&
-          slice.parent.depth > 0 &&
-          slice.parent.target &&
-          slice.parent.target.y0 !== 0 &&
-          display.explanationsCenter.present || 
-          display.nbRing === "all" && slice.parent && !slice.parent.target && 
-          slice.parent.depth > 0
+          (slice.parent &&
+            slice.parent.depth > 0 &&
+            slice.parent.target &&
+            slice.parent.target.y0 !== 0 &&
+            display.explanationsCenter.present) ||
+          (display.nbRing === "all" &&
+            slice.parent &&
+            !slice.parent.target &&
+            slice.parent.depth > 0)
         ) {
           select("#slice" + slice.parent.position).style("opacity", 1);
           overParents(slice.parent, doc, display);
         } else if (
           (slice.depth === 0 && !display.slices.center.visibility) ||
-          (display.explanationsCenter.present && slice.target && slice.target.y0 === 0)
+          (display.explanationsCenter.present &&
+            slice.target &&
+            slice.target.y0 === 0)
         ) {
           mouseOnCenter(doc);
         }
@@ -767,11 +773,7 @@ export default {
 
       selectAll("#chart path").style("opacity", 0.3);
       select("#slice" + index).style("opacity", 1);
-      overParents(
-        this.root.descendants()[index],
-        this,
-        this.displaySunburst
-      );
+      overParents(this.root.descendants()[index], this, this.displaySunburst);
       this.sequences.colorName = this.root.descendants()[index].parentName;
       this.sequences.currentHover =
         (index &&
