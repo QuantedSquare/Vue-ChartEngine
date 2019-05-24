@@ -1,39 +1,39 @@
 <template>
   <div v-if="isLoaded" class="container">
     <v-container grid-list-xs>
-    <v-layout row wrap>
-      <v-flex xs9>
-        <ChartDonut
-          idDonut="donut1"
-          :dataDonut="donutBudget"
-          :width="300"
-          @onClick="searchYearsData"
-          :displaySunburst="smallDonut"
-        />
-      </v-flex>
-      <v-flex xs3>Introduction</v-flex>
+      <v-layout row wrap>
+        <v-flex xs9>
+          <ChartDonut
+            idDonut="donut1"
+            :dataDonut="donutBudget"
+            :width="300"
+            @onClick="searchYearsData"
+            :displaySunburst="smallDonut"
+          />
+        </v-flex>
+        <v-flex xs3>Introduction</v-flex>
 
-      <v-flex xs12>
-        <ChartDonut
-          idDonut="donut2"
-          :dataDonut="donutBudget"
-          :width="width"
-          @onClick="searchYearsData"
-          :displaySunburst="displaySunburst"
-         />
-        <Chartlines
-          v-if="currentData.yearsData.length"
-          :lines="currentData.yearsData"
-          :width="linesW"
-          :height="linesH"
-          curve="curveLinear"
-          scale="time"
-          :title="currentData.name"
-          :legends="legends"
-        />
-      </v-flex>
-    </v-layout>
-  </v-container>
+        <v-flex xs12>
+          <ChartDonut
+            idDonut="donut2"
+            :dataDonut="donutBudget"
+            :width="width"
+            @onClick="searchYearsData"
+            :displaySunburst="displaySunburst"
+          />
+          <Chartlines
+            v-if="currentData.yearsData.length"
+            :lines="currentData.yearsData"
+            :width="linesW"
+            :height="linesH"
+            curve="curveLinear"
+            scale="time"
+            :title="currentData.name"
+            :legends="legends"
+          />
+        </v-flex>
+      </v-layout>
+    </v-container>
   </div>
 </template>
 <script>
@@ -84,7 +84,7 @@ export default {
         display: "frame",
         names: ["Prévisions budgetaires", "Dépenses réalisées"]
       },
-      smallDonut:{
+      smallDonut: {
         color: {
           colorScale: Function,
           opacity: 0.6,
@@ -113,8 +113,12 @@ export default {
             },
             rotation: "transform string"
           },
-          joinSlices: true,
-          supprSlices: true,
+          joinSlices: { present: true, bornInclusion: [0, 29720540] },
+          supprSlices: {
+            present: true,
+            bornExclusion: [0, 400000000],
+            into: true
+          },
           center: {
             visibility: false
           },
@@ -178,7 +182,12 @@ export default {
             },
             rotation: "transform string"
           },
-          joinSlices: true,
+          joinSlices: { present: false, bornInclusion: [0, 29720540] },
+          supprSlices: {
+            present: true,
+            bornExclusion: [0, 29720540],
+            into: false
+          },
           center: {
             visibility: false
           },

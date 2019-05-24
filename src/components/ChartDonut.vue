@@ -186,8 +186,12 @@ export default {
             },
             rotation: "transform string"
           },
-          joinSlices: true,
-          supprSlices: true,
+          joinSlices: { present: false, bornInclusion: [0, 29720540] },
+          supprSlices: {
+            present: false,
+            bornExclusion: [0, 0],
+            into: true
+          },
           center: {
             visibility: false
           },
@@ -278,11 +282,57 @@ export default {
   },
   computed: {
     transformData: function() {
-      console.log("transform", this.dataDonut);
-      return this.dataDonut;
+      let a = {
+        name: "Budget",
+        children: []
+      };
+
+      let newChildren = [];
+      let subChild = [];
+      let budget = 0;
+
+      //suppr slices inutiles
+      a.children = this.dataDonut.children.filter(child => {
+        if (this.displaySunburst.slices.supprSlices.present) {
+          if (this.displaySunburst.slices.supprSlices.into)
+            return (
+              this.displaySunburst.slices.supprSlices.bornExclusion[0] <
+                child.budget &&
+              child.budget <
+                this.displaySunburst.slices.supprSlices.bornExclusion[1]
+            );
+          else
+            return (
+              this.displaySunburst.slices.supprSlices.bornExclusion[0] <
+                child.budget &&
+              child.budget <=
+                this.displaySunburst.slices.supprSlices.bornExclusion[1]
+            );
+        }
+        return child;
+      });
+
+      if (this.displaySunburst.slices.joinSlices.present) {
+        a.children.forEach(child => {
+          if (child.budget >= this.displaySunburst.slices.joinSlices.bornInclusion[0] && child.budget <= this.displaySunburst.slices.joinSlices.bornInclusion[1]) {
+            subChild.push(child);
+            budget += child.budget;
+          } else newChildren.push(child);
+        });
+        newChildren.push({
+          budget: budget,
+          name: "AUTRES",
+          children: subChild
+        });
+        console.log(newChildren);
+        a.children = newChildren;
+      }
+
+      return a;
     },
     root: function() {
-      let root = hierarchy(this.dataDonut)
+      console.log("je passe la");
+      let root = hierarchy(this.transformData)
         .sum(d => {
           return d.value;
         })

@@ -46,8 +46,12 @@ export default {
             },
             rotation: "transform string"
           },
-          joinSlices: true,
-          supprSlices: true,
+          joinSlices: { present: false, bornInclusion: [0, 29720540] },
+          supprSlices: {
+            present: false,
+            bornExclusion: [0, 0],
+            into: true,
+          },
           center: {
             visibility: false
           },
