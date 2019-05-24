@@ -6,7 +6,7 @@
         <ChartDonut
           idDonut="donut1"
           :dataDonut="donutBudget"
-          :width="width"
+          :width="300"
           @onClick="searchYearsData"
           :displaySunburst="smallDonut"
         />
@@ -113,7 +113,8 @@ export default {
             },
             rotation: "transform string"
           },
-          joinSmallestSlices: true,
+          joinSlices: true,
+          supprSlices: true,
           center: {
             visibility: false
           },
@@ -121,9 +122,9 @@ export default {
         },
         sizes: {
           margin: 30,
-          sunburstW: this.width,
+          sunburstW: 300,
           legendW: 300,
-          sequenceW: this.width + 300 + 30
+          sequenceW: 300 + 300 + 30
         },
         legends: {
           present: false,
@@ -177,7 +178,7 @@ export default {
             },
             rotation: "transform string"
           },
-          joinSmallestSlices: true,
+          joinSlices: true,
           center: {
             visibility: false
           },

@@ -1,7 +1,11 @@
 <template>
   <v-container grid-list-xs :class="idDonut">
-    <v-layout row wrap id="donutChart" :style="`width:`+displaySunburst.sizes.sequenceW+`px; height:auto;`">
-      <!-- <div id="donutChart" :width="displaySunburst.sizes.sequenceW" height="auto"> -->
+    <v-layout
+      row
+      wrap
+      id="donutChart"
+      :style="`width:`+displaySunburst.sizes.sequenceW+`px; height:auto;`"
+    >
       <v-flex xs12 class="width_text" :style="fontSlices+`;color: transparent;`">
         <span id="maj">ACHATS DE</span>
         <span id="min">achats de</span>
@@ -119,9 +123,7 @@
             </g>
           </svg>
         </div>
-        <!-- </div> -->
       </v-flex>
-      <!-- </div> -->
     </v-layout>
   </v-container>
 </template>
@@ -184,7 +186,8 @@ export default {
             },
             rotation: "transform string"
           },
-          joinSmallestSlices: true,
+          joinSlices: true,
+          supprSlices: true,
           center: {
             visibility: false
           },
@@ -274,6 +277,10 @@ export default {
     this.fontHeight = document.getElementById("mix").offsetHeight;
   },
   computed: {
+    transformData: function() {
+      console.log("transform", this.dataDonut);
+      return this.dataDonut;
+    },
     root: function() {
       let root = hierarchy(this.dataDonut)
         .sum(d => {
@@ -534,8 +541,11 @@ export default {
           .onUpdate(set => {
             const x = (((set.x0 + set.x1) / 2) * 180) / Math.PI;
             const y = (set.y0 + set.y1) / 2;
-            select("."+this.idDonut + " #slice" + i).attr("d", this.arcSlice(set));
-            select("."+this.idDonut + " #text" + i).attr(
+            select("." + this.idDonut + " #slice" + i).attr(
+              "d",
+              this.arcSlice(set)
+            );
+            select("." + this.idDonut + " #text" + i).attr(
               "transform",
               `rotate(${x - 90}) translate(${y},0) rotate(${x < 180 ? 0 : 180})`
             );
@@ -733,6 +743,8 @@ export default {
     // }
 
     mouseover(index) {
+      let doc = this;
+
       function mouseOnCenter(doc) {
         doc.mLeave = true;
         const turnOnHover = () => {
@@ -741,7 +753,7 @@ export default {
           doc.sequences.currentHover = null;
         };
 
-        selectAll("."+this.idDonut + " #chart path")
+        selectAll("." + doc.idDonut + " #chart path")
           .transition()
           .duration(500)
           .style("opacity", 1)
@@ -749,7 +761,7 @@ export default {
             turnOnHover();
           });
       }
-      function overParents(slice, doc, display) {
+      function overParents(slice, doc, display, idDonut) {
         if (
           (slice.parent &&
             slice.parent.depth > 0 &&
@@ -761,11 +773,11 @@ export default {
             !slice.parent.target &&
             slice.parent.depth > 0)
         ) {
-          select("."+doc.idDonut + " #slice" + slice.parent.position).style(
+          select("." + idDonut + " #slice" + slice.parent.position).style(
             "opacity",
             1
           );
-          overParents(slice.parent, doc, display);
+          overParents(slice.parent, doc, display, idDonut);
         } else if (
           (slice.depth === 0 && !display.slices.center.visibility) ||
           (display.explanationsCenter.present &&
@@ -782,9 +794,14 @@ export default {
         }
       }
 
-      selectAll("."+this.idDonut + " #chart path").style("opacity", 0.3);
-      select("."+this.idDonut + " #slice" + index).style("opacity", 1);
-      overParents(this.root.descendants()[index], this, this.displaySunburst);
+      selectAll("." + doc.idDonut + " #chart path").style("opacity", 0.3);
+      select("." + doc.idDonut + " #slice" + index).style("opacity", 1);
+      overParents(
+        this.root.descendants()[index],
+        this,
+        this.displaySunburst,
+        this.idDonut
+      );
       this.sequences.colorName = this.root.descendants()[index].parentName;
       this.sequences.currentHover =
         (index &&
@@ -818,7 +835,7 @@ export default {
         this.sequences.currentHover = null;
       };
 
-      selectAll("."+this.idDonut + " #chart path")
+      selectAll("." + this.idDonut + " #chart path")
         .transition()
         .duration(500)
         .style("opacity", 1)

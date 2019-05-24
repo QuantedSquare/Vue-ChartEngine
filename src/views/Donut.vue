@@ -46,7 +46,8 @@ export default {
             },
             rotation: "transform string"
           },
-          joinSmallestSlices: true,
+          joinSlices: true,
+          supprSlices: true,
           center: {
             visibility: false
           },
