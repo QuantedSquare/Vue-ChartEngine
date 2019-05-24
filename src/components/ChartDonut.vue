@@ -1,45 +1,47 @@
 <template>
-  <div id="donutChart" :width="displaySunburst.sizes.sequenceW" height="auto">
-    <div class="width_text" :style="fontSlices+`;color: transparent;`">
-      <span id="maj">ACHATS DE</span>
-      <span id="min">achats de</span>
-      <span id="mix">Achats de</span>
-    </div>
-    <div id="sequence" v-if="displaySunburst.sequence.present">
-      <svg :width="displaySunburst.sizes.sequenceW" height="80" id="trail">
-        <text
-          v-if="sequences.seqNames.length && notCenter(sequences.seqNames) && displaySunburst.sequence.endLabel.present"
-          id="endlabel"
-          :x="translatePolygon[translatePolygon.length - 1] + 15"
-          y="15"
-          dy="0.35em"
-          text-anchor="start"
-          fill="rgb(0, 0, 0);"
-          :style="fontEndLabel"
-        >{{sequences.labelBudget}} {{displaySunburst.sequence.endLabel.unit}}</text>
-        <g
-          v-if="notCenter(sequences.seqNames)"
-          v-for="(sequence, index) in sequences.seqNames"
-          :transform="`translate(`+ translatePolygon[index] +`, 0)`"
-        >
-          <polygon
-            :points="polygonPoints(sequence[0], sequences.seqNames)"
-            :fill="colorScale(sequences.colorName)"
-            fill-opacity="0.6"
-          ></polygon>
-          <text :id="`text_`+index" text-anchor="middle" :style="fontSeq">
-            <tspan
-              v-for="(name, index) in sequence"
-              :x="((sequence[0].length * majW + 10) / 2)+10"
-              :y="ySpan(sequence, sequences.seqNames)"
-              :dy="sequence.length > 1 ? (index * 1.1) + `em` : `0.35em`"
-            >{{name}}</tspan>
-          </text>
-        </g>
-      </svg>
-    </div>
-    <div id="chart">
-      <div>
+  <v-container grid-list-xs :class="idDonut">
+    <v-layout row wrap id="donutChart" :style="`width:`+displaySunburst.sizes.sequenceW+`px; height:auto;`">
+      <!-- <div id="donutChart" :width="displaySunburst.sizes.sequenceW" height="auto"> -->
+      <v-flex xs12 class="width_text" :style="fontSlices+`;color: transparent;`">
+        <span id="maj">ACHATS DE</span>
+        <span id="min">achats de</span>
+        <span id="mix">Achats de</span>
+      </v-flex>
+      <v-flex xs12 id="sequence" v-if="displaySunburst.sequence.present">
+        <svg :width="displaySunburst.sizes.sequenceW" height="80" id="trail">
+          <text
+            v-if="sequences.seqNames.length && notCenter(sequences.seqNames) && displaySunburst.sequence.endLabel.present"
+            id="endlabel"
+            :x="translatePolygon[translatePolygon.length - 1] + 15"
+            y="15"
+            dy="0.35em"
+            text-anchor="start"
+            fill="rgb(0, 0, 0);"
+            :style="fontEndLabel"
+          >{{sequences.labelBudget}} {{displaySunburst.sequence.endLabel.unit}}</text>
+          <g
+            v-if="notCenter(sequences.seqNames)"
+            v-for="(sequence, index) in sequences.seqNames"
+            :transform="`translate(`+ translatePolygon[index] +`, 0)`"
+          >
+            <polygon
+              :points="polygonPoints(sequence[0], sequences.seqNames)"
+              :fill="colorScale(sequences.colorName)"
+              fill-opacity="0.6"
+            ></polygon>
+            <text :id="`text_`+index" text-anchor="middle" :style="fontSeq">
+              <tspan
+                v-for="(name, index) in sequence"
+                :x="((sequence[0].length * majW + 10) / 2)+10"
+                :y="ySpan(sequence, sequences.seqNames)"
+                :dy="sequence.length > 1 ? (index * 1.1) + `em` : `0.35em`"
+              >{{name}}</tspan>
+            </text>
+          </g>
+        </svg>
+      </v-flex>
+      <v-flex xs8 id="chart">
+        <!-- <div> -->
         <div
           id="explanation"
           :style="fontExplanations"
@@ -93,8 +95,8 @@
             </text>
           </g>
         </svg>
-      </div>
-      <div id="sidebar" v-if="displaySunburst.legends.present">
+      </v-flex>
+      <v-flex xs4 id="sidebar" v-if="displaySunburst.legends.present">
         Legend
         <br>
         <div id="legend" style>
@@ -117,9 +119,11 @@
             </g>
           </svg>
         </div>
-      </div>
-    </div>
-  </div>
+        <!-- </div> -->
+      </v-flex>
+      <!-- </div> -->
+    </v-layout>
+  </v-container>
 </template>
 <script>
 import {
@@ -140,6 +144,10 @@ var TWEEN = require("@tweenjs/tween.js");
 export default {
   name: "ChartDonut",
   props: {
+    idDonut: {
+      type: String,
+      default: "donut"
+    },
     dataDonut: Object,
     width: {
       type: Number,
@@ -526,8 +534,8 @@ export default {
           .onUpdate(set => {
             const x = (((set.x0 + set.x1) / 2) * 180) / Math.PI;
             const y = (set.y0 + set.y1) / 2;
-            select("#slice" + i).attr("d", this.arcSlice(set));
-            select("#text" + i).attr(
+            select("."+this.idDonut + " #slice" + i).attr("d", this.arcSlice(set));
+            select("."+this.idDonut + " #text" + i).attr(
               "transform",
               `rotate(${x - 90}) translate(${y},0) rotate(${x < 180 ? 0 : 180})`
             );
@@ -733,7 +741,7 @@ export default {
           doc.sequences.currentHover = null;
         };
 
-        selectAll("#chart path")
+        selectAll("."+this.idDonut + " #chart path")
           .transition()
           .duration(500)
           .style("opacity", 1)
@@ -753,7 +761,10 @@ export default {
             !slice.parent.target &&
             slice.parent.depth > 0)
         ) {
-          select("#slice" + slice.parent.position).style("opacity", 1);
+          select("."+doc.idDonut + " #slice" + slice.parent.position).style(
+            "opacity",
+            1
+          );
           overParents(slice.parent, doc, display);
         } else if (
           (slice.depth === 0 && !display.slices.center.visibility) ||
@@ -771,8 +782,8 @@ export default {
         }
       }
 
-      selectAll("#chart path").style("opacity", 0.3);
-      select("#slice" + index).style("opacity", 1);
+      selectAll("."+this.idDonut + " #chart path").style("opacity", 0.3);
+      select("."+this.idDonut + " #slice" + index).style("opacity", 1);
       overParents(this.root.descendants()[index], this, this.displaySunburst);
       this.sequences.colorName = this.root.descendants()[index].parentName;
       this.sequences.currentHover =
@@ -807,7 +818,7 @@ export default {
         this.sequences.currentHover = null;
       };
 
-      selectAll("#chart path")
+      selectAll("."+this.idDonut + " #chart path")
         .transition()
         .duration(500)
         .style("opacity", 1)
@@ -820,9 +831,9 @@ export default {
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
-#chart {
+/* #chart {
   display: flex;
-}
+} */
 .width_text {
   height: 0px;
 }
@@ -835,7 +846,7 @@ export default {
   color: rgb(94, 94, 94);
   z-index: -1;
 }
-#labelBugdet {
+/* #labelBugdet {
   font-weight: bold;
-}
+} */
 </style>

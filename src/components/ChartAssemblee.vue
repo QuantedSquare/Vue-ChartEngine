@@ -1,27 +1,39 @@
 <template>
   <div v-if="isLoaded" class="container">
-    <ChartDonut
-      :dataDonut="donutBudget"
-      :width="width"
-      @onClick="searchYearsData"
-      :displaySunburst="displaySunburst"
-    />
-    <ChartDonut
-      :dataDonut="donutBudget"
-      :width="width"
-      @onClick="searchYearsData"
-      :displaySunburst="displaySunburst"
-    />
-    <Chartlines
-      v-if="currentData.yearsData.length"
-      :lines="currentData.yearsData"
-      :width="linesW"
-      :height="linesH"
-      curve="curveLinear"
-      scale="time"
-      :title="currentData.name"
-      :legends="legends"
-    />
+    <v-container grid-list-xs>
+    <v-layout row wrap>
+      <v-flex xs9>
+        <ChartDonut
+          idDonut="donut1"
+          :dataDonut="donutBudget"
+          :width="width"
+          @onClick="searchYearsData"
+          :displaySunburst="smallDonut"
+        />
+      </v-flex>
+      <v-flex xs3>Introduction</v-flex>
+
+      <v-flex xs12>
+        <ChartDonut
+          idDonut="donut2"
+          :dataDonut="donutBudget"
+          :width="width"
+          @onClick="searchYearsData"
+          :displaySunburst="displaySunburst"
+         />
+        <Chartlines
+          v-if="currentData.yearsData.length"
+          :lines="currentData.yearsData"
+          :width="linesW"
+          :height="linesH"
+          curve="curveLinear"
+          scale="time"
+          :title="currentData.name"
+          :legends="legends"
+        />
+      </v-flex>
+    </v-layout>
+  </v-container>
   </div>
 </template>
 <script>
@@ -61,10 +73,6 @@ export default {
         name: "Budget",
         children: []
       },
-      PartBudget: {
-        name: "Budget",
-        children: []
-      },
       currentData: {
         name: null,
         yearsData: []
@@ -75,6 +83,70 @@ export default {
       legends: {
         display: "frame",
         names: ["Prévisions budgetaires", "Dépenses réalisées"]
+      },
+      smallDonut:{
+        color: {
+          colorScale: Function,
+          opacity: 0.6,
+          childrenOpacity: {
+            present: false,
+            opacity: 0.6
+          }
+        },
+        nbRing: 2,
+        radiusCenter: 30,
+        explanationsCenter: {
+          present: false,
+          width: 140,
+          font: {
+            size: 15,
+            family: "sans-serif"
+          }
+        },
+        slices: {
+          zoomable: false,
+          text: {
+            present: true,
+            font: {
+              size: 10,
+              family: "sans-serif"
+            },
+            rotation: "transform string"
+          },
+          joinSmallestSlices: true,
+          center: {
+            visibility: false
+          },
+          hover: true
+        },
+        sizes: {
+          margin: 30,
+          sunburstW: this.width,
+          legendW: 300,
+          sequenceW: this.width + 300 + 30
+        },
+        legends: {
+          present: false,
+          position: "right",
+          clickable: true
+        },
+        sequence: {
+          present: true,
+          font: {
+            size: 10,
+            family: "sans-serif"
+          },
+          position: "top",
+          endLabel: {
+            font: {
+              size: 12,
+              family: "sans-serif",
+              weight: "bold"
+            },
+            present: true,
+            unit: "Million d'euros"
+          }
+        }
       },
       displaySunburst: {
         color: {
@@ -259,8 +331,5 @@ export default {
 <style>
 text {
   font: 10px sans-serif;
-}
-.container {
-  display: flex;
 }
 </style>
