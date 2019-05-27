@@ -1,5 +1,5 @@
 <template>
-  <v-container grid-list-xs :class="idDonut">
+  <v-container fluid fill-height :class="idDonut">
     <v-layout
       row
       wrap
@@ -44,7 +44,7 @@
           </g>
         </svg>
       </v-flex>
-      <v-flex xs8 id="chart">
+      <v-flex xs8 id="chart" style="position: relative">
         <!-- <div> -->
         <div
           id="explanation"
@@ -61,7 +61,7 @@
         <svg
           :height="width"
           :width="width"
-          :style="`margin-right: `+displaySunburst.sizes.margin+`px;`"
+          
           @mouseleave="mouseleave"
         >
           <g fill-opacity="0.6" :transform="translateChart">
@@ -916,7 +916,4 @@ export default {
   color: rgb(94, 94, 94);
   z-index: -1;
 }
-/* #labelBugdet {
-  font-weight: bold;
-} */
 </style>

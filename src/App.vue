@@ -4,7 +4,11 @@
     <router-link to="/">Home</router-link> |
     <router-link to="/about">About</router-link>
 </div> -->
+    <v-app>
+        <v-content>
         <router-view />
+        </v-content>
+    </v-app>
     </div>
 </template>
 <style>

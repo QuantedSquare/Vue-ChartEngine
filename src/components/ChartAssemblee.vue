@@ -1,8 +1,7 @@
 <template>
-  <div v-if="isLoaded" class="container">
-    <v-container grid-list-xs>
-      <v-layout row wrap>
-        <v-flex xs9>
+    <v-container fill-height v-if="isLoaded">
+      <v-layout wrap>
+        <v-flex xs5>
           <ChartDonut
             idDonut="donut1"
             :dataDonut="donutBudget"
@@ -11,7 +10,7 @@
             :displaySunburst="smallDonut"
           />
         </v-flex>
-        <v-flex xs3>Introduction</v-flex>
+        <v-flex xs7>Introduction</v-flex>
 
         <v-flex xs12>
           <ChartDonut
@@ -34,7 +33,6 @@
         </v-flex>
       </v-layout>
     </v-container>
-  </div>
 </template>
 <script>
 import {
@@ -125,10 +123,9 @@ export default {
           hover: true
         },
         sizes: {
-          margin: 30,
           sunburstW: 300,
           legendW: 300,
-          sequenceW: 300 + 300 + 30
+          sequenceW: 300 + 300
         },
         legends: {
           present: false,
