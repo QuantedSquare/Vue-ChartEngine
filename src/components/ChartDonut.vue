@@ -1,5 +1,5 @@
 <template>
-  <v-container fluid fill-height :class="idDonut">
+  <v-container pa-0 fill-height :class="idDonut">
     <v-layout
       row
       wrap
@@ -914,6 +914,5 @@ export default {
   width: 140px;
   text-align: center;
   color: rgb(94, 94, 94);
-  z-index: -1;
 }
 </style>

@@ -1,6 +1,6 @@
 <template>
     <v-container fill-height v-if="isLoaded">
-      <v-layout wrap>
+      <v-layout wrap align-end>
         <v-flex xs5>
           <ChartDonut
             idDonut="donut1"
@@ -10,9 +10,9 @@
             :displaySunburst="smallDonut"
           />
         </v-flex>
-        <v-flex xs7>Introduction</v-flex>
+        <v-flex xs7 class="text-xs-left"><span style="font-size: 4rem;">Budget de l'Assemblée</span><br>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed facilisis nibh erat, eu aliquet tortor consequat vitae. Duis cursus laoreet tempus. Aenean turpis diam, finibus in nisi quis, euismod sollicitudin erat. Nullam et magna id sem venenatis ultricies. Maecenas vitae sapien ante. Duis ex orci, consequat nec massa ultricies, venenatis fringilla ante. Nullam tristique eros vitae massa vestibulum aliquet. Sed vehicula diam in pretium volutpat. Etiam bibendum enim ut efficitur euismod.</v-flex>
 
-        <v-flex xs12>
+        <v-flex xs12 mt-4>
           <ChartDonut
             idDonut="donut2"
             :dataDonut="donutBudget"
