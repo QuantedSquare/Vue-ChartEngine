@@ -1,38 +1,54 @@
 <template>
-    <v-container fill-height v-if="isLoaded">
-      <v-layout wrap align-end>
-        <v-flex xs5>
-          <ChartDonut
-            idDonut="donut1"
-            :dataDonut="donutBudget"
-            :width="300"
-            @onClick="searchYearsData"
-            :displaySunburst="smallDonut"
-          />
-        </v-flex>
-        <v-flex xs7 class="text-xs-left"><span style="font-size: 4rem;">Budget de l'Assemblée</span><br>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed facilisis nibh erat, eu aliquet tortor consequat vitae. Duis cursus laoreet tempus. Aenean turpis diam, finibus in nisi quis, euismod sollicitudin erat. Nullam et magna id sem venenatis ultricies. Maecenas vitae sapien ante. Duis ex orci, consequat nec massa ultricies, venenatis fringilla ante. Nullam tristique eros vitae massa vestibulum aliquet. Sed vehicula diam in pretium volutpat. Etiam bibendum enim ut efficitur euismod.</v-flex>
-
-        <v-flex xs12 mt-4>
-          <ChartDonut
-            idDonut="donut2"
-            :dataDonut="donutBudget"
-            :width="width"
-            @onClick="searchYearsData"
-            :displaySunburst="displaySunburst"
-          />
-          <Chartlines
-            v-if="currentData.yearsData.length"
-            :lines="currentData.yearsData"
-            :width="linesW"
-            :height="linesH"
-            curve="curveLinear"
-            scale="time"
-            :title="currentData.name"
-            :legends="legends"
-          />
-        </v-flex>
-      </v-layout>
-    </v-container>
+  <v-container  fluid fill-height v-if="isLoaded">
+    <v-layout wrap>
+      <v-flex xs12>
+        <v-card color="lime accent-1" class="pa-3">
+        <v-layout wrap align-end>
+          <v-flex xs5>
+            <!-- <v-card dark color="red"> -->
+            <ChartDonut
+              idDonut="donut1"
+              :dataDonut="donutBudget"
+              :width="300"
+              @onClick="searchYearsData"
+              :displaySunburst="smallDonut"
+            />
+            <!-- </v-card> -->
+          </v-flex>
+          <v-flex xs7 class="text-xs-left">
+            <span style="font-size: 4rem;">Budget de l'Assemblée</span>
+            <br>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed facilisis nibh erat, eu aliquet tortor consequat vitae. Duis cursus laoreet tempus. Aenean turpis diam, finibus in nisi quis, euismod sollicitudin erat. Nullam et magna id sem venenatis ultricies. Maecenas vitae sapien ante. Duis ex orci, consequat nec massa ultricies, venenatis fringilla ante. Nullam tristique eros vitae massa vestibulum aliquet. Sed vehicula diam in pretium volutpat. Etiam bibendum enim ut efficitur euismod.
+          </v-flex>
+        </v-layout>
+        </v-card>
+      </v-flex>
+      <v-flex xs12 mt-4>
+        <v-layout wrap align-center>
+          <v-flex xs7>
+        <ChartDonut
+          idDonut="donut2"
+          :dataDonut="donutBudget"
+          :width="width"
+          @onClick="searchYearsData"
+          :displaySunburst="displaySunburst"
+        />
+          </v-flex>
+          <v-flex xs5 id="chartLines" v-resize="onResize">
+        <Chartlines
+          v-if="currentData.yearsData.length"
+          :lines="currentData.yearsData"
+          :width="linesW"
+          :height="linesH"
+          curve="curveLinear"
+          scale="time"
+          :title="currentData.name"
+          :legends="legends"
+        />
+          </v-flex>
+        </v-layout>
+      </v-flex>
+    </v-layout>
+  </v-container>
 </template>
 <script>
 import {
@@ -88,7 +104,7 @@ export default {
           opacity: 0.6,
           childrenOpacity: {
             present: false,
-            opacity: 0.6
+            opacity: 0.4
           }
         },
         nbRing: 2,
@@ -156,8 +172,8 @@ export default {
           colorScale: Function,
           opacity: 0.6,
           childrenOpacity: {
-            present: false,
-            opacity: 0.6
+            present: true,
+            opacity: 0.4
           }
         },
         nbRing: "all",
@@ -326,6 +342,11 @@ export default {
     this.isLoaded = true;
   },
   methods: {
+    onResize() {
+      let lines = document.getElementById("chartLines");
+      // console.log(doc[0].children[0].children.sequence.offsetWidth)
+      this.linesW = lines.offsetWidth;
+    },
     searchYearsData(yearsData) {
       console.log("data years", yearsData);
       this.currentData.yearsData = yearsData.data.budgetProgess

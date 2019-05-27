@@ -11,7 +11,7 @@
         <span id="min">achats de</span>
         <span id="mix">Achats de</span>
       </v-flex>
-      <v-flex xs8 id="sequence" v-if="displaySunburst.sequence.present" v-resize="onResize">
+      <v-flex :class="displaySunburst.legends.present ? `xs8` : `xs12`" id="sequence" v-if="displaySunburst.sequence.present" v-resize="onResize">
         <svg width="100%" height="80" id="trail">
           <text
             v-if="sequences.seqNames.length && notCenter(sequences.seqNames) && displaySunburst.sequence.endLabel.present"
@@ -44,7 +44,11 @@
           </g>
         </svg>
       </v-flex>
-      <v-flex :class="displaySunburst.legends.present ? `xs8` : `xs12`" id="chart" style="position: relative">
+      <v-flex
+        :class="displaySunburst.legends.present ? `xs8` : `xs12`"
+        id="chart"
+        style="position: relative"
+      >
         <!-- <div> -->
         <div
           id="explanation"
@@ -58,12 +62,7 @@
             id="labelBugdet"
           >{{sequences.currentHover ? sequences.labelBudget : transformData.budget}} {{displaySunburst.sequence.endLabel.unit}}</span>
         </div>
-        <svg
-          :height="width"
-          :width="width"
-          
-          @mouseleave="mouseleave"
-        >
+        <svg :height="width" :width="width" @mouseleave="mouseleave">
           <g fill-opacity="0.6" :transform="translateChart">
             <path
               v-for="(slice, index) in slices"
@@ -297,7 +296,6 @@ export default {
       let subChild = [];
       let budget = 0;
 
-
       //suppr slices inutiles
       a.children = this.dataDonut.children.filter(child => {
         if (this.displaySunburst.slices.supprSlices.present) {
@@ -322,7 +320,12 @@ export default {
       //join data
       if (this.displaySunburst.slices.joinSlices.present) {
         a.children.forEach(child => {
-          if (child.budget >= this.displaySunburst.slices.joinSlices.bornInclusion[0] && child.budget <= this.displaySunburst.slices.joinSlices.bornInclusion[1]) {
+          if (
+            child.budget >=
+              this.displaySunburst.slices.joinSlices.bornInclusion[0] &&
+            child.budget <=
+              this.displaySunburst.slices.joinSlices.bornInclusion[1]
+          ) {
             subChild.push(child);
             budget += child.budget;
           } else newChildren.push(child);
@@ -335,8 +338,8 @@ export default {
         a.children = newChildren;
       }
 
-      a.children.forEach(child => a.budget += child.budget)
-      a.budget = (a.budget / 1000000).toFixed(2)
+      a.children.forEach(child => (a.budget += child.budget));
+      a.budget = (a.budget / 1000000).toFixed(2);
       return a;
     },
     root: function() {
@@ -379,7 +382,7 @@ export default {
         r1Scale
           .range([newPartY + this.displaySunburst.radiusCenter, this.radius])
           .domain([p.depth, maxDomain]);
-        root.each(d => {                
+        root.each(d => {
           let newX0 =
               d.depth > maxDomain && this.displaySunburst.nbRing !== "all"
                 ? 0
@@ -395,7 +398,9 @@ export default {
             newY0 =
               d.depth > maxDomain && this.displaySunburst.nbRing !== "all"
                 ? 0
-                : newX1 - newX0 === 2 * Math.PI && d.data.name !== p.data.name || d.depth === 0
+                : (newX1 - newX0 === 2 * Math.PI &&
+                    d.data.name !== p.data.name) ||
+                  d.depth === 0
                 ? 0
                 : r0Scale(d.depth),
             newY1 =
@@ -404,7 +409,7 @@ export default {
                 : newX1 - newX0 === 2 * Math.PI && d.data.name !== p.data.name
                 ? this.displaySunburst.radiusCenter
                 : r1Scale(d.depth);
-                // console.log(d.depth, maxDomain, newX1 - newX0, 2 * Math.PI, d.data.name, p.data.name, r0Scale(d.depth))
+          // console.log(d.depth, maxDomain, newX1 - newX0, 2 * Math.PI, d.data.name, p.data.name, r0Scale(d.depth))
           return (d.target = {
             x0: newX0,
             x1: newX1,
@@ -487,8 +492,8 @@ export default {
               ? r0Scale(slice.depth) // all rings at the begining
               : slice.y0 + this.displaySunburst.radiusCenter / 2, // if just 1 ring at the begining
           y1:
-            (slice.depth > this.currentRing + 1 &&
-              this.displaySunburst.nbRing !== "all")
+            slice.depth > this.currentRing + 1 &&
+            this.displaySunburst.nbRing !== "all"
               ? 0
               : this.displaySunburst.nbRing === "all"
               ? r1Scale(slice.depth)
@@ -614,9 +619,10 @@ export default {
   },
   methods: {
     onResize() {
-      let doc = document.getElementsByClassName(this.idDonut)
+      let doc = document.getElementsByClassName(this.idDonut);
       // console.log(doc[0].children[0].children.sequence.offsetWidth)
-      this.displaySunburst.sizes.sequenceW = doc[0].children[0].children.sequence.offsetWidth
+      this.displaySunburst.sizes.sequenceW =
+        doc[0].children[0].children.sequence.offsetWidth;
     },
     searchMaxDepth(p) {
       let maxDepth = 0;
@@ -637,7 +643,11 @@ export default {
           this.displaySunburst.explanationsCenter.present)
       )
         return 0;
-      return slice.children ? 0.6 : 0.4;
+      return slice.children
+        ? this.displaySunburst.color.opacity
+        : this.displaySunburst.color.childrenOpacity.present
+        ? this.displaySunburst.color.childrenOpacity.opacity
+        : this.displaySunburst.color.opacity;
     },
     sizeWords(wordAr, ringSize) {
       let sizeOk = true;
@@ -865,8 +875,8 @@ export default {
       this.sequences.currentHover =
         (index &&
           (this.root.descendants()[index].target &&
-            this.root.descendants()[index].target.y0 !== 0)) || (index &&
-        !this.root.descendants()[index].target)
+            this.root.descendants()[index].target.y0 !== 0)) ||
+        (index && !this.root.descendants()[index].target)
           ? this.root.descendants()[index].data.name
           : null;
 
