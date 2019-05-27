@@ -104,7 +104,7 @@
         Legend
         <br>
         <div id="legend" style>
-          <svg :width="legends.width * majW" :height="legends.names.length * 33">
+          <svg :width="legends.width * majW + 20" :height="legends.names.length * 33">
             <g
               v-for="(legend, index) in legends.names"
               :transform="`translate(0, `+ 33 * index +`)`"
@@ -312,6 +312,7 @@ export default {
         return child;
       });
 
+      //join data
       if (this.displaySunburst.slices.joinSlices.present) {
         a.children.forEach(child => {
           if (child.budget >= this.displaySunburst.slices.joinSlices.bornInclusion[0] && child.budget <= this.displaySunburst.slices.joinSlices.bornInclusion[1]) {
@@ -324,14 +325,12 @@ export default {
           name: "AUTRES",
           children: subChild
         });
-        console.log(newChildren);
         a.children = newChildren;
       }
 
       return a;
     },
     root: function() {
-      console.log("je passe la");
       let root = hierarchy(this.transformData)
         .sum(d => {
           return d.value;
@@ -371,7 +370,7 @@ export default {
         r1Scale
           .range([newPartY + this.displaySunburst.radiusCenter, this.radius])
           .domain([p.depth, maxDomain]);
-        root.each(d => {
+        root.each(d => {                
           let newX0 =
               d.depth > maxDomain && this.displaySunburst.nbRing !== "all"
                 ? 0
@@ -387,7 +386,7 @@ export default {
             newY0 =
               d.depth > maxDomain && this.displaySunburst.nbRing !== "all"
                 ? 0
-                : newX1 - newX0 === 2 * Math.PI && d.data.name !== p.data.name
+                : newX1 - newX0 === 2 * Math.PI && d.data.name !== p.data.name || d.depth === 0
                 ? 0
                 : r0Scale(d.depth),
             newY1 =
@@ -396,6 +395,7 @@ export default {
                 : newX1 - newX0 === 2 * Math.PI && d.data.name !== p.data.name
                 ? this.displaySunburst.radiusCenter
                 : r1Scale(d.depth);
+                console.log(d.depth, maxDomain, newX1 - newX0, 2 * Math.PI, d.data.name, p.data.name, r0Scale(d.depth))
           return (d.target = {
             x0: newX0,
             x1: newX1,
@@ -549,7 +549,6 @@ export default {
       let b = [];
       this.sequences.seqNames.forEach((elem, i) => {
         let l = 0;
-        // console.log(this.majW)
         if (i !== 0) l = antL * this.majW + 2 + b[i - 1] + 20;
         b.push(l);
         antL = elem[0].length;
@@ -788,9 +787,6 @@ export default {
       this.currentRing = this.root.descendants()[index].depth;
       this.$emit("onClick", this.root.descendants()[index]);
     },
-    // clickedLegend(index) {
-
-    // }
 
     mouseover(index) {
       let doc = this;
