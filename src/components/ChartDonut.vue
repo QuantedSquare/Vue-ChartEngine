@@ -49,14 +49,14 @@
         <div
           id="explanation"
           :style="fontExplanations"
-          v-if="displaySunburst.explanationsCenter.present && sequences.currentHover"
+          v-if="displaySunburst.explanationsCenter.present"
         >
-          {{sequences.currentHover.toUpperCase()}}
+          {{sequences.currentHover ? sequences.currentHover.toUpperCase() : transformData.name}}
           <br>
           <br>
           <span
             id="labelBugdet"
-          >{{sequences.labelBudget}} {{displaySunburst.sequence.endLabel.unit}}</span>
+          >{{sequences.currentHover ? sequences.labelBudget : transformData.budget}} {{displaySunburst.sequence.endLabel.unit}}</span>
         </div>
         <svg
           :height="width"
@@ -246,6 +246,10 @@ export default {
         labelBudget: null,
         currentHover: null
       },
+      centerInfos: {
+        name: null,
+        value: null
+      },
       majW: null,
       minW: null,
       mixW: null,
@@ -283,13 +287,15 @@ export default {
   computed: {
     transformData: function() {
       let a = {
-        name: "Budget",
-        children: []
+        name: this.dataDonut.name.toUpperCase(),
+        children: [],
+        budget: 0
       };
 
       let newChildren = [];
       let subChild = [];
       let budget = 0;
+
 
       //suppr slices inutiles
       a.children = this.dataDonut.children.filter(child => {
@@ -328,6 +334,8 @@ export default {
         a.children = newChildren;
       }
 
+      a.children.forEach(child => a.budget += child.budget)
+      a.budget = (a.budget / 1000000).toFixed(2)
       return a;
     },
     root: function() {
@@ -395,7 +403,7 @@ export default {
                 : newX1 - newX0 === 2 * Math.PI && d.data.name !== p.data.name
                 ? this.displaySunburst.radiusCenter
                 : r1Scale(d.depth);
-                console.log(d.depth, maxDomain, newX1 - newX0, 2 * Math.PI, d.data.name, p.data.name, r0Scale(d.depth))
+                // console.log(d.depth, maxDomain, newX1 - newX0, 2 * Math.PI, d.data.name, p.data.name, r0Scale(d.depth))
           return (d.target = {
             x0: newX0,
             x1: newX1,
@@ -479,8 +487,7 @@ export default {
               : slice.y0 + this.displaySunburst.radiusCenter / 2, // if just 1 ring at the begining
           y1:
             (slice.depth > this.currentRing + 1 &&
-              this.displaySunburst.nbRing !== "all") ||
-            slice.depth === 0
+              this.displaySunburst.nbRing !== "all")
               ? 0
               : this.displaySunburst.nbRing === "all"
               ? r1Scale(slice.depth)
@@ -852,8 +859,8 @@ export default {
       this.sequences.currentHover =
         (index &&
           (this.root.descendants()[index].target &&
-            this.root.descendants()[index].target.y0 !== 0)) ||
-        !this.root.descendants()[index].target
+            this.root.descendants()[index].target.y0 !== 0)) || (index &&
+        !this.root.descendants()[index].target)
           ? this.root.descendants()[index].data.name
           : null;
 
