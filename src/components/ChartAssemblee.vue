@@ -139,6 +139,7 @@ export default {
             family: "sans-serif"
           },
           position: "top",
+          center: true,
           endLabel: {
             font: {
               size: 12,
@@ -208,6 +209,7 @@ export default {
             family: "sans-serif"
           },
           position: "top",
+          center: false,
           endLabel: {
             font: {
               size: 12,

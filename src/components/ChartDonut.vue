@@ -1,18 +1,18 @@
 <template>
   <v-container pa-0 fill-height :class="idDonut">
     <v-layout
+      :class="displaySunburst.sequence.center ? `justify-center` : ``"
       row
       wrap
       id="donutChart"
-      :style="`width:`+displaySunburst.sizes.sequenceW+`px; height:auto;`"
     >
       <v-flex xs12 class="width_text" :style="fontSlices+`;color: transparent;`">
         <span id="maj">ACHATS DE</span>
         <span id="min">achats de</span>
         <span id="mix">Achats de</span>
       </v-flex>
-      <v-flex xs12 id="sequence" v-if="displaySunburst.sequence.present">
-        <svg :width="displaySunburst.sizes.sequenceW" height="80" id="trail">
+      <v-flex xs8 id="sequence" v-if="displaySunburst.sequence.present" v-resize="onResize">
+        <svg width="100%" height="80" id="trail">
           <text
             v-if="sequences.seqNames.length && notCenter(sequences.seqNames) && displaySunburst.sequence.endLabel.present"
             id="endlabel"
@@ -44,7 +44,7 @@
           </g>
         </svg>
       </v-flex>
-      <v-flex xs8 id="chart" style="position: relative">
+      <v-flex :class="displaySunburst.legends.present ? `xs8` : `xs12`" id="chart" style="position: relative">
         <!-- <div> -->
         <div
           id="explanation"
@@ -215,6 +215,7 @@ export default {
             family: "sans-serif"
           },
           position: "top",
+          center: false,
           endLabel: {
             font: {
               size: 12,
@@ -612,6 +613,11 @@ export default {
     }
   },
   methods: {
+    onResize() {
+      let doc = document.getElementsByClassName(this.idDonut)
+      // console.log(doc[0].children[0].children.sequence.offsetWidth)
+      this.displaySunburst.sizes.sequenceW = doc[0].children[0].children.sequence.offsetWidth
+    },
     searchMaxDepth(p) {
       let maxDepth = 0;
       p.each(elem => {

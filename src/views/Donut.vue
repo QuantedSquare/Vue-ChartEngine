@@ -75,6 +75,7 @@ export default {
             family: "sans-serif"
           },
           position: "top",
+          center: false,
           endLabel: {
             font: {
               size: 12,
