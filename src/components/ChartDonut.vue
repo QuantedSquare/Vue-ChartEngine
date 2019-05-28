@@ -2,7 +2,6 @@
   <v-container pa-0 fill-height :class="idDonut">
     <v-layout
       :class="displaySunburst.sequence.center ? `justify-center` : ``"
-      row
       wrap
       id="donutChart"
     >
@@ -104,7 +103,7 @@
           </g>
         </svg>
       </v-flex>
-      <v-flex xs4 id="sidebar" v-if="displaySunburst.legends.present">
+      <v-flex xs2 id="sidebar" v-if="displaySunburst.legends.present">
         Legend
         <br>
         <div id="legend" style>
@@ -272,14 +271,7 @@ export default {
         this.displaySunburst.sequence.font.size +
         "px " +
         this.displaySunburst.sequence.font.family,
-      fontExplanations:
-        "font: " +
-        this.displaySunburst.explanationsCenter.font.size +
-        "px " +
-        this.displaySunburst.explanationsCenter.font.family +
-        "; width: " +
-        (this.displaySunburst.radiusCenter - 10) +
-        "px;"
+      
     };
   },
   mounted: function() {
@@ -290,6 +282,15 @@ export default {
     this.explanationsPos = this.setExplanationsPos()
   },
   computed: {
+    fontExplanations: function() {
+        return "font: " +
+        this.displaySunburst.explanationsCenter.font.size +
+        "px " +
+        this.displaySunburst.explanationsCenter.font.family +
+        "; width: " +
+        (this.displaySunburst.radiusCenter - 10) +
+        "px;"
+    },
     transformData: function() {
       let a = {
         name: this.dataDonut.name.toUpperCase(),
@@ -831,6 +832,16 @@ export default {
 
       let donut = document.getElementsByClassName(this.idDonut),
       chartW = donut[0].children[0].children.chart.offsetWidth;
+
+      console.log(chartW, this.displaySunburst.sizes.width)
+      if (chartW > 340 && chartW < this.displaySunburst.sizes.width) {
+        this.displaySunburst.sizes.sunburstW = chartW
+        this.displaySunburst.radiusCenter = chartW / 4
+      }
+      else if (chartW >= this.displaySunburst.sizes.width) {
+        this.displaySunburst.sizes.sunburstW = this.displaySunburst.sizes.width
+        this.displaySunburst.radiusCenter = this.displaySunburst.sizes.center
+      }
 
       let hDiv = newDiv.offsetHeight;
       let tDiv = (this.displaySunburst.sizes.sunburstW / 2) - (hDiv / 2)

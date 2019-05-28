@@ -23,7 +23,7 @@
       </v-flex>
       <v-flex xs12 mt-4>
         <v-layout wrap align-center justify-center>
-          <v-flex :class="currentData.yearsData.length ?`xs7` : `xs9`">
+          <v-flex :class="currentData.yearsData.length ?`md12 lg7` : `sm12 lg9`">
             <ChartDonut
               idDonut="donut2"
               :dataDonut="donutBudget"
@@ -31,7 +31,7 @@
               :displaySunburst="displaySunburst"
             />
           </v-flex>
-          <v-flex v-if="currentData.yearsData.length" xs5 id="chartLines" v-resize="onResize">
+          <v-flex v-if="currentData.yearsData.length" xs10 lg5 pt-4 id="chartLines" v-resize="onResize">
             <Chartlines
               :lines="currentData.yearsData"
               :width="linesW"
@@ -132,6 +132,8 @@ export default {
           hover: true
         },
         sizes: {
+          width: 300,
+          center: 30,
           sunburstW: 300,
           legendW: 300,
           sequenceW: 300 + 300
@@ -182,7 +184,7 @@ export default {
         slices: {
           zoomable: true,
           text: {
-            present: true,
+            present: false,
             font: {
               size: 10,
               family: "sans-serif"
@@ -201,7 +203,8 @@ export default {
           hover: true
         },
         sizes: {
-          margin: 30,
+          width: 500,
+          center: 150,
           sunburstW: 500,
           legendW: 300,
           sequenceW: 500 + 300 + 30
