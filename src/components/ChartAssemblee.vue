@@ -89,7 +89,7 @@ export default {
         present: true,
         display: "frame",
         names: ["Prévisions budgetaires", "Dépenses réalisées"],
-        width: 200
+        width: 115
       },
       smallDonut: {
         color: {
@@ -340,8 +340,10 @@ export default {
   methods: {
     onResize() {
       let lines = document.getElementById("chartLines");
-      // console.log(doc[0].children[0].children.sequence.offsetWidth)
-      this.linesW = lines.offsetWidth;
+      if (lines.offsetWidth < 375)
+        this.linesW = 372
+      else
+        this.linesW = lines.offsetWidth;
     },
     searchYearsData(yearsData) {
       console.log("data years", yearsData);

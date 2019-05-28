@@ -103,10 +103,10 @@
           </g>
         </svg>
       </v-flex>
-      <v-flex xs2 id="sidebar" v-if="displaySunburst.legends.present">
+      <v-flex xs2 pl-3 id="sidebar" v-if="displaySunburst.legends.present">
         Legend
         <br>
-        <div id="legend" style>
+        <div id="legend">
           <svg :width="legends.width * majW + 20" :height="legends.names.length * 33">
             <g
               v-for="(legend, index) in legends.names"
