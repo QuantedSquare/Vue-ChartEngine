@@ -11,7 +11,12 @@
         <span id="min">achats de</span>
         <span id="mix">Achats de</span>
       </v-flex>
-      <v-flex :class="displaySunburst.legends.present ? `xs8` : `xs12`" id="sequence" v-if="displaySunburst.sequence.present" v-resize="onResize">
+      <v-flex
+        :class="displaySunburst.legends.present ? `xs8` : `xs12`"
+        id="sequence"
+        v-if="displaySunburst.sequence.present"
+        v-resize="onResize"
+      >
         <svg width="100%" height="80" id="trail">
           <text
             v-if="sequences.seqNames.length && notCenter(sequences.seqNames) && displaySunburst.sequence.endLabel.present"
@@ -62,7 +67,7 @@
             id="labelBugdet"
           >{{sequences.currentHover ? sequences.labelBudget : transformData.budget}} {{displaySunburst.sequence.endLabel.unit}}</span>
         </div>
-        <svg :height="width" :width="width" @mouseleave="mouseleave">
+        <svg :height="displaySunburst.sizes.sunburstW" :width="displaySunburst.sizes.sunburstW" @mouseleave="mouseleave">
           <g fill-opacity="0.6" :transform="translateChart">
             <path
               v-for="(slice, index) in slices"
@@ -150,10 +155,6 @@ export default {
       default: "donut"
     },
     dataDonut: Object,
-    width: {
-      type: Number,
-      default: 932
-    },
     displaySunburst: {
       type: Object,
       default: {
@@ -197,7 +198,6 @@ export default {
           hover: true
         },
         sizes: {
-          margin: 30,
           sunburstW: 500,
           legendW: 300,
           sequenceW: 500 + 300 + 30
@@ -275,7 +275,11 @@ export default {
         "font: " +
         this.displaySunburst.explanationsCenter.font.size +
         "px " +
-        this.displaySunburst.explanationsCenter.font.family
+        this.displaySunburst.explanationsCenter.font.family +
+        "; width: " +
+        (this.displaySunburst.radiusCenter - 10) +
+        "px;"
+        
     };
   },
   mounted: function() {
@@ -421,7 +425,7 @@ export default {
       return root;
     },
     radius: function() {
-      return this.width / 2;
+      return this.displaySunburst.sizes.sunburstW / 2;
     },
     partition: function() {
       return partition().size([2 * Math.PI, this.radius]);
@@ -555,7 +559,7 @@ export default {
       return textData;
     },
     translateChart: function() {
-      return `translate(${this.width / 2}, ${this.width / 2})`;
+      return `translate(${this.displaySunburst.sizes.sunburstW / 2}, ${this.displaySunburst.sizes.sunburstW / 2})`;
     },
     translatePolygon: function() {
       let antL = 0;
@@ -880,6 +884,25 @@ export default {
           ? this.root.descendants()[index].data.name
           : null;
 
+      let newDiv = document.createElement("div");
+      newDiv.innerHTML = this.sequences.currentHover.toUpperCase() + "<br><br><span>"+this.sequences.labelBudget+ " " + this.displaySunburst.sequence.endLabel.unit +"</span>";
+      newDiv.setAttribute("id", "explanation");
+      newDiv.setAttribute("style", this.fontExplanations);
+
+      let currentDiv = document.getElementById("chart");
+      currentDiv.appendChild(newDiv);
+
+      let hDiv = newDiv.offsetHeight;
+
+      this.posExplanations = "top: " +
+        275 +
+        "px; left: " +
+        190 +
+        "px;"
+        
+
+
+
       let seqNames = [];
       seqNames.push(this.root.descendants()[index].data.name.toUpperCase());
       setSequence(this.root.descendants()[index]);
@@ -925,9 +948,6 @@ export default {
 }
 #explanation {
   position: absolute;
-  top: 275px;
-  left: 190px;
-  width: 140px;
   text-align: center;
   color: rgb(94, 94, 94);
 }

@@ -1,6 +1,6 @@
 <template>
   <div class="chart">
-    <ChartAssemblee :width="chartWidth"/>
+    <ChartAssemblee/>
   </div>
 </template>
 <script>
@@ -10,11 +10,6 @@ export default {
   name: "donut",
   components: {
     ChartAssemblee
-  },
-  data: function() {
-    return {
-      chartWidth: 500
-    };
   }
 };
 </script>

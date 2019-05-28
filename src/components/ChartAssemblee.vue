@@ -1,49 +1,48 @@
 <template>
-  <v-container  fluid fill-height v-if="isLoaded">
+  <v-container fluid fill-height v-if="isLoaded">
     <v-layout wrap>
       <v-flex xs12>
         <v-card color="lime accent-1" class="pa-3">
-        <v-layout wrap align-end>
-          <v-flex xs5>
-            <!-- <v-card dark color="red"> -->
-            <ChartDonut
-              idDonut="donut1"
-              :dataDonut="donutBudget"
-              :width="300"
-              @onClick="searchYearsData"
-              :displaySunburst="smallDonut"
-            />
-            <!-- </v-card> -->
-          </v-flex>
-          <v-flex xs7 class="text-xs-left">
-            <span style="font-size: 4rem;">Budget de l'Assemblée</span>
-            <br>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed facilisis nibh erat, eu aliquet tortor consequat vitae. Duis cursus laoreet tempus. Aenean turpis diam, finibus in nisi quis, euismod sollicitudin erat. Nullam et magna id sem venenatis ultricies. Maecenas vitae sapien ante. Duis ex orci, consequat nec massa ultricies, venenatis fringilla ante. Nullam tristique eros vitae massa vestibulum aliquet. Sed vehicula diam in pretium volutpat. Etiam bibendum enim ut efficitur euismod.
-          </v-flex>
-        </v-layout>
+          <v-layout wrap align-end>
+            <v-flex xs5>
+              <!-- <v-card dark color="red"> -->
+              <ChartDonut
+                idDonut="donut1"
+                :dataDonut="donutBudget"
+                :width="300"
+                @onClick="searchYearsData"
+                :displaySunburst="smallDonut"
+              />
+              <!-- </v-card> -->
+            </v-flex>
+            <v-flex xs7 class="text-xs-left">
+              <span style="font-size: 4rem;">Budget de l'Assemblée</span>
+              <br>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed facilisis nibh erat, eu aliquet tortor consequat vitae. Duis cursus laoreet tempus. Aenean turpis diam, finibus in nisi quis, euismod sollicitudin erat. Nullam et magna id sem venenatis ultricies. Maecenas vitae sapien ante. Duis ex orci, consequat nec massa ultricies, venenatis fringilla ante. Nullam tristique eros vitae massa vestibulum aliquet. Sed vehicula diam in pretium volutpat. Etiam bibendum enim ut efficitur euismod.
+            </v-flex>
+          </v-layout>
         </v-card>
       </v-flex>
       <v-flex xs12 mt-4>
-        <v-layout wrap align-center>
-          <v-flex xs7>
-        <ChartDonut
-          idDonut="donut2"
-          :dataDonut="donutBudget"
-          :width="width"
-          @onClick="searchYearsData"
-          :displaySunburst="displaySunburst"
-        />
+        <v-layout wrap align-center justify-center>
+          <v-flex :class="currentData.yearsData.length ?`xs7` : `xs9`">
+            <ChartDonut
+              idDonut="donut2"
+              :dataDonut="donutBudget"
+              :width="width"
+              @onClick="searchYearsData"
+              :displaySunburst="displaySunburst"
+            />
           </v-flex>
-          <v-flex xs5 id="chartLines" v-resize="onResize">
-        <Chartlines
-          v-if="currentData.yearsData.length"
-          :lines="currentData.yearsData"
-          :width="linesW"
-          :height="linesH"
-          curve="curveLinear"
-          scale="time"
-          :title="currentData.name"
-          :legends="legends"
-        />
+          <v-flex v-if="currentData.yearsData.length" xs5 id="chartLines" v-resize="onResize">
+            <Chartlines
+              :lines="currentData.yearsData"
+              :width="linesW"
+              :height="linesH"
+              curve="curveLinear"
+              scale="time"
+              :title="currentData.name"
+              :legends="legends"
+            />
           </v-flex>
         </v-layout>
       </v-flex>
@@ -74,12 +73,6 @@ export default {
   components: {
     ChartDonut,
     Chartlines
-  },
-  props: {
-    width: {
-      type: Number,
-      default: 500
-    }
   },
   data: function() {
     return {
@@ -211,9 +204,9 @@ export default {
         },
         sizes: {
           margin: 30,
-          sunburstW: this.width,
+          sunburstW: 500,
           legendW: 300,
-          sequenceW: this.width + 300 + 30
+          sequenceW: 500 + 300 + 30
         },
         legends: {
           present: true,
