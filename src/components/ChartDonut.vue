@@ -57,7 +57,7 @@
         <!-- <div> -->
         <div
           id="explanation"
-          :style="fontExplanations"
+          :style="fontExplanations + explanationsPos"
           v-if="displaySunburst.explanationsCenter.present"
         >
           {{sequences.currentHover ? sequences.currentHover.toUpperCase() : transformData.name}}
@@ -254,6 +254,7 @@ export default {
       minW: null,
       mixW: null,
       fontHeight: null,
+      explanationsPos: null,
       fontSlices:
         "font: " +
         this.displaySunburst.slices.text.font.size +
@@ -279,7 +280,6 @@ export default {
         "; width: " +
         (this.displaySunburst.radiusCenter - 10) +
         "px;"
-        
     };
   },
   mounted: function() {
@@ -287,6 +287,7 @@ export default {
     this.minW = document.getElementById("min").offsetWidth / 9;
     this.mixW = document.getElementById("mix").offsetWidth / 9;
     this.fontHeight = document.getElementById("mix").offsetHeight;
+    this.explanationsPos = this.setExplanationsPos()
   },
   computed: {
     transformData: function() {
@@ -815,6 +816,33 @@ export default {
       this.$emit("onClick", this.root.descendants()[index]);
     },
 
+    setExplanationsPos: function() {
+      let newDiv = document.createElement("div");
+      // console.log(this.sequences, this.transformData)
+      let name = this.sequences.currentHover ? this.sequences.currentHover : this.transformData.name;
+      newDiv.innerHTML = name.toUpperCase() + "<br><br><span>"+this.sequences.labelBudget+ " " + this.displaySunburst.sequence.endLabel.unit +"</span>";
+      newDiv.setAttribute("id", "explanation");
+      newDiv.setAttribute("style", this.fontExplanations);
+
+      let currentDiv = document.getElementById("app");
+      currentDiv.appendChild(newDiv);
+
+      let donut = document.getElementsByClassName(this.idDonut),
+      chartW = donut[0].children[0].children.chart.offsetWidth;
+
+      let hDiv = newDiv.offsetHeight;
+      let tDiv = (this.displaySunburst.sizes.sunburstW / 2) - (hDiv / 2)
+      let lDiv = (chartW / 2) - ((this.displaySunburst.radiusCenter - 10) / 2)
+
+      currentDiv.removeChild(newDiv);
+
+      return "top: " +
+        tDiv +
+        "px; left: " +
+        lDiv +
+        "px;"
+    },
+
     mouseover(index) {
       let doc = this;
 
@@ -884,24 +912,7 @@ export default {
           ? this.root.descendants()[index].data.name
           : null;
 
-      let newDiv = document.createElement("div");
-      newDiv.innerHTML = this.sequences.currentHover.toUpperCase() + "<br><br><span>"+this.sequences.labelBudget+ " " + this.displaySunburst.sequence.endLabel.unit +"</span>";
-      newDiv.setAttribute("id", "explanation");
-      newDiv.setAttribute("style", this.fontExplanations);
-
-      let currentDiv = document.getElementById("chart");
-      currentDiv.appendChild(newDiv);
-
-      let hDiv = newDiv.offsetHeight;
-
-      this.posExplanations = "top: " +
-        275 +
-        "px; left: " +
-        190 +
-        "px;"
-        
-
-
+      this.explanationsPos = this.setExplanationsPos()
 
       let seqNames = [];
       seqNames.push(this.root.descendants()[index].data.name.toUpperCase());

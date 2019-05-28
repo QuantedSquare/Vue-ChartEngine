@@ -9,7 +9,6 @@
               <ChartDonut
                 idDonut="donut1"
                 :dataDonut="donutBudget"
-                :width="300"
                 @onClick="searchYearsData"
                 :displaySunburst="smallDonut"
               />
@@ -28,7 +27,6 @@
             <ChartDonut
               idDonut="donut2"
               :dataDonut="donutBudget"
-              :width="width"
               @onClick="searchYearsData"
               :displaySunburst="displaySunburst"
             />
