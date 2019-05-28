@@ -95,8 +95,10 @@ export default {
       linesW: 500,
       linesH: 200,
       legends: {
+        present: true,
         display: "frame",
-        names: ["Prévisions budgetaires", "Dépenses réalisées"]
+        names: ["Prévisions budgetaires", "Dépenses réalisées"],
+        width: 200
       },
       smallDonut: {
         color: {

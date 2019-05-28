@@ -6,21 +6,49 @@
     <div v-else>
       <span>xMax: {{xMax}}, yMax: {{yMax}}, xMin: {{xMin}}, yMin: {{yMin}}</span>
     </div>
-    <svg :height="height" :width="width + 200">
+    <svg :height="height" :width="width">
       <g :transform="display">
         <g id="xAxis" :transform="bottomTranslate"></g>
         <g id="yAxis">
-            <text v-if="legends.names.length" transform="translate(40,-20)" y="6" dy=".71em" style="text-anchor: end;" fill="currentColor">Million d'euros</text>
+          <text
+            v-if="legends.names.length"
+            transform="translate(40,-20)"
+            y="6"
+            dy=".71em"
+            style="text-anchor: end;"
+            fill="currentColor"
+          >Million d'euros</text>
         </g>
         <g v-for="(line, index) in lines">
           <path class="line" :d="lineDrawer(line)" :style="`stroke:`+ colorLine(index)"></path>
-          <text v-if="legends.display === `endLine`" :transform="legendTranslate(line)" x="3" dy=".35em">{{legends.names[index]}}</text>
+          <text
+            v-if="legends.display === `endLine`"
+            :transform="legendTranslate(line)"
+            x="3"
+            dy=".35em"
+          >{{legends.names[index]}}</text>
         </g>
-        <g class="legend" :transform="frameTranslate" style="font-size: 20px;" data-style-padding="10" v-if="legends.display === `frame`">
-            <g class="legend_items">
-                <text v-for="(legend, index) in legends.names" :y="index + (index-0.25)+`em`" x="1em">{{legend}}</text>
-                <circle v-for="(legend, index) in legends.names" :cy="index-0.25+`em`" cx="0" r="0.2em" :style="`fill:` + colorLine(index)"></circle>
-            </g>
+        <g
+          class="legend"
+          :transform="frameTranslate"
+          style="font-size: 20px;"
+          data-style-padding="10"
+          v-if="legends.display === `frame`"
+        >
+          <g class="legend_items">
+            <text
+              v-for="(legend, index) in legends.names"
+              :y="index + (index-0.25)+`em`"
+              x="1em"
+            >{{legend}}</text>
+            <circle
+              v-for="(legend, index) in legends.names"
+              :cy="index-0.25+`em`"
+              cx="0"
+              r="0.2em"
+              :style="`fill:` + colorLine(index)"
+            ></circle>
+          </g>
         </g>
       </g>
     </svg>
@@ -156,7 +184,9 @@ export default {
       select("#yAxis").call(axisLeft(this.yScale));
     },
     _width: function() {
-      return this.width - margin.left - margin.right;
+      return this.legends.present
+        ? this.width - margin.left - margin.right - this.legends.width
+        : this.width - margin.left - margin.right;
     },
     _height: function() {
       return this.height - margin.top - margin.bottom;
@@ -176,10 +206,10 @@ export default {
       );
     },
     legendTranslate: function(line) {
-        let xT = line[line.length - 1].x
-        let yT = line[line.length - 1].y
+      let xT = line[line.length - 1].x;
+      let yT = line[line.length - 1].y;
       return `translate(${this.xScale(xT)}, ${this.yScale(yT)})`;
-    },
+    }
   },
   computed: {
     display: function() {
@@ -189,7 +219,7 @@ export default {
       return "translate(0," + this._height() + ")";
     },
     frameTranslate: function() {
-        return "translate("+ (this.width - margin.left) + ",30)"
+      return "translate(" + (this._width() + margin.right) + ",30)";
     },
     xMax: function() {
       return this.getMax("x");
