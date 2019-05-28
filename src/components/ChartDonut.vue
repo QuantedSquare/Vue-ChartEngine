@@ -628,6 +628,8 @@ export default {
       // console.log(doc[0].children[0].children.sequence.offsetWidth)
       this.displaySunburst.sizes.sequenceW =
         doc[0].children[0].children.sequence.offsetWidth;
+      
+      this.explanationsPos = this.setExplanationsPos()
     },
     searchMaxDepth(p) {
       let maxDepth = 0;
