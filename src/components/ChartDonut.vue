@@ -29,7 +29,7 @@
             :transform="`translate(`+ translatePolygon[index] +`, 0)`"
           >
             <polygon
-              :points="polygonPoints(sequence[0], sequences.seqNames)"
+              :points="polygonPoints(sequence, sequences.seqNames)"
               :fill="colorScale(sequences.colorName)"
               :fill-opacity="displaySunburst.color.opacity"
             ></polygon>
@@ -44,11 +44,7 @@
           </g>
         </svg>
       </v-flex>
-      <v-flex
-        :class="chartPos"
-        id="chart"
-        style="position: relative"
-      >
+      <v-flex :class="chartPos" id="chart" style="position: relative">
         <!-- <div> -->
         <div
           id="explanation"
@@ -283,9 +279,9 @@ export default {
   computed: {
     interpolator: function() {
       if (this.displaySunburst.color.colorScale === "interpolateCool")
-        return interpolateCool
+        return interpolateCool;
       else if (this.displaySunburst.color.colorScale === "interpolateRainbow")
-        return interpolateRainbow
+        return interpolateRainbow;
     },
     colorScale: function() {
       return scaleOrdinal(
@@ -637,11 +633,14 @@ export default {
     }
   },
   methods: {
-    setChartPos: function(){
-      let proportion = this.displaySunburst.legends.present ? `xs8` : `xs12`;
-      let offset = this.displaySunburst.sizes.offset
+    setChartPos: function() {
+      let proportion =
+        window.innerWidth > 600 && this.displaySunburst.legends.present
+          ? "xs8"
+          : "xs12";
+      let offset = this.displaySunburst.sizes.offset;
 
-      return proportion + " " + offset
+      return proportion + " " + offset;
     },
     onResize() {
       let doc = document.getElementsByClassName(this.idDonut);
@@ -651,10 +650,11 @@ export default {
 
       this.explanationsPos = this.setExplanationsPos();
 
-      if (window.innerWidth > 600 && this.displaySunburst.legends.present) this.chartPos = "xs8"
-      else this.chartPos = "xs12" 
+      if (window.innerWidth > 600 && this.displaySunburst.legends.present)
+        this.chartPos = "xs8";
+      else this.chartPos = "xs12";
     },
-    
+
     searchMaxDepth(p) {
       let maxDepth = 0;
       p.each(elem => {
@@ -713,20 +713,29 @@ export default {
     reduceNbW(wordAr, sizeSeq, sizeLabel) {
       // console.log(wordAr);
       let nbWords = wordAr.map(arrayW => arrayW.length);
-      let maxNbWords = Math.max(...nbWords);
-      wordAr = wordAr.map(elem => {
-        if (elem.length === maxNbWords) elem = elem.slice(0, elem.length - 1);
-        return elem;
-      });
-      let array = wordAr.map(elem => elem.join(" ").length * this.majW);
-
+      let wordLength = wordAr.map(
+        arrayW => arrayW.length + Math.max(...arrayW.map(word => word.length))
+      );
+      console.log(wordLength);
       const reducer = (accumulator, currentValue) => accumulator + currentValue;
-      let sumW = array.reduce(reducer);
-      if (sumW > sizeSeq - sizeLabel)
-        return this.reduceNbW(wordAr, sizeSeq, sizeLabel);
+      if (wordLength.reduce(reducer) * this.majW < sizeSeq - sizeLabel) {
+        let maxNbWords = Math.max(...nbWords);
+        wordAr = wordAr.map(elem => {
+          if (elem.length === maxNbWords) elem = elem.slice(0, elem.length - 1);
+          return elem;
+        });
+        let array = wordAr.map(elem => elem.join(" ").length * this.majW);
+        console.log(wordAr);
 
-      wordAr = wordAr.map(elem => elem.join(" "));
-      return wordAr;
+        let sumW = array.reduce(reducer);
+        if (sumW > sizeSeq - sizeLabel)
+          return this.reduceNbW(wordAr, sizeSeq, sizeLabel);
+
+        wordAr = wordAr.map(elem => elem.join(" "));
+        return wordAr;
+      }
+      else
+        return 
     },
     reduceSecondLine: function(word, tspan, newSpan) {
       let splitSpan = tspan.split(/\s+/);
@@ -776,6 +785,7 @@ export default {
             endLabelW + endLabelP
           );
           newSeqNames = this.sequences.seqNames.map((elem, i) => {
+            console.log(elem, wordAr[i])
             if (elem[0] !== wordAr[i]) {
               let tspan = elem[0].split(wordAr[i] + " ");
               elem = [wordAr[i], tspan[1]];
@@ -800,13 +810,14 @@ export default {
       }
       return true;
     },
-    polygonPoints(sequence, allNames) {
+    polygonPoints(allSpan, allNames) {
       let nbSpanText = allNames.map(span => span.length);
-      let maxL = Math.max(...nbSpanText);
-      let a = sequence.length * this.majW + 20, //padding
+      let maxLSpan = Math.max(...allSpan.map(span => span.length))
+      let maxH = Math.max(...nbSpanText);
+      let a = maxLSpan * this.majW + 20, //padding
         b = a + 10, //pointe
-        c = maxL > 2 ? (maxL + 1) * 10 : 30,
-        d = maxL > 2 ? 5 + maxL * 5 : 15;
+        c = maxH > 2 ? (maxH + 1) * 10 : 30,
+        d = maxH > 2 ? 5 + maxH * 5 : 15;
       return (
         "0,0 " +
         a +
@@ -867,7 +878,10 @@ export default {
       // console.log(chartW, this.displaySunburst.sizes.maxW)
       if (chartW > 200 && chartW < this.displaySunburst.sizes.maxW) {
         this.displaySunburst.sizes.sunburstW = chartW;
-        this.displaySunburst.radiusCenter = chartW / 4 > this.displaySunburst.sizes.center ? this.displaySunburst.sizes.center : chartW / 4;
+        this.displaySunburst.radiusCenter =
+          chartW / 4 > this.displaySunburst.sizes.center
+            ? this.displaySunburst.sizes.center
+            : chartW / 4;
       } else if (chartW >= this.displaySunburst.sizes.maxW) {
         this.displaySunburst.sizes.sunburstW = this.displaySunburst.sizes.maxW;
         this.displaySunburst.radiusCenter = this.displaySunburst.sizes.center;
