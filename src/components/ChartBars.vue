@@ -1,13 +1,13 @@
 <template>
     <div>
         <div>
-            <span>yMax: {{yMax}}, yMin: {{yMin}}</span>
+            <!-- <span>yMax: {{yMax}}, yMin: {{yMin}}</span> -->
         </div>
         <svg :height="height" :width="width">
             <g :transform="display">
                 <g id="xAxis" :transform="bottomTranslate"></g>
                 <g id="yAxis"></g>
-                <rect class="bar" v-for="point in displayedBars" :x="xScale(point.x)" :y="_height() - yScale(point.y)" :width="xScale.bandwidth()" :height="positiveOrZero(yScale(point.y))"></rect>
+                <rect class="bar" v-for="point in displayedBars" :x="xScale(point.x)" :y="yScale(point.y)" :width="xScale.bandwidth()" :height="positiveOrZero(_height() - yScale(point.y))"></rect>
             </g>
         </svg>
     </div>
@@ -20,7 +20,7 @@ let margin = { top: 20, right: 20, bottom: 20, left: 30 };
 export default {
     name: 'ChartLines',
     props: {
-        bars: {
+        data: {
             type: Array,
             required: true
         },
@@ -38,13 +38,13 @@ export default {
         }
     },
     data: function() {
-        console.log(this.bars);
+        // console.log(this.data);
 
         let xScale = scaleBand(),
             yScale = scaleLinear();
 
         xScale.range([0, this._width()]);
-        xScale.domain(this.bars.map(point => point.x));
+        xScale.domain(this.data.map(point => point.x));
         xScale.padding(0.2)
 
         yScale.range([this._height(), 0]);
@@ -53,8 +53,8 @@ export default {
         return {
             xScale: xScale,
             yScale: yScale,
-            renderedBars: this.bars,
-            interpolatedBars: this.bars.map(b => interpolateObject({ x: b.x, y: this.getMax('y') }, b)),
+            renderedBars: this.data,
+            interpolatedBars: this.data.map(b => interpolateObject({ x: b.x, y: 0 }, b)),
             displayedBars: [],
             startAnimation: Date.now()
         }
@@ -76,15 +76,15 @@ export default {
         },
         bars: function() {
             this.startAnimation = Date.now();
-            this.interpolatedBars = this.bars.map(bar => {
+            this.interpolatedBars = this.data.map(bar => {
                 let _bar = this.renderedBars.find(b => b.x == bar.x);
                 if (!_bar) _bar = { x: bar.x, y: this.getMax('y') }
                 return interpolateObject(_bar, bar);
             });
 
-            this.renderedBars = this.bars;
+            this.renderedBars = this.data;
 
-            this.xScale.domain(this.bars.map(point => point.x));
+            this.xScale.domain(this.data.map(point => point.x));
             this.yScale.domain([this.yMin, this.yMax]);
             this.drawXAxis(true);
             this.drawYAxis(true);
@@ -94,13 +94,11 @@ export default {
     },
     methods: {
         animate: function() {
-            if (this.animationState() < 1) {
-                this.displayedBars = this.interpolatedBars.map(interpolatedBar => {
-                    return interpolatedBar(this.animationState());
-                });
+            this.displayedBars = this.interpolatedBars.map(interpolatedBar => {
+                return interpolatedBar(this.animationState());
+            });
 
-                setTimeout(this.animate, 0);
-            }
+            if (this.animationState() < 1) setTimeout(this.animate, 0);
         },
         animationState: function() {
             if ((this.startAnimation + this.animationTime) > Date.now()) {
@@ -130,10 +128,10 @@ export default {
             return this.height - margin.top - margin.bottom;
         },
         getMax: function(axis) {
-            return max(this.bars, (d) => d[axis]);
+            return max(this.data, (d) => d[axis]);
         },
         getMin: function(axis) {
-            return min(this.bars, (d) => d[axis]);
+            return min(this.data, (d) => d[axis]);
         },
         positiveOrZero: function(nb) {
             return nb > 0 ? nb : 0;

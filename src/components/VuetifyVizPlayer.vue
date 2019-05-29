@@ -7,8 +7,11 @@
         </v-flex>
         <v-flex xs10>
             <template v-for="(chart, i) in charts">
-                <v-layout :key="chart.title" v-if="chartIndex == i">
+                <v-layout wrap :key="chart.title" v-if="chartIndex == i">
                     <v-flex xs12>{{chart.title}}</v-flex>
+                    <v-flex xs12>
+                        <component :is="chart.chartType" :data="chart.data"></component>
+                    </v-flex>
                 </v-layout>
             </template>
         </v-flex>

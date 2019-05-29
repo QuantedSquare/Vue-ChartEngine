@@ -1,13 +1,13 @@
 <template>
     <div>
         <div>
-            <span>xMax: {{xMax}}, yMax: {{yMax}}, xMin: {{xMin}}, yMin: {{yMin}}</span>
+            <!-- <span>xMax: {{xMax}}, yMax: {{yMax}}, xMin: {{xMin}}, yMin: {{yMin}}</span> -->
         </div>
         <svg :height="height" :width="width">
             <g :transform="display">
                 <g id="xAxis" :transform="bottomTranslate"></g>
                 <g id="yAxis"></g>
-                <path class="line" v-for="line in lines" :d="lineDrawer(line)"></path>
+                <path class="line" v-for="line in data" :d="lineDrawer(line)"></path>
             </g>
         </svg>
     </div>
@@ -21,7 +21,7 @@ let margin = { top: 20, right: 20, bottom: 20, left: 30 };
 export default {
     name: 'ChartLines',
     props: {
-        lines: {
+        data: {
             type: Array,
             required: true
         },
@@ -39,7 +39,7 @@ export default {
         }
     },
     data: function() {
-        console.log(this.lines);
+        // console.log(this.data);
 
         let xScale = scaleLinear(),
             yScale = scaleLinear();
@@ -108,12 +108,12 @@ export default {
             return this.height - margin.top - margin.bottom;
         },
         getMax: function(axis) {
-            return max(this.lines.map(line => {
+            return max(this.data.map(line => {
                 return max(line, (d) => d[axis]);
             }));
         },
         getMin: function(axis) {
-            return min(this.lines.map(line => {
+            return min(this.data.map(line => {
                 return min(line, (d) => d[axis]);
             }));
         }
