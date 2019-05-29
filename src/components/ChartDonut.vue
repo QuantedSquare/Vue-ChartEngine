@@ -1,10 +1,6 @@
 <template>
   <v-container pa-0 fill-height :class="idDonut">
-    <v-layout
-      :class="displaySunburst.sequence.center ? `justify-center` : ``"
-      wrap
-      id="donutChart"
-    >
+    <v-layout :class="displaySunburst.sequence.center ? `justify-center` : ``" wrap id="donutChart">
       <v-flex xs12 class="width_text" :style="fontSlices+`;color: transparent;`">
         <span id="maj">ACHATS DE</span>
         <span id="min">achats de</span>
@@ -35,7 +31,7 @@
             <polygon
               :points="polygonPoints(sequence[0], sequences.seqNames)"
               :fill="colorScale(sequences.colorName)"
-              fill-opacity="0.6"
+              :fill-opacity="displaySunburst.color.opacity"
             ></polygon>
             <text :id="`text_`+index" text-anchor="middle" :style="fontSeq">
               <tspan
@@ -49,7 +45,7 @@
         </svg>
       </v-flex>
       <v-flex
-        :class="displaySunburst.legends.present ? `xs8` : `xs12`"
+        :class="setChartPos()"
         id="chart"
         style="position: relative"
       >
@@ -66,7 +62,11 @@
             id="labelBugdet"
           >{{sequences.currentHover ? sequences.labelBudget : transformData.budget}} {{displaySunburst.sequence.endLabel.unit}}</span>
         </div>
-        <svg :height="displaySunburst.sizes.sunburstW" :width="displaySunburst.sizes.sunburstW" @mouseleave="mouseleave">
+        <svg
+          :height="displaySunburst.sizes.sunburstW"
+          :width="displaySunburst.sizes.sunburstW"
+          @mouseleave="mouseleave"
+        >
           <g fill-opacity="0.6" :transform="translateChart">
             <path
               v-for="(slice, index) in slices"
@@ -142,6 +142,8 @@ import {
   arc,
   quantize,
   interpolateRainbow,
+  interpolateCool,
+  interpolateGnBu,
   interpolate
 } from "d3";
 var TWEEN = require("@tweenjs/tween.js");
@@ -158,7 +160,7 @@ export default {
       type: Object,
       default: {
         color: {
-          colorScale: Function,
+          colorScale: "interpolateRainbow",
           opacity: 0.6,
           childrenOpacity: {
             present: false,
@@ -197,6 +199,8 @@ export default {
           hover: true
         },
         sizes: {
+          maxW: 500,
+          center: 150,
           sunburstW: 500,
           legendW: 300,
           sequenceW: 500 + 300 + 30
@@ -228,14 +232,9 @@ export default {
     }
   },
   data: function() {
-    let color = scaleOrdinal(
-      quantize(interpolateRainbow, this.dataDonut.children.length + 1)
-    );
-
     return {
       targetIndex: 0,
       currentRing: 0,
-      colorScale: color,
       tweenedCoord: [],
       targetCoords: [],
       mLeave: false,
@@ -270,8 +269,7 @@ export default {
         "font: " +
         this.displaySunburst.sequence.font.size +
         "px " +
-        this.displaySunburst.sequence.font.family,
-      
+        this.displaySunburst.sequence.font.family
     };
   },
   mounted: function() {
@@ -279,17 +277,30 @@ export default {
     this.minW = document.getElementById("min").offsetWidth / 9;
     this.mixW = document.getElementById("mix").offsetWidth / 9;
     this.fontHeight = document.getElementById("mix").offsetHeight;
-    this.explanationsPos = this.setExplanationsPos()
+    this.explanationsPos = this.setExplanationsPos();
   },
   computed: {
+    interpolator: function() {
+      if (this.displaySunburst.color.colorScale === "interpolateCool")
+        return interpolateCool
+      else if (this.displaySunburst.color.colorScale === "interpolateRainbow")
+        return interpolateRainbow
+    },
+    colorScale: function() {
+      return scaleOrdinal(
+        quantize(this.interpolator, this.transformData.children.length + 1)
+      );
+    },
     fontExplanations: function() {
-        return "font: " +
+      return (
+        "font: " +
         this.displaySunburst.explanationsCenter.font.size +
         "px " +
         this.displaySunburst.explanationsCenter.font.family +
         "; width: " +
         (this.displaySunburst.radiusCenter - 10) +
         "px;"
+      );
     },
     transformData: function() {
       let a = {
@@ -561,7 +572,8 @@ export default {
       return textData;
     },
     translateChart: function() {
-      return `translate(${this.displaySunburst.sizes.sunburstW / 2}, ${this.displaySunburst.sizes.sunburstW / 2})`;
+      return `translate(${this.displaySunburst.sizes.sunburstW / 2}, ${this
+        .displaySunburst.sizes.sunburstW / 2})`;
     },
     translatePolygon: function() {
       let antL = 0;
@@ -629,8 +641,14 @@ export default {
       // console.log(doc[0].children[0].children.sequence.offsetWidth)
       this.displaySunburst.sizes.sequenceW =
         doc[0].children[0].children.sequence.offsetWidth;
-      
-      this.explanationsPos = this.setExplanationsPos()
+
+      this.explanationsPos = this.setExplanationsPos();
+    },
+    setChartPos(){
+      let proportion = this.displaySunburst.legends.present ? `xs8` : `xs12`;
+      let offset = this.displaySunburst.sizes.offset
+
+      return proportion + " " + offset
     },
     searchMaxDepth(p) {
       let maxDepth = 0;
@@ -822,8 +840,16 @@ export default {
     setExplanationsPos: function() {
       let newDiv = document.createElement("div");
       // console.log(this.sequences, this.transformData)
-      let name = this.sequences.currentHover ? this.sequences.currentHover : this.transformData.name;
-      newDiv.innerHTML = name.toUpperCase() + "<br><br><span>"+this.sequences.labelBudget+ " " + this.displaySunburst.sequence.endLabel.unit +"</span>";
+      let name = this.sequences.currentHover
+        ? this.sequences.currentHover
+        : this.transformData.name;
+      newDiv.innerHTML =
+        name.toUpperCase() +
+        "<br><br><span>" +
+        this.sequences.labelBudget +
+        " " +
+        this.displaySunburst.sequence.endLabel.unit +
+        "</span>";
       newDiv.setAttribute("id", "explanation");
       newDiv.setAttribute("style", this.fontExplanations);
 
@@ -831,29 +857,24 @@ export default {
       currentDiv.appendChild(newDiv);
 
       let donut = document.getElementsByClassName(this.idDonut),
-      chartW = donut[0].children[0].children.chart.offsetWidth;
+        chartW = donut[0].children[0].children.chart.offsetWidth;
 
-      console.log(chartW, this.displaySunburst.sizes.width)
-      if (chartW > 340 && chartW < this.displaySunburst.sizes.width) {
-        this.displaySunburst.sizes.sunburstW = chartW
-        this.displaySunburst.radiusCenter = chartW / 4
-      }
-      else if (chartW >= this.displaySunburst.sizes.width) {
-        this.displaySunburst.sizes.sunburstW = this.displaySunburst.sizes.width
-        this.displaySunburst.radiusCenter = this.displaySunburst.sizes.center
+      // console.log(chartW, this.displaySunburst.sizes.maxW)
+      if (chartW > 200 && chartW < this.displaySunburst.sizes.maxW) {
+        this.displaySunburst.sizes.sunburstW = chartW;
+        this.displaySunburst.radiusCenter = chartW / 4;
+      } else if (chartW >= this.displaySunburst.sizes.maxW) {
+        this.displaySunburst.sizes.sunburstW = this.displaySunburst.sizes.maxW;
+        this.displaySunburst.radiusCenter = this.displaySunburst.sizes.center;
       }
 
       let hDiv = newDiv.offsetHeight;
-      let tDiv = (this.displaySunburst.sizes.sunburstW / 2) - (hDiv / 2)
-      let lDiv = (chartW / 2) - ((this.displaySunburst.radiusCenter - 10) / 2)
+      let tDiv = this.displaySunburst.sizes.sunburstW / 2 - hDiv / 2;
+      let lDiv = chartW / 2 - (this.displaySunburst.radiusCenter - 10) / 2;
 
       currentDiv.removeChild(newDiv);
 
-      return "top: " +
-        tDiv +
-        "px; left: " +
-        lDiv +
-        "px;"
+      return "top: " + tDiv + "px; left: " + lDiv + "px;";
     },
 
     mouseover(index) {
@@ -925,7 +946,7 @@ export default {
           ? this.root.descendants()[index].data.name
           : null;
 
-      this.explanationsPos = this.setExplanationsPos()
+      this.explanationsPos = this.setExplanationsPos();
 
       let seqNames = [];
       seqNames.push(this.root.descendants()[index].data.name.toUpperCase());

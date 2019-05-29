@@ -1,10 +1,10 @@
 <template>
-  <v-container fluid fill-height v-if="isLoaded">
-    <v-layout wrap>
+  <v-container fluid fill-height v-if="isLoaded" class="pa-0">
+    <v-layout wrap justify-center>
       <v-flex xs12>
-        <v-card color="lime accent-1" class="pa-3">
+        <v-card color="indigo accent-4" class="pa-3 elevation-0">
           <v-layout wrap align-end>
-            <v-flex xs5>
+            <v-flex xs7 md5>
               <!-- <v-card dark color="red"> -->
               <ChartDonut
                 idDonut="donut1"
@@ -14,25 +14,20 @@
               />
               <!-- </v-card> -->
             </v-flex>
-            <v-flex xs7 class="text-xs-left">
-              <span style="font-size: 4rem;">Budget de l'Assemblée</span>
+            <v-flex xs5 md7 class="text-xs-left pl-3" style="color:white; ">
+              <span
+                style="font-size: 5rem; font-weight: bold; font-family: sans-serif; line-height: 1.125;"
+              >Budget de l'Assemblée</span>
               <br>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed facilisis nibh erat, eu aliquet tortor consequat vitae. Duis cursus laoreet tempus. Aenean turpis diam, finibus in nisi quis, euismod sollicitudin erat. Nullam et magna id sem venenatis ultricies. Maecenas vitae sapien ante. Duis ex orci, consequat nec massa ultricies, venenatis fringilla ante. Nullam tristique eros vitae massa vestibulum aliquet. Sed vehicula diam in pretium volutpat. Etiam bibendum enim ut efficitur euismod.
             </v-flex>
           </v-layout>
         </v-card>
       </v-flex>
       <v-flex xs12 mt-4>
-        <v-layout wrap align-center justify-center>
-          <v-flex :class="currentData.yearsData.length ?`md12 lg7` : `sm12 lg9`">
-            <ChartDonut
-              idDonut="donut2"
-              :dataDonut="donutBudget"
-              @onClick="searchYearsData"
-              :displaySunburst="displaySunburst"
-            />
-          </v-flex>
-          <v-flex v-if="currentData.yearsData.length" xs10 lg5 pt-4 id="chartLines" v-resize="onResize">
+        <v-layout wrap justify-center px-5>
+          <v-flex v-if="currentData.yearsData.length" xs10 lg5 mb-4 :class="spacingTop" id="chartLines" v-resize="onResize">
             <Chartlines
+              
               :lines="currentData.yearsData"
               :width="linesW"
               :height="linesH"
@@ -40,6 +35,14 @@
               scale="time"
               :title="currentData.name"
               :legends="legends"
+            />
+          </v-flex>
+          <v-flex :class="currentData.yearsData.length ?`md12 lg7` : `sm12 lg9`">
+            <ChartDonut
+              idDonut="donut2"
+              :dataDonut="donutBudget"
+              @onClick="searchYearsData"
+              :displaySunburst="displaySunburst"
             />
           </v-flex>
         </v-layout>
@@ -85,6 +88,7 @@ export default {
       isLoaded: false,
       linesW: 500,
       linesH: 200,
+      spacingTop: "mt-2",
       legends: {
         present: true,
         display: "frame",
@@ -93,8 +97,8 @@ export default {
       },
       smallDonut: {
         color: {
-          colorScale: Function,
-          opacity: 0.6,
+          colorScale: "interpolateCool",
+          opacity: 1,
           childrenOpacity: {
             present: false,
             opacity: 0.4
@@ -132,11 +136,12 @@ export default {
           hover: true
         },
         sizes: {
-          width: 300,
+          maxW: 300,
           center: 30,
           sunburstW: 300,
           legendW: 300,
-          sequenceW: 300 + 300
+          sequenceW: 300 + 300,
+          offset: "offset-xs0 offset-sm2 offset-md4"
         },
         legends: {
           present: false,
@@ -164,7 +169,7 @@ export default {
       },
       displaySunburst: {
         color: {
-          colorScale: Function,
+          colorScale: "interpolateCool",
           opacity: 0.6,
           childrenOpacity: {
             present: true,
@@ -203,11 +208,12 @@ export default {
           hover: true
         },
         sizes: {
-          width: 500,
+          maxW: 500,
           center: 150,
           sunburstW: 500,
           legendW: 300,
-          sequenceW: 500 + 300 + 30
+          sequenceW: 500 + 300 + 30,
+          offset: "offset-xs1 offset-md0"
         },
         legends: {
           present: true,
@@ -340,10 +346,11 @@ export default {
   methods: {
     onResize() {
       let lines = document.getElementById("chartLines");
-      if (lines.offsetWidth < 375)
-        this.linesW = 372
-      else
-        this.linesW = lines.offsetWidth;
+      if (lines.offsetWidth < 375) this.linesW = 372;
+      else this.linesW = lines.offsetWidth;
+
+      if (window.innerWidth > 1264) this.spacingTop = "mt-5 pt-5"
+      else this.spacingTop = "mt-2"
     },
     searchYearsData(yearsData) {
       console.log("data years", yearsData);
