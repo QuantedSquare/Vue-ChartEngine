@@ -862,7 +862,7 @@ export default {
       // console.log(chartW, this.displaySunburst.sizes.maxW)
       if (chartW > 200 && chartW < this.displaySunburst.sizes.maxW) {
         this.displaySunburst.sizes.sunburstW = chartW;
-        this.displaySunburst.radiusCenter = chartW / 4;
+        this.displaySunburst.radiusCenter = chartW / 4 > this.displaySunburst.sizes.center ? this.displaySunburst.sizes.center : chartW / 4;
       } else if (chartW >= this.displaySunburst.sizes.maxW) {
         this.displaySunburst.sizes.sunburstW = this.displaySunburst.sizes.maxW;
         this.displaySunburst.radiusCenter = this.displaySunburst.sizes.center;
