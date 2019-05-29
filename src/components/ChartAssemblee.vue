@@ -213,7 +213,7 @@ export default {
           sunburstW: 500,
           legendW: 300,
           sequenceW: 500 + 300 + 30,
-          offset: "offset-xs1 offset-md0"
+          offset: ""
         },
         legends: {
           present: true,

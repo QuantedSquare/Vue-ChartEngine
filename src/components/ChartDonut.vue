@@ -45,7 +45,7 @@
         </svg>
       </v-flex>
       <v-flex
-        :class="setChartPos()"
+        :class="chartPos"
         id="chart"
         style="position: relative"
       >
@@ -103,7 +103,7 @@
           </g>
         </svg>
       </v-flex>
-      <v-flex xs2 pl-3 id="sidebar" v-if="displaySunburst.legends.present">
+      <v-flex xs10 sm2 pl-3 pt-5 id="sidebar" v-if="displaySunburst.legends.present">
         Legend
         <br>
         <div id="legend">
@@ -253,6 +253,7 @@ export default {
       mixW: null,
       fontHeight: null,
       explanationsPos: null,
+      chartPos: this.setChartPos(),
       fontSlices:
         "font: " +
         this.displaySunburst.slices.text.font.size +
@@ -636,6 +637,12 @@ export default {
     }
   },
   methods: {
+    setChartPos: function(){
+      let proportion = this.displaySunburst.legends.present ? `xs8` : `xs12`;
+      let offset = this.displaySunburst.sizes.offset
+
+      return proportion + " " + offset
+    },
     onResize() {
       let doc = document.getElementsByClassName(this.idDonut);
       // console.log(doc[0].children[0].children.sequence.offsetWidth)
@@ -643,13 +650,11 @@ export default {
         doc[0].children[0].children.sequence.offsetWidth;
 
       this.explanationsPos = this.setExplanationsPos();
-    },
-    setChartPos(){
-      let proportion = this.displaySunburst.legends.present ? `xs8` : `xs12`;
-      let offset = this.displaySunburst.sizes.offset
 
-      return proportion + " " + offset
+      if (window.innerWidth > 600 && this.displaySunburst.legends.present) this.chartPos = "xs8"
+      else this.chartPos = "xs12" 
     },
+    
     searchMaxDepth(p) {
       let maxDepth = 0;
       p.each(elem => {
