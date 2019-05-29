@@ -7,7 +7,7 @@
         <span id="mix">Achats de</span>
       </v-flex>
       <v-flex
-        :class="displaySunburst.legends.present ? `xs8` : `xs12`"
+        :class="chartPos"
         id="sequence"
         v-if="displaySunburst.sequence.present"
         v-resize="onResize"
