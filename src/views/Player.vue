@@ -1,0 +1,42 @@
+<template>
+    <v-container fill-height>
+        <VuetifyVizPlayer :charts="charts" />
+    </v-container>
+</template>
+<script>
+import { points, collection } from '@/modules/randomVals.js'
+
+import VuetifyVizPlayer from '@/components/VuetifyVizPlayer.vue'
+
+
+export default {
+    name: 'bars',
+    components: {
+        VuetifyVizPlayer
+    },
+    data: function() {
+        let randomData = collection();
+
+        let chartList = [{
+            title: 'Here is a collection of lines',
+            subTitle: 'Nothing much to say about them',
+            chartType: 'ChartLines',
+            data: randomData,
+            techTitle: 'Random numbers on Y by random numbers on X'
+        }];
+
+        randomData.forEach((points, i) => {
+            chartList.push({
+                title: 'The points of line ' + (i + 1) + ' in bars',
+                chartType: 'ChartBars',
+                data: points,
+                techTitle: 'Random numbers on Y by random numbers on X'
+            });
+        });
+
+        return {
+            charts: chartList
+        }
+    }
+}
+</script>

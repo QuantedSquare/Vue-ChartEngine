@@ -30,6 +30,11 @@ export default new Router({
             path: '/bars',
             name: 'bars',
             component: () => import('./views/Bars.vue')
+        },
+        {
+            path: '/player',
+            name: 'player',
+            component: () => import('./views/Player.vue')
         }
     ]
 })
