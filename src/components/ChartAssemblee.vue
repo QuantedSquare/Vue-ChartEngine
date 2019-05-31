@@ -25,7 +25,7 @@
       </v-flex>
       <v-flex xs12 mt-4 v-resize="onResize2">
         <v-layout wrap justify-center :class="padding">
-          <v-flex v-if="currentData.yearsData.length" xs10 lg5 mb-4 :class="spacingTop" id="chartLines" v-resize="onResize">
+          <v-flex v-if="currentData.yearsData.length" xs12 lg5 mb-4 :class="spacingTop" id="chartLines" v-resize="onResize">
             <Chartlines
               
               :lines="currentData.yearsData"
