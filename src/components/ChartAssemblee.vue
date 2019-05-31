@@ -352,7 +352,6 @@ export default {
       else return "px-5";
     },
     onResize2() {
-      console.log("here")
       this.padding = this.setPadding()
     },
     onResize() {

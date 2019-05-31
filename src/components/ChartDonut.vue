@@ -7,12 +7,7 @@
         <span id="mix">Achats de</span>
         <span id="label" :style="fontEndLabel">14.52 {{displaySunburst.sequence.endLabel.unit}}</span>
       </v-flex>
-      <v-flex
-        :class="chartPos"
-        id="sequence"
-        v-if="displaySunburst.sequence.present"
-        v-resize="onResize"
-      >
+      <v-flex xs12 id="sequence" v-if="displaySunburst.sequence.present" v-resize="onResize">
         <svg width="100%" height="80" id="trail">
           <text
             v-if="sequences.seqNames.length && notCenter(sequences.seqNames) && displaySunburst.sequence.endLabel.present"
@@ -721,7 +716,8 @@ export default {
       // console.log(wordAr);
       let nbWords = wordAr.map(arrayW => arrayW.length);
       let wordLength = wordAr.map(
-        arrayW => arrayW.length + Math.max(...arrayW.map(word => word.length + 10))
+        arrayW =>
+          arrayW.length + Math.max(...arrayW.map(word => word.length + 20))
       );
       const reducer = (accumulator, currentValue) => accumulator + currentValue;
       // console.log(wordLength, wordLength.reduce(reducer) * this.majW, sizeSeq - sizeLabel, wordAr);
@@ -731,7 +727,7 @@ export default {
           if (elem.length === maxNbWords) elem = elem.slice(0, elem.length - 1);
           return elem;
         });
-        let array = wordAr.map(elem => elem.join(" ").length * this.majW + 10);
+        let array = wordAr.map(elem => elem.join(" ").length * this.majW + 20);
         console.log(wordAr);
 
         let sumW = array.reduce(reducer);
@@ -740,9 +736,7 @@ export default {
 
         wordAr = wordAr.map(elem => elem.join(" "));
         return wordAr;
-      }
-      else
-        return 
+      } else return;
     },
     reduceSecondLine: function(word, tspan, newSpan) {
       let splitSpan = tspan.split(/\s+/);
@@ -775,7 +769,11 @@ export default {
         const reducer = (accumulator, currentValue) =>
           accumulator + currentValue;
 
-        let endLabelW = (this.sequences.labelBudget.length + this.displaySunburst.sequence.endLabel.unit.length + 1) * this.labelW,
+        let endLabelW =
+            (this.sequences.labelBudget.length +
+              this.displaySunburst.sequence.endLabel.unit.length +
+              1) *
+            this.labelW,
           endLabelP = 15;
 
         let sumW = array.reduce(reducer);
@@ -793,19 +791,25 @@ export default {
             this.displaySunburst.sizes.sequenceW,
             endLabelW + endLabelP
           );
-          newSeqNames = wordAr ? this.sequences.seqNames.map((elem, i) => {
-            // console.log(elem, wordAr[i])
-            if (elem[0] !== wordAr[i]) {
-              let tspan = elem[0].split(wordAr[i] + " ");
-              elem = [wordAr[i], tspan[1]];
-              if (wordAr[i].length < tspan[1].length) {
-                let newSpan = [];
-                newSpan = this.reduceSecondLine(wordAr[i], tspan[1], newSpan);
-                elem = [wordAr[i]].concat(newSpan);
-              }
-            }
-            return elem;
-          }) : [];
+          newSeqNames = wordAr
+            ? this.sequences.seqNames.map((elem, i) => {
+                // console.log(elem, wordAr[i])
+                if (elem[0] !== wordAr[i]) {
+                  let tspan = elem[0].split(wordAr[i] + " ");
+                  elem = [wordAr[i], tspan[1]];
+                  if (wordAr[i].length < tspan[1].length) {
+                    let newSpan = [];
+                    newSpan = this.reduceSecondLine(
+                      wordAr[i],
+                      tspan[1],
+                      newSpan
+                    );
+                    elem = [wordAr[i]].concat(newSpan);
+                  }
+                }
+                return elem;
+              })
+            : [];
           this.sequences.seqNames = newSeqNames;
           // console.log("new",newSeqNames)
         }
@@ -822,7 +826,7 @@ export default {
     },
     polygonPoints(allSpan, allNames) {
       let nbSpanText = allNames.map(span => span.length);
-      let maxLSpan = Math.max(...allSpan.map(span => span.length))
+      let maxLSpan = Math.max(...allSpan.map(span => span.length));
       let maxH = Math.max(...nbSpanText);
       // console.log("span",allSpan, maxLSpan)
       let a = maxLSpan * this.majW + 20, //padding
