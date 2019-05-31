@@ -728,7 +728,7 @@ export default {
           return elem;
         });
         let array = wordAr.map(elem => elem.join(" ").length * this.majW + 20);
-        console.log(wordAr);
+        // console.log(wordAr);
 
         let sumW = array.reduce(reducer);
         if (sumW > sizeSeq - sizeLabel)
@@ -762,7 +762,7 @@ export default {
       let newSeqNames = this.sequences.seqNames;
       if (this.sequences.seqNames.length) {
         let array = this.sequences.seqNames.map(
-          elem => elem[0].length * this.majW + 10
+          elem => elem[0].length * this.majW + 20
         );
         // pas encore en span
 
