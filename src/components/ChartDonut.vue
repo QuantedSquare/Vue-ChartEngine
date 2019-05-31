@@ -36,7 +36,7 @@
             <text :id="`text_`+index" text-anchor="middle" :style="fontSeq">
               <tspan
                 v-for="(name, index) in sequence"
-                :x="((sequence[0].length * majW + 10) / 2)+10"
+                :x="((Math.max(...sequence.map(span => span.length)) * majW + 10) / 2)+10"
                 :y="ySpan(sequence, sequences.seqNames)"
                 :dy="sequence.length > 1 ? (index * 1.1) + `em` : `0.35em`"
               >{{name}}</tspan>
@@ -268,6 +268,9 @@ export default {
         "px " +
         this.displaySunburst.sequence.font.family
     };
+  },
+  updated: function() {
+    this.explanationsPos = this.setExplanationsPos();
   },
   mounted: function() {
     this.majW = document.getElementById("maj").offsetWidth / 9;
@@ -579,11 +582,12 @@ export default {
         let l = 0;
         if (i !== 0) l = antL * this.majW + 2 + b[i - 1] + 20;
         b.push(l);
-        antL = elem[0].length;
+        antL = Math.max(...elem.map(span => span.length));
         i++;
       });
       // x label budget
       b.push(antL * this.majW + 2 + b[b.length - 1] + 20);
+      console.log(b)
       return b;
     },
     legends: function() {
@@ -716,7 +720,7 @@ export default {
       let wordLength = wordAr.map(
         arrayW => arrayW.length + Math.max(...arrayW.map(word => word.length))
       );
-      console.log(wordLength);
+      // console.log(wordLength);
       const reducer = (accumulator, currentValue) => accumulator + currentValue;
       if (wordLength.reduce(reducer) * this.majW < sizeSeq - sizeLabel) {
         let maxNbWords = Math.max(...nbWords);
@@ -725,7 +729,7 @@ export default {
           return elem;
         });
         let array = wordAr.map(elem => elem.join(" ").length * this.majW);
-        console.log(wordAr);
+        // console.log(wordAr);
 
         let sumW = array.reduce(reducer);
         if (sumW > sizeSeq - sizeLabel)
@@ -784,8 +788,8 @@ export default {
             this.displaySunburst.sizes.sequenceW,
             endLabelW + endLabelP
           );
-          newSeqNames = this.sequences.seqNames.map((elem, i) => {
-            console.log(elem, wordAr[i])
+          newSeqNames = wordAr ? this.sequences.seqNames.map((elem, i) => {
+            // console.log(elem, wordAr[i])
             if (elem[0] !== wordAr[i]) {
               let tspan = elem[0].split(wordAr[i] + " ");
               elem = [wordAr[i], tspan[1]];
@@ -796,8 +800,9 @@ export default {
               }
             }
             return elem;
-          });
+          }) : [];
           this.sequences.seqNames = newSeqNames;
+          console.log("new",newSeqNames)
         }
       }
     },
@@ -814,6 +819,7 @@ export default {
       let nbSpanText = allNames.map(span => span.length);
       let maxLSpan = Math.max(...allSpan.map(span => span.length))
       let maxH = Math.max(...nbSpanText);
+      console.log("span",allSpan, maxLSpan)
       let a = maxLSpan * this.majW + 20, //padding
         b = a + 10, //pointe
         c = maxH > 2 ? (maxH + 1) * 10 : 30,
