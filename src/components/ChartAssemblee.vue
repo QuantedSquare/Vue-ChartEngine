@@ -23,8 +23,8 @@
           </v-layout>
         </v-card>
       </v-flex>
-      <v-flex xs12 mt-4>
-        <v-layout wrap justify-center px-5>
+      <v-flex xs12 mt-4 v-resize="onResize2">
+        <v-layout wrap justify-center :class="padding">
           <v-flex v-if="currentData.yearsData.length" xs10 lg5 mb-4 :class="spacingTop" id="chartLines" v-resize="onResize">
             <Chartlines
               
@@ -86,6 +86,7 @@ export default {
         yearsData: []
       },
       isLoaded: false,
+      padding: this.setPadding(),
       linesW: 500,
       linesH: 200,
       spacingTop: "mt-2",
@@ -163,7 +164,7 @@ export default {
               weight: "bold"
             },
             present: true,
-            unit: "Million d'euros"
+            unit: "M€"
           }
         }
       },
@@ -235,7 +236,7 @@ export default {
               weight: "bold"
             },
             present: true,
-            unit: "Million d'euros"
+            unit: "M€"
           }
         }
       }
@@ -344,6 +345,16 @@ export default {
     this.isLoaded = true;
   },
   methods: {
+    setPadding() {
+      // console.log(window.innerWidth)
+      if (window.innerWidth < 600)
+        return "px-1";
+      else return "px-5";
+    },
+    onResize2() {
+      console.log("here")
+      this.padding = this.setPadding()
+    },
     onResize() {
       let lines = document.getElementById("chartLines");
       if (lines.offsetWidth < 375) this.linesW = 372;

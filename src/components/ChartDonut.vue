@@ -5,6 +5,7 @@
         <span id="maj">ACHATS DE</span>
         <span id="min">achats de</span>
         <span id="mix">Achats de</span>
+        <span id="label" :style="fontEndLabel">14.52 {{displaySunburst.sequence.endLabel.unit}}</span>
       </v-flex>
       <v-flex
         :class="chartPos"
@@ -247,6 +248,7 @@ export default {
       majW: null,
       minW: null,
       mixW: null,
+      labelW: null,
       fontHeight: null,
       explanationsPos: null,
       chartPos: this.setChartPos(),
@@ -276,6 +278,7 @@ export default {
     this.majW = document.getElementById("maj").offsetWidth / 9;
     this.minW = document.getElementById("min").offsetWidth / 9;
     this.mixW = document.getElementById("mix").offsetWidth / 9;
+    this.labelW = document.getElementById("label").offsetWidth / 8;
     this.fontHeight = document.getElementById("mix").offsetHeight;
     this.explanationsPos = this.setExplanationsPos();
   },
@@ -587,7 +590,7 @@ export default {
       });
       // x label budget
       b.push(antL * this.majW + 2 + b[b.length - 1] + 20);
-      console.log(b)
+      // console.log(b)
       return b;
     },
     legends: function() {
@@ -718,18 +721,18 @@ export default {
       // console.log(wordAr);
       let nbWords = wordAr.map(arrayW => arrayW.length);
       let wordLength = wordAr.map(
-        arrayW => arrayW.length + Math.max(...arrayW.map(word => word.length))
+        arrayW => arrayW.length + Math.max(...arrayW.map(word => word.length + 10))
       );
-      // console.log(wordLength);
       const reducer = (accumulator, currentValue) => accumulator + currentValue;
+      // console.log(wordLength, wordLength.reduce(reducer) * this.majW, sizeSeq - sizeLabel, wordAr);
       if (wordLength.reduce(reducer) * this.majW < sizeSeq - sizeLabel) {
         let maxNbWords = Math.max(...nbWords);
         wordAr = wordAr.map(elem => {
           if (elem.length === maxNbWords) elem = elem.slice(0, elem.length - 1);
           return elem;
         });
-        let array = wordAr.map(elem => elem.join(" ").length * this.majW);
-        // console.log(wordAr);
+        let array = wordAr.map(elem => elem.join(" ").length * this.majW + 10);
+        console.log(wordAr);
 
         let sumW = array.reduce(reducer);
         if (sumW > sizeSeq - sizeLabel)
@@ -767,14 +770,16 @@ export default {
         let array = this.sequences.seqNames.map(
           elem => elem[0].length * this.majW + 10
         );
+        // pas encore en span
 
         const reducer = (accumulator, currentValue) =>
           accumulator + currentValue;
 
-        let endLabelW = 120,
+        let endLabelW = (this.sequences.labelBudget.length + this.displaySunburst.sequence.endLabel.unit.length + 1) * this.labelW,
           endLabelP = 15;
 
         let sumW = array.reduce(reducer);
+        // console.log("Wendlabel",endLabelW, array, sumW, this.displaySunburst.sizes.sequenceW - endLabelW - endLabelP)
 
         if (
           sumW >
@@ -802,7 +807,7 @@ export default {
             return elem;
           }) : [];
           this.sequences.seqNames = newSeqNames;
-          console.log("new",newSeqNames)
+          // console.log("new",newSeqNames)
         }
       }
     },
@@ -819,7 +824,7 @@ export default {
       let nbSpanText = allNames.map(span => span.length);
       let maxLSpan = Math.max(...allSpan.map(span => span.length))
       let maxH = Math.max(...nbSpanText);
-      console.log("span",allSpan, maxLSpan)
+      // console.log("span",allSpan, maxLSpan)
       let a = maxLSpan * this.majW + 20, //padding
         b = a + 10, //pointe
         c = maxH > 2 ? (maxH + 1) * 10 : 30,
