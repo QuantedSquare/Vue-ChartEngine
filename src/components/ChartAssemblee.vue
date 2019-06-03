@@ -67,6 +67,7 @@ import {
 var TWEEN = require("@tweenjs/tween.js");
 import ChartDonut from "@/components/ChartDonut.vue";
 import Chartlines from "@/components/ChartLines";
+import { maxHeaderSize } from 'http';
 
 export default {
   name: "ChartAssemblee",
@@ -115,7 +116,7 @@ export default {
           }
         },
         slices: {
-          zoomable: false,
+          zoomable: true,
           text: {
             present: true,
             font: {
@@ -127,6 +128,7 @@ export default {
           joinSlices: { present: true, bornInclusion: [0, 29720540] },
           supprSlices: {
             present: true,
+            keepData: null,
             bornExclusion: [0, 400000000],
             into: true
           },
@@ -199,6 +201,7 @@ export default {
           joinSlices: { present: false, bornInclusion: [0, 29720540] },
           supprSlices: {
             present: true,
+            keepData: null,
             bornExclusion: [0, 29720540],
             into: false
           },
@@ -256,7 +259,7 @@ export default {
       let name = elem.Libellé;
       let budget = parseInt(elem["Réalisé 2017"].replace(/\s/g, ""));
       let budgetProgess = [[], []];
-
+      console.log("je passe par extract")
       Object.keys(elem)
         .filter(key => key.search("Budget") >= 0)
         .forEach(budget => {
@@ -361,12 +364,17 @@ export default {
       if (window.innerWidth > 1264) this.spacingTop = "mt-5 pt-5"
       else this.spacingTop = "mt-2"
     },
-    searchYearsData(yearsData) {
-      console.log("data years", yearsData);
+    searchYearsData(yearsData, idDonut) {
+      console.log("data years", yearsData, idDonut);
+      if (idDonut === "donut1") {
+        
+        this.displaySunburst.slices.supprSlices.keepData = yearsData.data.name === "AUTRES" ? null : yearsData.data.name
+      }
       this.currentData.yearsData = yearsData.data.budgetProgess
         ? yearsData.data.budgetProgess
         : [];
       this.currentData.name = yearsData.data.name ? yearsData.data.name : null;
+    console.log("dataBudget", this.donutBudget.children[8].budget)
     }
   }
 };

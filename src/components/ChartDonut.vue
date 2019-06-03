@@ -52,7 +52,7 @@
           <br>
           <span
             id="labelBugdet"
-          >{{sequences.currentHover ? sequences.labelBudget : transformData.budget}} {{displaySunburst.sequence.endLabel.unit}}</span>
+          >{{displayBudget}} {{displaySunburst.sequence.endLabel.unit}}</span>
         </div>
         <svg
           :height="displaySunburst.sizes.sunburstW"
@@ -68,7 +68,7 @@
               :id="`slice`+index"
               :d="arcSlice(slice)"
               :style="!displaySunburst.slices.zoomable ? null : `cursor: pointer;`"
-              @click="!displaySunburst.slices.zoomable ? null : clicked(index)"
+              @click="!displaySunburst.slices.zoomable ? null : clicked(index, idDonut)"
               @mouseover="mLeave === 0 ? null : mouseover(index)"
             ></path>
           </g>
@@ -103,7 +103,7 @@
             <g
               v-for="(legend, index) in legends.names"
               :transform="`translate(0, `+ 33 * index +`)`"
-              @click="!displaySunburst.legends.clickable ? null : clicked(index + 1)"
+              @click="!displaySunburst.legends.clickable ? null : clicked(index + 1, idDonut)"
               :style="!displaySunburst.legends.clickable ? null : `cursor: pointer;`"
             >
               <rect
@@ -182,6 +182,7 @@ export default {
           joinSlices: { present: false, bornInclusion: [0, 29720540] },
           supprSlices: {
             present: false,
+            keepData: null,
             bornExclusion: [0, 0],
             into: true
           },
@@ -278,6 +279,10 @@ export default {
     this.explanationsPos = this.setExplanationsPos();
   },
   computed: {
+    displayBudget: function() {
+      // transform.budget = (transform.budget / 1000000).toFixed(2);
+      return this.sequences.currentHover ? this.sequences.labelBudget : (this.transformData.budget / 1000000).toFixed(2)
+    },
     interpolator: function() {
       if (this.displaySunburst.color.colorScale === "interpolateCool")
         return interpolateCool;
@@ -301,7 +306,8 @@ export default {
       );
     },
     transformData: function() {
-      let a = {
+      console.log("donut8", this.dataDonut.children[8].budget)
+      let transform = {
         name: this.dataDonut.name.toUpperCase(),
         children: [],
         budget: 0
@@ -311,30 +317,44 @@ export default {
       let subChild = [];
       let budget = 0;
 
-      //suppr slices inutiles
-      a.children = this.dataDonut.children.filter(child => {
-        if (this.displaySunburst.slices.supprSlices.present) {
-          if (this.displaySunburst.slices.supprSlices.into)
-            return (
-              this.displaySunburst.slices.supprSlices.bornExclusion[0] <
-                child.budget &&
-              child.budget <
-                this.displaySunburst.slices.supprSlices.bornExclusion[1]
-            );
-          else
-            return (
-              this.displaySunburst.slices.supprSlices.bornExclusion[0] <
-                child.budget &&
-              child.budget <=
-                this.displaySunburst.slices.supprSlices.bornExclusion[1]
-            );
-        }
-        return child;
-      });
+      console.log(this.displaySunburst.slices.supprSlices.keepData);
+      console.log("a before", transform.children, this.dataDonut.children[8].budget)
 
+      //suppr slices inutiles
+      if (!this.displaySunburst.slices.supprSlices.keepData) {
+        console.log("je passe dans le suppr", this.displaySunburst.slices.supprSlices.bornExclusion)
+        transform.children = this.dataDonut.children.filter(child => {
+          console.log("child here", child)
+          if (this.displaySunburst.slices.supprSlices.present) {
+            if (this.displaySunburst.slices.supprSlices.into)
+              return (
+                this.displaySunburst.slices.supprSlices.bornExclusion[0] <
+                  child.budget &&
+                child.budget <
+                  this.displaySunburst.slices.supprSlices.bornExclusion[1]
+              );
+            else
+              return (
+                this.displaySunburst.slices.supprSlices.bornExclusion[0] <
+                  child.budget &&
+                child.budget <=
+                  this.displaySunburst.slices.supprSlices.bornExclusion[1]
+              );
+          }
+          return child;
+        });
+      } else
+        transform = this.dataDonut.children.filter(
+          child =>
+            child.name === this.displaySunburst.slices.supprSlices.keepData
+        )[0];
+
+      console.log("a", transform.children, this.dataDonut.children[8].budget);
       //join data
       if (this.displaySunburst.slices.joinSlices.present) {
-        a.children.forEach(child => {
+        console.log("je passe ici");
+        transform.children.forEach(child => {
+          console.log("child", child)
           if (
             child.budget >=
               this.displaySunburst.slices.joinSlices.bornInclusion[0] &&
@@ -350,14 +370,19 @@ export default {
           name: "AUTRES",
           children: subChild
         });
-        a.children = newChildren;
+        transform.children = newChildren;
       }
-
-      a.children.forEach(child => (a.budget += child.budget));
-      a.budget = (a.budget / 1000000).toFixed(2);
-      return a;
+      
+      if (!this.displaySunburst.slices.supprSlices.keepData && !this.displaySunburst.slices.joinSlices.present) transform.name = "AUTRES"
+      if (!this.displaySunburst.slices.supprSlices.keepData)
+        transform.children.forEach(child => (transform.budget += child.budget));
+      console.log("child8 dataDonut", this.dataDonut.children[8].budget)
+      // transform.budget = (transform.budget / 1000000).toFixed(2);
+      console.log("a after", transform.children, this.dataDonut.children[8].budget)
+      return transform;
     },
     root: function() {
+      console.log("transform", this.transformData);
       let root = hierarchy(this.transformData)
         .sum(d => {
           return d.value;
@@ -715,8 +740,8 @@ export default {
     reduceNbW(wordAr, sizeSeq, sizeLabel) {
       // console.log(wordAr);
       let nbWords = wordAr.map(arrayW => arrayW.length);
-      let wordLength = wordAr.map(
-        arrayW => Math.max(...arrayW.map(word => word.length + 20))
+      let wordLength = wordAr.map(arrayW =>
+        Math.max(...arrayW.map(word => word.length + 20))
       );
       const reducer = (accumulator, currentValue) => accumulator + currentValue;
       // console.log(wordLength, wordLength.reduce(reducer) * this.majW, sizeSeq - sizeLabel, sizeSeq, wordAr);
@@ -862,10 +887,13 @@ export default {
           : 13
         : ySpanScale(sequence.length);
     },
-    clicked(index) {
-      this.targetIndex = index;
-      this.currentRing = this.root.descendants()[index].depth;
-      this.$emit("onClick", this.root.descendants()[index]);
+    clicked(index, idDonut) {
+      if (idDonut === "donut2") {
+        this.targetIndex = index;
+        this.currentRing = this.root.descendants()[index].depth;
+      }
+      console.log("dataDonut in click", this.dataDonut.children[8].budget)
+      this.$emit("onClick", this.root.descendants()[index], idDonut);
     },
 
     setExplanationsPos: function() {
