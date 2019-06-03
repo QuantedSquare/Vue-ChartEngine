@@ -8,7 +8,7 @@
 <script>
 import { points } from '@/modules/randomVals.js'
 
-import ChartBars from '@/components/ChartBars.vue'
+import ChartBars from '@/components/Charts/ChartBars.vue'
 
 
 export default {

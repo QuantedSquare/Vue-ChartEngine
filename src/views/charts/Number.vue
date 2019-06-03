@@ -1,14 +1,14 @@
 <template>
     <div class="chart">
-        <a @click="refreshData">Refresh Lines</a> |
+        <a @click="refreshData">Refresh Number</a> |
         <a @click="refreshSize">Refresh Size</a>
-        <Chartlines :data="randomData" :width="chartWidth" :height="chartHeight" curve="curveMonotoneX" />
+        <ChartNumber :data="randomData" :width="chartWidth" :height="chartHeight" curve="curveMonotoneX" />
     </div>
 </template>
 <script>
-import { collection } from '@/modules/randomVals.js'
+// import { collection } from '@/modules/randomVals.js'
 
-import Chartlines from '@/components/Charts/ChartLines'
+import ChartNumber from '@/components/Charts/ChartNumber.vue'
 
 
 export default {
@@ -18,17 +18,14 @@ export default {
     },
     data: function() {
         return {
-            randomData: collection(),
+            randomData: Math.round(Math.random() * 500),
             chartWidth: 720,
             chartHeight: 480
         }
     },
     methods: {
         refreshData: function() {
-            let nbLines = Math.round(Math.random() * 2 + 2);
-            let nbPoints = Math.round(Math.random() * 15 + 3)
-
-            this.randomData = collection(nbLines, nbPoints, 0, 100);
+            this.randomData = Math.round(Math.random() * 500);
         },
         refreshSize: function() {
             this.chartWidth = Math.round(Math.random() * 420 + 300);

@@ -23,8 +23,8 @@
     </v-layout>
 </template>
 <script>
-import ChartBars from '@/components/ChartBars.vue'
-import ChartLines from '@/components/ChartLines.vue'
+import ChartBars from '@/components/Charts/ChartBars.vue'
+import ChartLines from '@/components/Charts/ChartLines.vue'
 
 export default {
     name: 'VuetifyVizPlayer',

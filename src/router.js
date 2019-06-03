@@ -22,15 +22,21 @@ export default new Router({
         },
         // Charts
         {
+            path: '/bars',
+            name: 'bars',
+            component: () => import('./views/charts/Bars.vue')
+        },
+        {
             path: '/lines',
             name: 'lines',
             component: () => import('./views/charts/Lines.vue')
         },
         {
-            path: '/bars',
-            name: 'bars',
-            component: () => import('./views/charts/Bars.vue')
+            path: '/number',
+            name: 'number',
+            component: () => import('./views/charts/Number.vue')
         },
+        // Story Player
         {
             path: '/player',
             name: 'player',
