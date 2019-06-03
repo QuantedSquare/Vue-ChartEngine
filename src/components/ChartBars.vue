@@ -7,7 +7,7 @@
             <g :transform="display">
                 <g id="xAxis" :transform="bottomTranslate"></g>
                 <g id="yAxis"></g>
-                <rect class="bar" v-for="point in displayedBars" :x="xScale(point.x)" :y="yScale(point.y)" :width="xScale.bandwidth()" :height="positiveOrZero(_height() - yScale(point.y))"></rect>
+                <rect class="bar chart-color2-darken-0" v-for="point in displayedBars" :x="xScale(point.x)" :y="yScale(point.y)" :width="xScale.bandwidth()" :height="positiveOrZero(_height() - yScale(point.y))"></rect>
             </g>
         </svg>
     </div>
@@ -154,9 +154,11 @@ export default {
 }
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style lang="scss" scoped>
+@import '@/assets/charts.scss';
+
 .bar {
-    fill: steelblue;
+    /*fill: $chart-color-2-s100;*/
     /*stroke: steelblue;*/
     /*stroke-width: 1.5px;*/
 }

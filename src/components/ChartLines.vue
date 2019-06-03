@@ -7,7 +7,7 @@
             <g :transform="display">
                 <g id="xAxis" :transform="bottomTranslate"></g>
                 <g id="yAxis"></g>
-                <path class="line" v-for="line in data" :d="lineDrawer(line)"></path>
+                <path class="line chart-color4-darken-0" v-for="line in data" :d="lineDrawer(line)"></path>
             </g>
         </svg>
     </div>
@@ -141,10 +141,12 @@ export default {
 }
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
+<style lang="scss" scoped>
+@import '@/assets/charts.scss';
+
 .line {
     fill: none;
-    stroke: steelblue;
+    /*stroke: $chart-color-4-s40;*/
     stroke-width: 1.5px;
 }
 </style>
