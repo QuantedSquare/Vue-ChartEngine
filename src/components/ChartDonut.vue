@@ -716,12 +716,12 @@ export default {
       // console.log(wordAr);
       let nbWords = wordAr.map(arrayW => arrayW.length);
       let wordLength = wordAr.map(
-        arrayW =>
-          arrayW.length + Math.max(...arrayW.map(word => word.length + 20))
+        arrayW => Math.max(...arrayW.map(word => word.length + 20))
       );
       const reducer = (accumulator, currentValue) => accumulator + currentValue;
       // console.log(wordLength, wordLength.reduce(reducer) * this.majW, sizeSeq - sizeLabel, wordAr);
       if (wordLength.reduce(reducer) * this.majW < sizeSeq - sizeLabel) {
+        // console.log("je passe la")
         let maxNbWords = Math.max(...nbWords);
         wordAr = wordAr.map(elem => {
           if (elem.length === maxNbWords) elem = elem.slice(0, elem.length - 1);
