@@ -24,12 +24,12 @@ export default new Router({
         {
             path: '/lines',
             name: 'lines',
-            component: () => import('./views/Lines.vue')
+            component: () => import('./views/charts/Lines.vue')
         },
         {
             path: '/bars',
             name: 'bars',
-            component: () => import('./views/Bars.vue')
+            component: () => import('./views/charts/Bars.vue')
         },
         {
             path: '/player',
