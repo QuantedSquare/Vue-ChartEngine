@@ -36,7 +36,7 @@
               :legends="legends"
             />
           </v-flex>
-          <v-flex :class="currentData.yearsData.length ?`md12 lg7` : `sm12 lg9`">
+          <v-flex :class="currentData.yearsData.length ?`md12 lg7 mb-4` : `sm12 lg9 mb-4`">
             <ChartDonut
               idDonut="donut2"
               :dataDonut="donutBudget"

@@ -719,7 +719,7 @@ export default {
         arrayW => Math.max(...arrayW.map(word => word.length + 20))
       );
       const reducer = (accumulator, currentValue) => accumulator + currentValue;
-      // console.log(wordLength, wordLength.reduce(reducer) * this.majW, sizeSeq - sizeLabel, wordAr);
+      // console.log(wordLength, wordLength.reduce(reducer) * this.majW, sizeSeq - sizeLabel, sizeSeq, wordAr);
       if (wordLength.reduce(reducer) * this.majW < sizeSeq - sizeLabel) {
         // console.log("je passe la")
         let maxNbWords = Math.max(...nbWords);
