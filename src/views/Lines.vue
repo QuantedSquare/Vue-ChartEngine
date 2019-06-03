@@ -2,7 +2,7 @@
     <div class="chart">
         <a @click="refreshData">Refresh Lines</a> |
         <a @click="refreshSize">Refresh Size</a>
-        <Chartlines :lines="randomData" :width="chartWidth" :height="chartHeight" curve="curveMonotoneX" />
+        <Chartlines :data="randomData" :width="chartWidth" :height="chartHeight" curve="curveMonotoneX" />
     </div>
 </template>
 <script>
