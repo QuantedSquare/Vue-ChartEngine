@@ -159,7 +159,11 @@ export default {
 
 .bar {
     /*fill: $chart-color-2-s100;*/
-    /*stroke: steelblue;*/
+    stroke: none;
     /*stroke-width: 1.5px;*/
 }
+
+/*.bar:hover {
+    fill: $chart-color-4;
+}*/
 </style>
