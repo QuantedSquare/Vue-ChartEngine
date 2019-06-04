@@ -2,7 +2,7 @@
     <div class="chart">
         <a @click="refreshData">Refresh Bars</a> |
         <a @click="refreshSize">Refresh Size</a>
-        <ChartBars :data="randomData" :width="chartWidth" :height="chartHeight" />
+        <ChartBars :data="randomData" :width="chartWidth" :height="chartHeight" :animationTime="0" />
     </div>
 </template>
 <script>
