@@ -23,7 +23,7 @@
           <v-divider></v-divider>
           Source
           <a
-            href="http://www2.assemblee-nationale.fr/15/statistiques-de-l-activite-parlementaire#node_45338"
+            href="http://data.assemblee-nationale.fr/autres/le-budget-de-l-assemblee-nationale/le-budget-de-l-assemblee-nationale"
             style="color: rgb(40, 234, 141);"
           >données officiels de l'Assemblée Générale</a>
         </v-card-text>

@@ -1,6 +1,6 @@
 <template>
   <v-container pa-0 fill-height :class="idDonut">
-    <v-layout :class="displaySunburst.sequence.center ? `justify-center` : ``" wrap id="donutChart">
+    <v-layout wrap id="donutChart">
       <v-flex xs12 class="width_text" :style="fontSlices+`;color: transparent;`">
         <span id="maj">ACHATS DE</span>
         <span id="min">achats de</span>

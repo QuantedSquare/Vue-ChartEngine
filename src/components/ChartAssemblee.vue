@@ -3,29 +3,63 @@
     <v-layout wrap justify-center>
       <v-flex xs12>
         <v-card color="indigo accent-4" class="pa-3 elevation-0">
-          <v-layout wrap align-end>
-            <v-flex xs7 md5>
-              <!-- <v-card dark color="red"> -->
-              <ChartDonut
-                idDonut="donut1"
-                :dataDonut="donutBudget"
-                @onClick="searchYearsData"
-                :displaySunburst="smallDonut"
-              />
-              <!-- </v-card> -->
-            </v-flex>
-            <v-flex xs5 md7 class="text-xs-left pl-3" style="color:white; ">
-              <span
-                style="font-size: 5rem; font-weight: bold; font-family: sans-serif; line-height: 1.125;"
-              >Budget de l'Assemblée</span>
-              <br>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed facilisis nibh erat, eu aliquet tortor consequat vitae. Duis cursus laoreet tempus. Aenean turpis diam, finibus in nisi quis, euismod sollicitudin erat. Nullam et magna id sem venenatis ultricies. Maecenas vitae sapien ante. Duis ex orci, consequat nec massa ultricies, venenatis fringilla ante. Nullam tristique eros vitae massa vestibulum aliquet. Sed vehicula diam in pretium volutpat. Etiam bibendum enim ut efficitur euismod.
-            </v-flex>
-          </v-layout>
+          <v-container>
+            <v-layout wrap align-end>
+              <v-flex xs12 sm4 xl2>
+                <!-- <v-card dark color="red"> -->
+                <ChartDonut
+                  idDonut="donut1"
+                  :dataDonut="donutBudget"
+                  @onClick="searchYearsData"
+                  :displaySunburst="smallDonut"
+                />
+                <!-- </v-card> -->
+              </v-flex>
+              <v-flex xs12 sm8 xl10 class="text-xs-left pl-3" style="color:white; ">
+                <span
+                  style="font-size: 5em; font-weight: bold; font-family: sans-serif; line-height: 1.125;"
+                >Dépenses de l'Assemblée</span>
+                <p class="textPara intro">
+                <br>En 2017 l'assemblée nationale a dépensé au total <span class="firstLetter" style="color: rgb(255, 172, 142)">576,29 M€</span>
+                <br>Comment sont-elles réparties ?
+                </p>
+                <p class="textPara">
+                  <span style="color: rgb(47, 150, 224)">
+                    <span class="firstLetter">57%</span> en
+                    <b>Charges parlementaires</b>
+                  </span>
+                  <br>blabla
+                </p>
+                <p class="textPara">
+                  <span style="color: rgb(40, 234, 141)">
+                    <span class="firstLetter">30%</span> en
+                    <b>Charges de personnel</b>
+                  </span>
+                  <br>blabla
+                </p>
+                <p class="textPara">
+                  <span style="color: rgb(175, 240, 91)">
+                    <span class="firstLetter">13%</span> pour
+                    <b>d'autres charges</b>
+                  </span>
+                  <br>blabla
+                </p>
+              </v-flex>
+            </v-layout>
+          </v-container>
         </v-card>
       </v-flex>
       <v-flex xs12 mt-4 v-resize="onResize2">
         <v-layout wrap justify-center :class="padding">
-          <v-flex v-if="currentData.yearsData.length" xs12 lg5 mb-4 :class="spacingTop" id="chartLines" v-resize="onResize">
+          <v-flex
+            v-if="currentData.yearsData.length"
+            xs12
+            lg5
+            mb-4
+            :class="spacingTop"
+            id="chartLines"
+            v-resize="onResize"
+          >
             <Chartlines
               :lines="currentData.yearsData"
               :width="linesW"
@@ -67,7 +101,7 @@ import {
 var TWEEN = require("@tweenjs/tween.js");
 import ChartDonut from "@/components/ChartDonut.vue";
 import Chartlines from "@/components/ChartLines";
-import { maxHeaderSize } from 'http';
+import { maxHeaderSize } from "http";
 
 export default {
   name: "ChartAssemblee",
@@ -261,13 +295,16 @@ export default {
       let name = elem.Libellé;
       let budget = parseInt(elem["Réalisé 2017"].replace(/\s/g, ""));
       let budgetProgess = [[], []];
-      console.log("je passe par extract")
+      console.log("je passe par extract");
       Object.keys(elem)
         .filter(key => key.search("Budget") >= 0)
         .forEach(budget => {
           budgetProgess[0].push({
             x: new Date(parseInt(budget.match(/20\d\d/)[0]), 0),
-            y: parseInt(elem[budget].length ? elem[budget].replace(/\s/g, "") : 0) / 1000000
+            y:
+              parseInt(
+                elem[budget].length ? elem[budget].replace(/\s/g, "") : 0
+              ) / 1000000
           });
         });
       Object.keys(elem)
@@ -276,7 +313,10 @@ export default {
           // console.log("elem budget",elem[budget], )
           budgetProgess[1].push({
             x: new Date(parseInt(budget.match(/20\d\d/)[0]), 0),
-            y: parseInt(elem[budget].length ? elem[budget].replace(/\s/g, "") : 0) / 1000000
+            y:
+              parseInt(
+                elem[budget].length ? elem[budget].replace(/\s/g, "") : 0
+              ) / 1000000
           });
         });
       if (
@@ -352,34 +392,32 @@ export default {
   methods: {
     setPadding() {
       // console.log(window.innerWidth)
-      if (window.innerWidth < 600)
-        return "px-1";
+      if (window.innerWidth < 600) return "px-1";
       else return "px-5";
     },
     onResize2() {
-      this.padding = this.setPadding()
+      this.padding = this.setPadding();
     },
     onResize() {
       let lines = document.getElementById("chartLines");
       if (lines.offsetWidth < 375) this.linesW = 372;
       else this.linesW = lines.offsetWidth;
 
-      if (window.innerWidth > 1264) this.spacingTop = "mt-5 pt-5"
-      else this.spacingTop = "mt-2"
+      if (window.innerWidth > 1264) this.spacingTop = "mt-5 pt-5";
+      else this.spacingTop = "mt-2";
     },
     searchYearsData(yearsData, idDonut, index) {
       console.log("data years", yearsData, idDonut);
       if (idDonut === "donut1") {
-        this.displaySunburst.slices.supprSlices.keepData = yearsData.data.name === "AUTRES" ? null : yearsData.data.name
-        this.displaySunburst.targetIndex = 0
-      }
-      else
-        this.displaySunburst.targetIndex = index
+        this.displaySunburst.slices.supprSlices.keepData =
+          yearsData.data.name === "AUTRES" ? null : yearsData.data.name;
+        this.displaySunburst.targetIndex = 0;
+      } else this.displaySunburst.targetIndex = index;
       this.currentData.yearsData = yearsData.data.budgetProgess
         ? yearsData.data.budgetProgess
         : [];
       this.currentData.name = yearsData.data.name ? yearsData.data.name : null;
-    // console.log("dataBudget", this.donutBudget.children[8].budget)
+      // console.log("dataBudget", this.donutBudget.children[8].budget)
     }
   }
 };
@@ -388,5 +426,19 @@ export default {
 <style>
 text {
   font: 10px sans-serif;
+}
+
+.intro {
+  font-size: 15px;
+}
+
+.textPara {
+    line-height: 20px;
+    margin-top: 10px;
+}
+
+.firstLetter {
+    font-size: 20px;
+    font-weight: bolder;
 }
 </style>

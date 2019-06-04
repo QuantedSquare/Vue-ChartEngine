@@ -192,7 +192,7 @@ export default {
       return this.height - margin.top - margin.bottom;
     },
     getMax: function(axis) {
-      console.log("lines",this.lines);
+      // console.log("lines",this.lines);
       return max(
         this.lines.map(line => {
           return max(line, d => d[axis]);
