@@ -151,6 +151,7 @@ export default {
     displaySunburst: {
       type: Object,
       default: {
+        targetIndex: 0,
         color: {
           colorScale: "interpolateRainbow",
           opacity: 0.6,
@@ -398,8 +399,8 @@ export default {
         return (d.position = i);
       });
 
-      if (this.targetIndex) {
-        let p = root.descendants()[this.targetIndex];
+      if (this.displaySunburst.targetIndex) {
+        let p = root.descendants()[this.displaySunburst.targetIndex];
         let maxDepth = this.searchMaxDepth(p);
         // console.log(maxDepth - p.depth + 1, this.displaySunburst.nbRing)
         let radiusDivider =
@@ -546,8 +547,8 @@ export default {
       if (amppedSlices[0].target) {
         this.targetCoords = amppedSlices.map(elem => elem.target);
       }
-      if (this.targetIndex === 0) this.targetCoords = this.currentCoords;
-      console.log("here", amppedSlices[0].target, this.currentCoords, this.targetCoords, this.targetIndex)
+      if (this.displaySunburst.targetIndex === 0) this.targetCoords = this.currentCoords;
+      console.log("here", amppedSlices[0].target, this.currentCoords, this.targetCoords, this.displaySunburst.targetIndex)
       // nb d'anneaux au sunburst
       if (this.displaySunburst.nbRing !== "all")
         amppedSlices = amppedSlices.filter(
@@ -570,7 +571,7 @@ export default {
         })`;
         let name = [];
         name.push(d.data.name);
-        // console.log(name.length * this.majW, y1 - y0, name, d.depth, this.currentRing, this.targetIndex, i);
+        // console.log(name.length * this.majW, y1 - y0, name, d.depth, this.currentRing, this.displaySunburst.targetIndex, i);
         if (name[0].length * this.majW > y1 - y0 && y1 - y0 !== 0) {
           let wordAr = name[0].split(/\s+/);
           let strArr = [];
@@ -891,15 +892,15 @@ export default {
     clicked(index, idDonut) {
       if (idDonut === "donut2") {
         console.log("japasse ici aussi")
-        this.targetIndex = index;
+        this.displaySunburst.targetIndex = index;
         this.currentRing = this.root.descendants()[index].depth;
       }
       if (idDonut === "donut1") {
-        this.targetIndex = 0
-        console.log("je change l'index", this.targetIndex)
+        this.displaySunburst.targetIndex = 0
+        console.log("je change l'index", this.displaySunburst.targetIndex)
       }
       console.log("dataDonut in click", this.dataDonut.children[8].budget)
-      this.$emit("onClick", this.root.descendants()[index], idDonut);
+      this.$emit("onClick", this.root.descendants()[index], idDonut, index);
     },
 
     setExplanationsPos: function() {

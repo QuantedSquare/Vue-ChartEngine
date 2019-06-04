@@ -97,6 +97,7 @@ export default {
         width: 115
       },
       smallDonut: {
+        targetIndex: 0,
         color: {
           colorScale: "interpolateCool",
           opacity: 1,
@@ -170,6 +171,7 @@ export default {
         }
       },
       displaySunburst: {
+        targetIndex: 0,
         color: {
           colorScale: "interpolateCool",
           opacity: 0.6,
@@ -364,12 +366,14 @@ export default {
       if (window.innerWidth > 1264) this.spacingTop = "mt-5 pt-5"
       else this.spacingTop = "mt-2"
     },
-    searchYearsData(yearsData, idDonut) {
+    searchYearsData(yearsData, idDonut, index) {
       console.log("data years", yearsData, idDonut);
       if (idDonut === "donut1") {
-        
         this.displaySunburst.slices.supprSlices.keepData = yearsData.data.name === "AUTRES" ? null : yearsData.data.name
+        this.displaySunburst.targetIndex = 0
       }
+      else
+        this.displaySunburst.targetIndex = index
       this.currentData.yearsData = yearsData.data.budgetProgess
         ? yearsData.data.budgetProgess
         : [];
