@@ -1,8 +1,8 @@
 <template>
 <v-content>
-  <header id="header" class="pt-2 pl-2 text-xs-left indigo accent-4">
+  <header id="header" class="pt-2 pl-2 text-xs-left">
         <div>
-            <img style="height:3em;" src="../assets/logo_couleur_blanc.png">
+            <img style="height:3em;" src="../assets/logo_couleur.png">
         </div>
         
     </header>
@@ -17,7 +17,7 @@
             <a href="http://quantedsquare.com/" style="color: rgb(40, 234, 141);">Quanted Square</a>
           </b>, 2019.
           <br>
-          <a href="mailto:julien@quantedsquare.com" style="color: rgb(40, 234, 141);">julien@quantedsquare.com</a>
+          <a href="mailto:julien@quantedsquare.com" style="color: rgb(40, 234, 141);">julien@quantedsquare.com</a>, <a href="mailto:fabien@quantedsquare.com" style="color: rgb(40, 234, 141);">fabien@quantedsquare.com</a>
           <br>
           <br>
           <v-divider></v-divider>

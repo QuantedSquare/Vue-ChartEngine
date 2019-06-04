@@ -136,6 +136,7 @@ import {
   interpolateRainbow,
   interpolateCool,
   interpolateGnBu,
+  interpolateRgb,
   interpolate
 } from "d3";
 var TWEEN = require("@tweenjs/tween.js");
@@ -289,6 +290,8 @@ export default {
         return interpolateCool;
       else if (this.displaySunburst.color.colorScale === "interpolateRainbow")
         return interpolateRainbow;
+      else if (this.displaySunburst.color.colorScale === "interpolateRgb")
+        return interpolateRgb(this.displaySunburst.color.colorMin, this.displaySunburst.color.colorMax);
     },
     colorScale: function() {
       return scaleOrdinal(

@@ -133,7 +133,9 @@ export default {
       smallDonut: {
         targetIndex: 0,
         color: {
-          colorScale: "interpolateCool",
+          colorScale: "interpolateRgb",
+          colorMin: 'rgba(255, 18, 120, 1)',
+          colorMax: 'rgba(172, 1, 207, 1)',
           opacity: 1,
           childrenOpacity: {
             present: false,
@@ -207,7 +209,9 @@ export default {
       displaySunburst: {
         targetIndex: 0,
         color: {
-          colorScale: "interpolateCool",
+          colorScale: "interpolateRgb",
+          colorMin: 'rgba(12, 204, 249, 1)',
+          colorMax: 'rgba(162, 255, 174, 1)',
           opacity: 0.6,
           childrenOpacity: {
             present: true,
