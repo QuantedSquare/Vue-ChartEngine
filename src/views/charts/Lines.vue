@@ -20,7 +20,11 @@ export default {
         return {
             randomData: collection(),
             chartOptions: {
-                curve: 'curveMonotoneX'
+                curve: 'curveMonotoneX',
+                events: [{
+                    x: 3,
+                    label: 'An Event on 3'
+                }]
             },
             chartWidth: 720,
             chartHeight: 480

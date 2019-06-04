@@ -7,7 +7,12 @@
             <g :transform="display">
                 <g id="xAxis" :transform="bottomTranslate"></g>
                 <g id="yAxis"></g>
-                <path class="line chart-color4-darken-0" v-for="line in data" :d="lineDrawer(line)"></path>
+                <path class="line chart-color4-darken-0" v-for="line in data" :d="lineDrawer(line.points)"></path>
+                <text v-for="line in data" :x="xScale(xMax) + 5" :y="yScale(line.points[line.points.length - 1].y) + 5" class="line-label">{{line.label}}</text>
+                <g v-if="options.events">
+                    <text v-for="event in options.events" :x="xScale(event.x)" :y="yScale(yMax) - 5" text-anchor="middle" class="event-label">{{event.label}}</text>
+                    <line v-for="event in options.events" class="event-line" :x1="xScale(event.x)" :x2="xScale(event.x)" :y1="yScale(0)" :y2="yScale(yMax)" stroke="black"></line>
+                </g>
             </g>
         </svg>
     </div>
@@ -16,7 +21,7 @@
 import { select, scaleLinear, min, max, axisLeft, axisBottom } from 'd3'
 import * as shapes from 'd3-shape'
 
-let margin = { top: 20, right: 20, bottom: 20, left: 30 };
+let margin = { top: 40, right: 50, bottom: 20, left: 30 };
 
 export default {
     name: 'ChartLines',
@@ -44,7 +49,7 @@ export default {
         }
     },
     data: function() {
-        // console.log(this.data);
+        console.log(this.data);
 
         let xScale = scaleLinear(),
             yScale = scaleLinear();
@@ -114,12 +119,12 @@ export default {
         },
         getMax: function(axis) {
             return max(this.data.map(line => {
-                return max(line, (d) => d[axis]);
+                return max(line.points, (d) => d[axis]);
             }));
         },
         getMin: function(axis) {
             return min(this.data.map(line => {
-                return min(line, (d) => d[axis]);
+                return min(line.points, (d) => d[axis]);
             }));
         },
         curve: function() {
@@ -156,5 +161,18 @@ export default {
     fill: none;
     /*stroke: $chart-color-4-s40;*/
     stroke-width: 1.5px;
+}
+
+.event-line {
+    stroke-dasharray: 10;
+    stroke-opacity: 0.5;
+}
+
+.event-label {
+    opacity: 0.5;
+}
+
+.line-label {
+    opacity: 0.5;
 }
 </style>
