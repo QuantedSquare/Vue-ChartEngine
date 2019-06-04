@@ -8,7 +8,7 @@
                 <g id="xAxis" :transform="bottomTranslate"></g>
                 <g id="yAxis"></g>
                 <rect class="bar chart-color2-darken-0" v-for="point in displayedBars" :x="xScale(point.x)" :y="yScale(point.y)" :width="xScale.bandwidth()" :height="positiveOrZero(_height() - yScale(point.y))"></rect>
-                <text v-for="point in displayedBars" :x="xScale(point.x) + (xScale.bandwidth()/2)" :y="yScale(point.y) - 5" text-anchor="middle" class="bar-label">{{point.label}}</text>
+                <text v-for="point in displayedBars" :x="xScale(point.x) + (xScale.bandwidth()/2)" :y="yScale(point.y) - 5" text-anchor="middle" :opacity="animationState()-0.5">{{point.label}}</text>
             </g>
         </svg>
     </div>
@@ -16,7 +16,7 @@
 <script>
 import { select, scaleLinear, scaleBand, min, max, interpolateObject, axisLeft, axisBottom } from 'd3'
 
-let margin = { top: 20, right: 20, bottom: 20, left: 30 };
+let margin = { top: 40, right: 20, bottom: 20, left: 30 };
 
 export default {
     name: 'ChartLines',

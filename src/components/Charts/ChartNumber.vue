@@ -93,9 +93,9 @@ export default {
         textLength: function() {
             let nbLength = this.displayedNumber.toString().length;
 
-            if (nbLength < 3) return this._width / 4;
-            if (nbLength <= 4) return this._width / 3;
-            return this.width / 2;
+            if (nbLength < 3) return this._width() / 4;
+            if (nbLength <= 4) return this._width() / 3;
+            return this._width() / 2;
         }
     }
 }

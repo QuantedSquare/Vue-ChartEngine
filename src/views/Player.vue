@@ -18,6 +18,12 @@ export default {
         let randomData = collection();
 
         let chartList = [{
+            title: 'Here is a Big Number',
+            subTitle: 'Nothing much to say about it',
+            chartType: 'ChartNumber',
+            data: Math.round(Math.random() * 10000),
+            techTitle: 'Random numbers on Y by random numbers on X'
+        }, {
             title: 'Here is a collection of lines',
             subTitle: 'Nothing much to say about them',
             chartType: 'ChartLines',

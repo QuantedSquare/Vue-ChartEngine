@@ -25,6 +25,7 @@
 <script>
 import ChartBars from '@/components/Charts/ChartBars.vue'
 import ChartLines from '@/components/Charts/ChartLines.vue'
+import ChartNumber from '@/components/Charts/ChartNumber.vue'
 
 export default {
     name: 'VuetifyVizPlayer',
@@ -33,7 +34,8 @@ export default {
     },
     components: {
         ChartBars,
-        ChartLines
+        ChartLines,
+        ChartNumber
     },
     data: function() {
         return {
