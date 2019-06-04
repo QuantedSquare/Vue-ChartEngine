@@ -891,15 +891,9 @@ export default {
     },
     clicked(index, idDonut) {
       if (idDonut === "donut2") {
-        console.log("japasse ici aussi")
-        this.displaySunburst.targetIndex = index;
         this.currentRing = this.root.descendants()[index].depth;
       }
-      if (idDonut === "donut1") {
-        this.displaySunburst.targetIndex = 0
-        console.log("je change l'index", this.displaySunburst.targetIndex)
-      }
-      console.log("dataDonut in click", this.dataDonut.children[8].budget)
+      // console.log("dataDonut in click", this.dataDonut.children[8].budget)
       this.$emit("onClick", this.root.descendants()[index], idDonut, index);
     },
 
