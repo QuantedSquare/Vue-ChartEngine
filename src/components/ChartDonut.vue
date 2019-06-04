@@ -547,6 +547,7 @@ export default {
         this.targetCoords = amppedSlices.map(elem => elem.target);
       }
       if (this.targetIndex === 0) this.targetCoords = this.currentCoords;
+      console.log("here", amppedSlices[0].target, this.currentCoords, this.targetCoords, this.targetIndex)
       // nb d'anneaux au sunburst
       if (this.displaySunburst.nbRing !== "all")
         amppedSlices = amppedSlices.filter(
@@ -637,7 +638,7 @@ export default {
           requestAnimationFrame(animate);
         }
       }
-      // console.log("newSet",newSet, oldSet)
+      console.log("newSet",newSet, oldSet)
       newSet.forEach((elem, i) => {
         new TWEEN.Tween(oldSet.length && oldSet[i] ? oldSet[i] : this.currentCoords[i])
           .to(elem, 1000)
@@ -889,8 +890,13 @@ export default {
     },
     clicked(index, idDonut) {
       if (idDonut === "donut2") {
+        console.log("japasse ici aussi")
         this.targetIndex = index;
         this.currentRing = this.root.descendants()[index].depth;
+      }
+      if (idDonut === "donut1") {
+        this.targetIndex = 0
+        console.log("je change l'index", this.targetIndex)
       }
       console.log("dataDonut in click", this.dataDonut.children[8].budget)
       this.$emit("onClick", this.root.descendants()[index], idDonut);
