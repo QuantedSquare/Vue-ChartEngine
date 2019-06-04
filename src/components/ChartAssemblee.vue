@@ -21,7 +21,7 @@
                 >Dépenses de l'Assemblée</span>
                 <p class="textPara intro">
                 <br>En 2017 l'assemblée nationale a dépensé au total <span class="firstLetter" style="color: rgb(255, 172, 142)">576,29 M€</span>
-                <br>Comment sont-elles réparties ?
+                <br><b>Comment sont-elles réparties ?</b>
                 </p>
                 <p class="textPara">
                   <span style="color: rgb(47, 150, 224)">
