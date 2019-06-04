@@ -117,7 +117,7 @@ export default {
     }
   },
   data: function() {
-    console.log(this.lines);
+    // console.log("lines",this.lines);
 
     let colorScale = scaleOrdinal(schemeCategory10);
 
@@ -192,6 +192,7 @@ export default {
       return this.height - margin.top - margin.bottom;
     },
     getMax: function(axis) {
+      console.log("lines",this.lines);
       return max(
         this.lines.map(line => {
           return max(line, d => d[axis]);

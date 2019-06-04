@@ -267,15 +267,16 @@ export default {
         .forEach(budget => {
           budgetProgess[0].push({
             x: new Date(parseInt(budget.match(/20\d\d/)[0]), 0),
-            y: parseInt(elem[budget].replace(/\s/g, "")) / 1000000
+            y: parseInt(elem[budget].length ? elem[budget].replace(/\s/g, "") : 0) / 1000000
           });
         });
       Object.keys(elem)
         .filter(key => key.search("Réalisé") >= 0)
         .forEach(budget => {
+          // console.log("elem budget",elem[budget], )
           budgetProgess[1].push({
             x: new Date(parseInt(budget.match(/20\d\d/)[0]), 0),
-            y: parseInt(elem[budget].replace(/\s/g, "")) / 1000000
+            y: parseInt(elem[budget].length ? elem[budget].replace(/\s/g, "") : 0) / 1000000
           });
         });
       if (
@@ -378,7 +379,7 @@ export default {
         ? yearsData.data.budgetProgess
         : [];
       this.currentData.name = yearsData.data.name ? yearsData.data.name : null;
-    console.log("dataBudget", this.donutBudget.children[8].budget)
+    // console.log("dataBudget", this.donutBudget.children[8].budget)
     }
   }
 };
