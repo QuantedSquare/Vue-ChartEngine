@@ -14,18 +14,18 @@ import ChartNumber from '@/components/Charts/ChartNumber.vue'
 export default {
     name: 'lines',
     components: {
-        Chartlines
+        ChartNumber
     },
     data: function() {
         return {
-            randomData: Math.round(Math.random() * 500),
+            randomData: Math.round(Math.random() * 100),
             chartWidth: 720,
             chartHeight: 480
         }
     },
     methods: {
         refreshData: function() {
-            this.randomData = Math.round(Math.random() * 500);
+            this.randomData = Math.round(Math.random() * 1000000);
         },
         refreshSize: function() {
             this.chartWidth = Math.round(Math.random() * 420 + 300);

@@ -74,7 +74,7 @@ export default {
             this.yScale.range([this._height(), 0]);
             this.drawYAxis();
         },
-        bars: function() {
+        data: function() {
             this.startAnimation = Date.now();
             this.interpolatedBars = this.data.map(bar => {
                 let _bar = this.renderedBars.find(b => b.x == bar.x);
