@@ -306,7 +306,7 @@ export default {
       );
     },
     transformData: function() {
-      console.log("donut8", this.dataDonut.children[8].budget)
+      // console.log("donut8", this.dataDonut.children[8].budget)
       let transform = {
         name: this.dataDonut.name.toUpperCase(),
         children: [],
@@ -317,14 +317,14 @@ export default {
       let subChild = [];
       let budget = 0;
 
-      console.log(this.displaySunburst.slices.supprSlices.keepData);
-      console.log("a before", transform.children, this.dataDonut.children[8].budget)
+      // console.log(this.displaySunburst.slices.supprSlices.keepData);
+      // console.log("a before", transform.children, this.dataDonut.children[8].budget)
 
       //suppr slices inutiles
       if (!this.displaySunburst.slices.supprSlices.keepData) {
-        console.log("je passe dans le suppr", this.displaySunburst.slices.supprSlices.bornExclusion)
+        // console.log("je passe dans le suppr", this.displaySunburst.slices.supprSlices.bornExclusion)
         transform.children = this.dataDonut.children.filter(child => {
-          console.log("child here", child)
+          // console.log("child here", child)
           if (this.displaySunburst.slices.supprSlices.present) {
             if (this.displaySunburst.slices.supprSlices.into)
               return (
@@ -349,12 +349,12 @@ export default {
             child.name === this.displaySunburst.slices.supprSlices.keepData
         )[0];
 
-      console.log("a", transform.children, this.dataDonut.children[8].budget);
+      // console.log("a", transform.children, this.dataDonut.children[8].budget);
       //join data
       if (this.displaySunburst.slices.joinSlices.present) {
-        console.log("je passe ici");
+        // console.log("je passe ici");
         transform.children.forEach(child => {
-          console.log("child", child)
+          // console.log("child", child)
           if (
             child.budget >=
               this.displaySunburst.slices.joinSlices.bornInclusion[0] &&
@@ -376,13 +376,13 @@ export default {
       if (!this.displaySunburst.slices.supprSlices.keepData && !this.displaySunburst.slices.joinSlices.present) transform.name = "AUTRES"
       if (!this.displaySunburst.slices.supprSlices.keepData)
         transform.children.forEach(child => (transform.budget += child.budget));
-      console.log("child8 dataDonut", this.dataDonut.children[8].budget)
+      // console.log("child8 dataDonut", this.dataDonut.children[8].budget)
       // transform.budget = (transform.budget / 1000000).toFixed(2);
-      console.log("a after", transform.children, this.dataDonut.children[8].budget)
+      // console.log("a after", transform.children, this.dataDonut.children[8].budget)
       return transform;
     },
     root: function() {
-      console.log("transform", this.transformData);
+      // console.log("transform", this.transformData);
       let root = hierarchy(this.transformData)
         .sum(d => {
           return d.value;
@@ -637,9 +637,9 @@ export default {
           requestAnimationFrame(animate);
         }
       }
-      // console.log(newSet)
+      // console.log("newSet",newSet, oldSet)
       newSet.forEach((elem, i) => {
-        new TWEEN.Tween(oldSet.length ? oldSet[i] : this.currentCoords[i])
+        new TWEEN.Tween(oldSet.length && oldSet[i] ? oldSet[i] : this.currentCoords[i])
           .to(elem, 1000)
           .easing(TWEEN.Easing.Quadratic.Out)
           .onUpdate(set => {
