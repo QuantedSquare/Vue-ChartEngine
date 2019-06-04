@@ -33,9 +33,14 @@ export default {
             type: Number,
             default: 720
         },
-        curve: {
-            type: String,
-            default: 'curveBasis'
+        options: {
+            type: Object,
+            default: function() {
+                return {
+                    curve: 'curveBasis',
+                    // events: [{x: 2, label: An Event}] // Events create a vertical ligne on the chart.
+                }
+            }
         }
     },
     data: function() {
@@ -47,7 +52,7 @@ export default {
         let lineDrawer = shapes.line()
             .x((d) => xScale(d.x))
             .y((d) => yScale(d.y))
-            .curve(shapes[this.curve]);
+            .curve(shapes[this.curve()]);
 
         xScale.range([0, this._width()]);
         xScale.domain([this.getMin('x'), this.getMax('x')]);
@@ -90,8 +95,8 @@ export default {
             this.yScale.domain([this.getMin('y'), this.getMax('y')]);
             this.drawYAxis();
         },
-        curve: function() {
-            this.lineDrawer.curve(shapes[this.curve]);
+        'options.curve': function() {
+            this.lineDrawer.curve(shapes[this.curve()]);
         }
     },
     methods: {
@@ -116,6 +121,9 @@ export default {
             return min(this.data.map(line => {
                 return min(line, (d) => d[axis]);
             }));
+        },
+        curve: function() {
+            return this.options.curve || 'curveBasis';
         }
     },
     computed: {
