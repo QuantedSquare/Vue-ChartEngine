@@ -8,7 +8,7 @@
                 <g id="xAxis" :transform="bottomTranslate"></g>
                 <g id="yAxis"></g>
                 <rect class="bar chart-color2-darken-0" v-for="point in displayedBars" :x="xScale(point.x)" :y="yScale(point.y)" :width="xScale.bandwidth()" :height="positiveOrZero(_height() - yScale(point.y))"></rect>
-                <text v-for="point in displayedBars" :x="xScale(point.x) + (xScale.bandwidth()/2)" :y="yScale(point.y) - 5" text-anchor="middle">{{point.label}}</text>
+                <text v-for="point in displayedBars" :x="xScale(point.x) + (xScale.bandwidth()/2)" :y="yScale(point.y) - 5" text-anchor="middle" class="bar-label">{{point.label}}</text>
             </g>
         </svg>
     </div>
@@ -162,6 +162,10 @@ export default {
     /*fill: $chart-color-2-s100;*/
     stroke: none;
     /*stroke-width: 1.5px;*/
+}
+
+.bar-label {
+    opacity: 0.5;
 }
 
 /*.bar:hover {

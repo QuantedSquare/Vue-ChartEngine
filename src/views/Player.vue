@@ -25,11 +25,11 @@ export default {
             techTitle: 'Random numbers on Y by random numbers on X'
         }];
 
-        randomData.forEach((points, i) => {
+        randomData.forEach((line, i) => {
             chartList.push({
                 title: 'The points of line ' + (i + 1) + ' in bars',
                 chartType: 'ChartBars',
-                data: points,
+                data: line.points,
                 techTitle: 'Random numbers on Y by random numbers on X'
             });
         });
