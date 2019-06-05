@@ -50,9 +50,7 @@
           {{sequences.currentHover ? sequences.currentHover.toUpperCase() : transformData.name}}
           <br>
           <br>
-          <span
-            id="labelBugdet"
-          >{{displayBudget}} {{displaySunburst.sequence.endLabel.unit}}</span>
+          <span id="labelBugdet">{{displayBudget}} {{displaySunburst.sequence.endLabel.unit}}</span>
         </div>
         <svg
           :height="displaySunburst.sizes.sunburstW"
@@ -144,6 +142,15 @@ var TWEEN = require("@tweenjs/tween.js");
 export default {
   name: "ChartDonut",
   props: {
+    linesData: {
+      type: Object,
+      default: function() {
+        return {
+          name: "",
+          yearsData: []
+        };
+      }
+    },
     idDonut: {
       type: String,
       default: "donut"
@@ -155,10 +162,12 @@ export default {
         targetIndex: 0,
         color: {
           colorScale: "interpolateRainbow",
+          colorMin: "rgba(12, 204, 249, 1)",
+          colorMax: "rgba(162, 255, 174, 1)",
           opacity: 0.6,
           childrenOpacity: {
             present: false,
-            opacity: 0.6
+            opacity: 0.4
           }
         },
         nbRing: "all",
@@ -269,6 +278,10 @@ export default {
         this.displaySunburst.sequence.font.family
     };
   },
+  model: {
+    prop: "linesData",
+    event: "update:linesData"
+  },
   updated: function() {
     this.explanationsPos = this.setExplanationsPos();
   },
@@ -283,7 +296,9 @@ export default {
   computed: {
     displayBudget: function() {
       // transform.budget = (transform.budget / 1000000).toFixed(2);
-      return this.sequences.currentHover ? this.sequences.labelBudget : (this.transformData.budget / 1000000).toFixed(2)
+      return this.sequences.currentHover
+        ? this.sequences.labelBudget
+        : (this.transformData.budget / 1000000).toFixed(2);
     },
     interpolator: function() {
       if (this.displaySunburst.color.colorScale === "interpolateCool")
@@ -291,7 +306,10 @@ export default {
       else if (this.displaySunburst.color.colorScale === "interpolateRainbow")
         return interpolateRainbow;
       else if (this.displaySunburst.color.colorScale === "interpolateRgb")
-        return interpolateRgb(this.displaySunburst.color.colorMin, this.displaySunburst.color.colorMax);
+        return interpolateRgb(
+          this.displaySunburst.color.colorMin,
+          this.displaySunburst.color.colorMax
+        );
     },
     colorScale: function() {
       return scaleOrdinal(
@@ -310,25 +328,21 @@ export default {
       );
     },
     transformData: function() {
-      // console.log("donut8", this.dataDonut.children[8].budget)
       let transform = {
         name: this.dataDonut.name.toUpperCase(),
         children: [],
+        budgetProgess: [],
         budget: 0
       };
 
       let newChildren = [];
       let subChild = [];
       let budget = 0;
-
-      // console.log(this.displaySunburst.slices.supprSlices.keepData);
-      // console.log("a before", transform.children, this.dataDonut.children[8].budget)
+      let budgetProgess = [[0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0]];
 
       //suppr slices inutiles
       if (!this.displaySunburst.slices.supprSlices.keepData) {
-        // console.log("je passe dans le suppr", this.displaySunburst.slices.supprSlices.bornExclusion)
         transform.children = this.dataDonut.children.filter(child => {
-          // console.log("child here", child)
           if (this.displaySunburst.slices.supprSlices.present) {
             if (this.displaySunburst.slices.supprSlices.into)
               return (
@@ -353,12 +367,9 @@ export default {
             child.name === this.displaySunburst.slices.supprSlices.keepData
         )[0];
 
-      // console.log("a", transform.children, this.dataDonut.children[8].budget);
       //join data
       if (this.displaySunburst.slices.joinSlices.present) {
-        // console.log("je passe ici");
         transform.children.forEach(child => {
-          // console.log("child", child)
           if (
             child.budget >=
               this.displaySunburst.slices.joinSlices.bornInclusion[0] &&
@@ -367,26 +378,46 @@ export default {
           ) {
             subChild.push(child);
             budget += child.budget;
+            budgetProgess[0] = budgetProgess[0].map((num, i) => {
+              return num + child.budgetProgess[0][i].y;
+            });
+            budgetProgess[1] = budgetProgess[1].map((num, i) => {
+              return num + child.budgetProgess[1][i].y;
+            });
           } else newChildren.push(child);
         });
+        budgetProgess = budgetProgess.map(array =>
+          array.map((value, i) => {
+            return {
+              x: transform.children[0].budgetProgess[0][i].x,
+              y: value
+            };
+          })
+        );
+        // console.log(budgetProgess)
         newChildren.push({
           budget: budget,
+          budgetProgess: budgetProgess,
           name: "AUTRES",
           children: subChild
         });
         transform.children = newChildren;
+        this.$emit("update:linesData", {
+          name: "AUTRES",
+          yearsData: budgetProgess
+        });
       }
-      
-      if (!this.displaySunburst.slices.supprSlices.keepData && !this.displaySunburst.slices.joinSlices.present) transform.name = "AUTRES"
+
+      if (
+        !this.displaySunburst.slices.supprSlices.keepData &&
+        !this.displaySunburst.slices.joinSlices.present
+      )
+        transform.name = "AUTRES";
       if (!this.displaySunburst.slices.supprSlices.keepData)
         transform.children.forEach(child => (transform.budget += child.budget));
-      // console.log("child8 dataDonut", this.dataDonut.children[8].budget)
-      // transform.budget = (transform.budget / 1000000).toFixed(2);
-      // console.log("a after", transform.children, this.dataDonut.children[8].budget)
       return transform;
     },
     root: function() {
-      // console.log("transform", this.transformData);
       let root = hierarchy(this.transformData)
         .sum(d => {
           return d.value;
@@ -550,7 +581,8 @@ export default {
       if (amppedSlices[0].target) {
         this.targetCoords = amppedSlices.map(elem => elem.target);
       }
-      if (this.displaySunburst.targetIndex === 0) this.targetCoords = this.currentCoords;
+      if (this.displaySunburst.targetIndex === 0)
+        this.targetCoords = this.currentCoords;
       // console.log("here", amppedSlices[0].target, this.currentCoords, this.targetCoords, this.displaySunburst.targetIndex)
       // nb d'anneaux au sunburst
       if (this.displaySunburst.nbRing !== "all")
@@ -644,7 +676,9 @@ export default {
       }
       // console.log("newSet",newSet, oldSet)
       newSet.forEach((elem, i) => {
-        new TWEEN.Tween(oldSet.length && oldSet[i] ? oldSet[i] : this.currentCoords[i])
+        new TWEEN.Tween(
+          oldSet.length && oldSet[i] ? oldSet[i] : this.currentCoords[i]
+        )
           .to(elem, 1000)
           .easing(TWEEN.Easing.Quadratic.Out)
           .onUpdate(set => {

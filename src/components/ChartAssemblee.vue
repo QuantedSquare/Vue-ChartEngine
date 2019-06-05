@@ -12,6 +12,7 @@
                   :dataDonut="donutBudget"
                   @onClick="searchYearsData"
                   :displaySunburst="smallDonut"
+                  v-model="linesData"
                 />
                 <!-- </v-card> -->
               </v-flex>
@@ -21,7 +22,10 @@
                 >Dépenses de l'Assemblée</span>
                 <p class="textPara intro">
                   <br>En 2017 l'assemblée nationale a dépensé au total
-                  <span class="firstLetter" style="color: rgb(12, 162, 249)">576,29 M€</span>
+                  <span
+                    class="firstLetter"
+                    style="color: rgb(12, 162, 249)"
+                  >576,29 M€</span>
                   <br>
                   <b>Comment sont-elles réparties ?</b>
                 </p>
@@ -70,6 +74,7 @@
               scale="time"
               :title="currentData.name"
               :legends="legends"
+              v-model="linesData"
             />
           </v-flex>
           <v-flex :class="currentData.yearsData.length ?`md12 lg7 mb-4` : `sm12 lg9 mb-4`">
@@ -113,6 +118,10 @@ export default {
   },
   data: function() {
     return {
+      linesData: {
+        name: null,
+        yearsData: []
+      },
       donutBudget: {
         name: "Budget",
         children: []
@@ -395,9 +404,13 @@ export default {
 
     this.isLoaded = true;
   },
+  watch: {
+    linesData: function(newLines) {
+      this.currentData = newLines;
+    }
+  },
   methods: {
     setPadding() {
-      // console.log(window.innerWidth)
       if (window.innerWidth < 600) return "px-1";
       else return "px-5";
     },
