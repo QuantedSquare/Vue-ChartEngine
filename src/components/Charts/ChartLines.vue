@@ -18,10 +18,10 @@
     </div>
 </template>
 <script>
-import { select, scaleLinear, min, max, axisLeft, axisBottom } from 'd3'
+import { select, scaleLinear, scaleTime, min, max, axisLeft, axisBottom } from 'd3'
 import * as shapes from 'd3-shape'
 
-let margin = { top: 40, right: 50, bottom: 20, left: 30 };
+let margin = { top: 40, right: 80, bottom: 20, left: 40 };
 
 export default {
     name: 'ChartLines',
@@ -42,16 +42,17 @@ export default {
             type: Object,
             default: function() {
                 return {
-                    curve: 'curveBasis',
+                    curve: 'curveLinear',
                     // events: [{x: 2, label: An Event}] // Events create a vertical ligne on the chart.
+                    isTime: false
                 }
             }
         }
     },
     data: function() {
-        console.log(this.data);
+        // console.log(this.data);
 
-        let xScale = scaleLinear(),
+        let xScale = this.options.isTime ? scaleTime() : scaleLinear(),
             yScale = scaleLinear();
 
         let lineDrawer = shapes.line()
@@ -128,7 +129,7 @@ export default {
             }));
         },
         curve: function() {
-            return this.options.curve || 'curveBasis';
+            return this.options.curve || 'curveLinear';
         }
     },
     computed: {

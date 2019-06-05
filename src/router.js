@@ -41,6 +41,12 @@ export default new Router({
             path: '/player',
             name: 'player',
             component: () => import('./views/Player.vue')
+        },
+        // Real Stories
+        {
+            path: '/data-story/Boeing-2019',
+            name: 'Boeing-2019',
+            component: () => import('./views/stories/Boeing-2019.vue')
         }
     ]
 })

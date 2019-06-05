@@ -14,7 +14,7 @@
 import { interpolateNumber } from 'd3'
 // import * as shapes from 'd3-shape'
 
-let margin = { top: 20, right: 20, bottom: 20, left: 30 };
+let margin = { top: 0, right: 0, bottom: 0, left: 0 };
 
 export default {
     name: 'ChartNumber',
@@ -23,9 +23,14 @@ export default {
             type: Number,
             required: true
         },
-        start: {
-            type: Number,
-            default: 0
+        options: {
+            type: Object,
+            default: function() {
+                return {
+                    start: 0,
+                    animationTime: 2000
+                }
+            }
         },
         height: {
             type: Number,
@@ -34,18 +39,14 @@ export default {
         width: {
             type: Number,
             default: 720
-        },
-        animationTime: {
-            type: Number,
-            default: 2000
         }
     },
     data: function() {
         // console.log(this.data)
 
         return {
-            interpolatedNumber: interpolateNumber(this.start, this.data),
-            displayedNumber: this.start,
+            interpolatedNumber: interpolateNumber(this.options.start, this.data),
+            displayedNumber: this.options.start,
             startAnimation: Date.now()
         }
     },
@@ -70,8 +71,8 @@ export default {
             if (this.animationState() < 1) setTimeout(this.animate, 0);
         },
         animationState: function() {
-            if ((this.startAnimation + this.animationTime) > Date.now()) {
-                return (Date.now() - this.startAnimation) / this.animationTime;
+            if ((this.startAnimation + this.options.animationTime) > Date.now()) {
+                return (Date.now() - this.startAnimation) / this.options.animationTime;
             } else {
                 return 1;
             }

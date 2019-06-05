@@ -8,10 +8,14 @@
         <v-flex xs10>
             <template v-for="(chart, i) in charts">
                 <v-layout wrap :key="chart.title" v-if="chartIndex == i">
-                    <v-flex xs12>{{chart.title}}</v-flex>
-                    <v-flex xs12>
-                        <component :is="chart.chartType" :data="chart.data"></component>
+                    <v-flex class="title" xs12>
+                        <p>{{chart.title}}</p>
                     </v-flex>
+                    <v-flex class="subheading" xs12>{{chart.subTitle}}</v-flex>
+                    <v-flex xs12>
+                        <component :is="chart.chartType" :data="chart.data" :options="chart.options"></component>
+                    </v-flex>
+                    <v-flex class="caption" xs12>{{chart.techTitle}}</v-flex>
                 </v-layout>
             </template>
         </v-flex>
