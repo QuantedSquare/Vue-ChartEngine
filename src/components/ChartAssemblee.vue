@@ -6,7 +6,6 @@
           <v-container>
             <v-layout wrap align-end>
               <v-flex xs12 sm4 xl3>
-                <!-- <v-card dark color="red"> -->
                 <ChartDonut
                   idDonut="donut1"
                   :dataDonut="donutBudget"
@@ -14,7 +13,6 @@
                   :displaySunburst="smallDonut"
                   v-model="linesData"
                 />
-                <!-- </v-card> -->
               </v-flex>
               <v-flex xs12 sm8 xl9 class="text-xs-left pl-3">
                 <span
@@ -406,7 +404,8 @@ export default {
   },
   watch: {
     linesData: function(newLines) {
-      this.currentData = newLines;
+      this.currentData.name = newLines.name;
+      this.currentData.yearsData = newLines.budgetProgess
     }
   },
   methods: {

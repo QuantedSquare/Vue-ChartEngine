@@ -229,6 +229,7 @@ export default {
       return "translate(0," + this._height() + ")";
     },
     frameTranslate: function() {
+      console.log("W",this._width())
       return "translate(" + (this._width() + margin.right) + ",30)";
     },
     xMax: function() {
