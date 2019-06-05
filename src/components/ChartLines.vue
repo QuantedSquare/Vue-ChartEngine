@@ -64,7 +64,9 @@ import {
   axisBottom,
   scaleTime,
   schemeCategory10,
-  scaleOrdinal
+  scaleOrdinal,
+  interpolateRgb,
+  quantize
 } from "d3";
 import * as shapes from "d3-shape";
 
@@ -119,7 +121,14 @@ export default {
   data: function() {
     // console.log("lines",this.lines);
 
-    let colorScale = scaleOrdinal(schemeCategory10);
+    // let colorScale = scaleOrdinal(schemeCategory10);
+    let interpolator = interpolateRgb(
+          "rgba(255, 18, 120, 1)",
+          "rgba(12, 204, 249, 1)"
+        );
+    let colorScale = scaleOrdinal(
+        quantize(interpolator, 2)
+      );
 
     let xScale = this.scale === "linear" ? scaleLinear() : scaleTime(),
       yScale = scaleLinear();

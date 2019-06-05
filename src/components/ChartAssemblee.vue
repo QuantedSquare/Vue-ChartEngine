@@ -5,7 +5,7 @@
         <v-card class="pa-3 elevation-0 back">
           <v-container>
             <v-layout wrap align-end>
-              <v-flex xs12 sm4 xl2>
+              <v-flex xs12 sm4 xl3>
                 <!-- <v-card dark color="red"> -->
                 <ChartDonut
                   idDonut="donut1"
@@ -16,10 +16,10 @@
                 />
                 <!-- </v-card> -->
               </v-flex>
-              <v-flex xs12 sm8 xl10 class="text-xs-left pl-3">
+              <v-flex xs12 sm8 xl9 class="text-xs-left pl-3">
                 <span
-                  style="font-size: 5em; font-weight: bold; font-family: sans-serif; line-height: 1.125;"
-                >Dépenses de l'Assemblée</span>
+                id="title"
+                >Dépenses de <br>l'Assemblée</span>
                 <p class="textPara intro">
                   <br>En 2017 l'assemblée nationale a dépensé au total
                   <span
@@ -465,4 +465,13 @@ text {
   background: linear-gradient(10deg, rgb(162, 255, 174), rgb(12, 205, 249));
   /* background: linear-gradient(45deg, rgb(136, 0, 163), rgb(255, 0, 111)); */
 }
+
+#title {
+  font-size: calc(40px + (80 - 40) * ((100vw - 300px) / (1600 - 300)));
+  /* font-size: 20px; */
+  font-weight: bold; 
+  font-family: sans-serif; 
+  line-height: 1.125;
+}
+
 </style>
