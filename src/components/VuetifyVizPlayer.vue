@@ -23,20 +23,12 @@
     </v-layout>
 </template>
 <script>
-import ChartBars from '@/components/Charts/ChartBars.vue'
-import ChartLines from '@/components/Charts/ChartLines.vue'
-import ChartNumber from '@/components/Charts/ChartNumber.vue'
-
 export default {
     name: 'VuetifyVizPlayer',
     props: {
         charts: Array
     },
-    components: {
-        ChartBars,
-        ChartLines,
-        ChartNumber
-    },
+    components: {},
     data: function() {
         return {
             chartIndex: 0,
