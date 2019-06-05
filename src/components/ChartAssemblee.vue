@@ -2,7 +2,7 @@
   <v-container fluid fill-height v-if="isLoaded" class="pa-0">
     <v-layout wrap justify-center>
       <v-flex xs12>
-        <v-card color="indigo accent-4" class="pa-3 elevation-0 back">
+        <v-card class="pa-3 elevation-0 back">
           <v-container>
             <v-layout wrap align-end>
               <v-flex xs12 sm4 xl2>
@@ -449,8 +449,7 @@ text {
 }
 
 .back {
-  background: linear-gradient(10deg, #A2FFAE, #0CCCF9);
-  color: rgb(12, 123, 249)
+  background: linear-gradient(10deg, rgb(162, 255, 174), rgb(12, 205, 249));
   /* background: linear-gradient(45deg, rgb(136, 0, 163), rgb(255, 0, 111)); */
 }
 </style>

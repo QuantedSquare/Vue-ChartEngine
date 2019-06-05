@@ -112,7 +112,7 @@
                 width="18"
                 height="18"
                 :fill="colorScale(legend)"
-                fill-opacity="0.6"
+                :fill-opacity="displaySunburst.color.opacity"
               ></rect>
               <text x="22" y="9" dy="0.35em" :style="fontSlices">{{legend.toUpperCase()}}</text>
             </g>

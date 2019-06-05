@@ -8,8 +8,7 @@
     <div class="chart">
       <ChartAssemblee/>
     </div>
-    <v-footer class="text-xs-center footer" height="auto" color="rgb(180, 255, 190)">
-      
+    <v-footer class="text-xs-center footer" height="auto" color="rgba(162, 255, 174, 0.5)">
       <v-card-text class="pt-1">
         Data storytelling réalisé par
         <b>
@@ -39,6 +38,6 @@ export default {
 <style>
 .footer {
   /* color: #A2FFAE; */
-  background: rgb(12, 162, 249);
+  background: rgba(162, 255, 174, 0.596);
 }
 </style>
