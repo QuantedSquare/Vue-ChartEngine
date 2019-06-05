@@ -2,7 +2,7 @@
   <v-container fluid fill-height v-if="isLoaded" class="pa-0">
     <v-layout wrap justify-center>
       <v-flex xs12>
-        <v-card color="indigo accent-4" class="pa-3 elevation-0">
+        <v-card color="indigo accent-4" class="pa-3 elevation-0 back">
           <v-container>
             <v-layout wrap align-end>
               <v-flex xs12 sm4 xl2>
@@ -15,30 +15,32 @@
                 />
                 <!-- </v-card> -->
               </v-flex>
-              <v-flex xs12 sm8 xl10 class="text-xs-left pl-3" style="color:white; ">
+              <v-flex xs12 sm8 xl10 class="text-xs-left pl-3">
                 <span
                   style="font-size: 5em; font-weight: bold; font-family: sans-serif; line-height: 1.125;"
                 >Dépenses de l'Assemblée</span>
                 <p class="textPara intro">
-                <br>En 2017 l'assemblée nationale a dépensé au total <span class="firstLetter" style="color: rgb(255, 172, 142)">576,29 M€</span>
-                <br><b>Comment sont-elles réparties ?</b>
+                  <br>En 2017 l'assemblée nationale a dépensé au total
+                  <span class="firstLetter" style="color: rgb(12, 162, 249)">576,29 M€</span>
+                  <br>
+                  <b>Comment sont-elles réparties ?</b>
                 </p>
                 <p class="textPara">
-                  <span style="color: rgb(47, 150, 224)">
+                  <span style="color: rgb(227, 12, 149)">
                     <span class="firstLetter">57%</span> en
                     <b>Charges parlementaires</b>
                   </span>
                   <br>blabla
                 </p>
                 <p class="textPara">
-                  <span style="color: rgb(40, 234, 141)">
+                  <span style="color: rgb(200, 7, 178)">
                     <span class="firstLetter">30%</span> en
                     <b>Charges de personnel</b>
                   </span>
                   <br>blabla
                 </p>
                 <p class="textPara">
-                  <span style="color: rgb(175, 240, 91)">
+                  <span style="color: rgb(172, 1, 207)">
                     <span class="firstLetter">13%</span> pour
                     <b>d'autres charges</b>
                   </span>
@@ -134,8 +136,8 @@ export default {
         targetIndex: 0,
         color: {
           colorScale: "interpolateRgb",
-          colorMin: 'rgba(255, 18, 120, 1)',
-          colorMax: 'rgba(172, 1, 207, 1)',
+          colorMin: "rgba(255, 18, 120, 1)",
+          colorMax: "rgba(172, 1, 207, 1)",
           opacity: 1,
           childrenOpacity: {
             present: false,
@@ -210,8 +212,8 @@ export default {
         targetIndex: 0,
         color: {
           colorScale: "interpolateRgb",
-          colorMin: 'rgba(12, 204, 249, 1)',
-          colorMax: 'rgba(162, 255, 174, 1)',
+          colorMin: "rgba(12, 204, 249, 1)",
+          colorMax: "rgba(162, 255, 174, 1)",
           opacity: 0.6,
           childrenOpacity: {
             present: true,
@@ -437,12 +439,18 @@ text {
 }
 
 .textPara {
-    line-height: 20px;
-    margin-top: 10px;
+  line-height: 20px;
+  margin-top: 10px;
 }
 
 .firstLetter {
-    font-size: 20px;
-    font-weight: bolder;
+  font-size: 20px;
+  font-weight: bolder;
+}
+
+.back {
+  background: linear-gradient(10deg, #A2FFAE, #0CCCF9);
+  color: rgb(12, 123, 249)
+  /* background: linear-gradient(45deg, rgb(136, 0, 163), rgb(255, 0, 111)); */
 }
 </style>
