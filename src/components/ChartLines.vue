@@ -19,8 +19,20 @@
             fill="currentColor"
           >Million d'euros</text>
         </g>
-        <g v-for="(line, index) in lines">
+        <g v-for="(line, index) in lines" class="lines" :id="`line_`+index">
           <path class="line" :d="lineDrawer(line)" :style="`stroke:`+ colorLine(index)"></path>
+          <circle
+            v-for="(coords, i) in line"
+            :cx="xScale(coords.x)"
+            :cy="yScale(coords.y)"
+            class="point"
+            :id="`point_`+i"
+            r="2.5"
+            :fill="colorLine(index)"
+            @mouseover="hoverPoint(index, i)"
+            @mouseleave="unhover(index, i)"
+            stroke-width="20px"
+          ></circle>
           <text
             v-if="legends.display === `endLine`"
             :transform="legendTranslate(line)"
@@ -119,16 +131,14 @@ export default {
     }
   },
   data: function() {
-    // console.log("lines",this.lines);
+    console.log("lines", this.lines);
 
     // let colorScale = scaleOrdinal(schemeCategory10);
     let interpolator = interpolateRgb(
-          "rgba(255, 18, 120, 1)",
-          "rgba(12, 204, 249, 1)"
-        );
-    let colorScale = scaleOrdinal(
-        quantize(interpolator, 2)
-      );
+      "rgba(255, 18, 120, 1)",
+      "rgba(12, 204, 249, 1)"
+    );
+    let colorScale = scaleOrdinal(quantize(interpolator, 2));
 
     let xScale = this.scale === "linear" ? scaleLinear() : scaleTime(),
       yScale = scaleLinear();
@@ -186,6 +196,18 @@ export default {
     }
   },
   methods: {
+    hoverPoint: function(lineI, pointI) {
+      // console.log("point", pointI, lineI);
+      let line = document.getElementById("line_"+lineI)
+      let point = line.children[pointI + 1]
+      point.classList.add("hover")
+    },
+    unhover: function(lineI, pointI) {
+      let line = document.getElementById("line_"+lineI)
+      let point = line.children[pointI + 1]
+      point.classList.remove("hover")
+      // point.style.r = "2.5"
+    },
     drawXAxis: function() {
       select("#xAxis").call(axisBottom(this.xScale));
     },
@@ -229,7 +251,7 @@ export default {
       return "translate(0," + this._height() + ")";
     },
     frameTranslate: function() {
-      console.log("W",this._width())
+      console.log("W", this._width());
       return "translate(" + (this._width() + margin.right) + ",30)";
     },
     xMax: function() {
@@ -253,5 +275,16 @@ export default {
   fill: none;
   stroke: steelblue;
   stroke-width: 1.5px;
+}
+
+.lines .point {
+  transition: r 250ms linear;
+  -moz-transition: r 250ms linear;
+  -webkit-transition: r 250ms linear;
+}
+
+.lines .point.hover {
+  r: 10;
+  opacity: .5;
 }
 </style>

@@ -444,14 +444,6 @@ export default {
       if (!this.displaySunburst.slices.supprSlices.keepData)
         transform.children.forEach(child => (transform.budget += child.budget));
 
-      console.log(transform)
-
-      // this.$emit("update:linesData", {
-      //       name: "AUTRES",
-      //       budgetProgess: budgetProgess
-      //     });
-      //     transform.budgetProgess = budgetProgess
-
       transform.children.forEach(child => {
         if (child.name === "AUTRES") {
           child.children.forEach(subchild => {
