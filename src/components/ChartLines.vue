@@ -61,27 +61,22 @@
           data-style-padding="10"
           v-if="legends.display === `frame`"
         >
-          <g class="legend_items">
-            <text
-              v-for="(legend, index) in legends.names"
-              :y="index + (index-0.25)+`em`"
-              x="1em"
-            >{{legend}}</text>
-            <circle
-              v-for="(legend, index) in legends.names"
-              :cy="index-0.25+`em`"
-              cx="0"
-              r="0.2em"
-              :style="`fill:` + colorLine(index)"
-            ></circle>
+          <g
+            class="legend_items"
+            v-for="(legend, index) in legends.names"
+            :id="`legend_`+index"
+            :transform="serieTranslate(index)"
+          >
+            <text :y="index + (index-0.25)+`em`" x="1em">{{legend}}</text>
+            <circle :cy="index-0.25+`em`" cx="0" r="0.2em" :style="`fill:` + colorLine(index)"></circle>
           </g>
         </g>
       </g>
       <g v-for="(line, index) in lines" class="tooltips" :id="`tooltips_`+index">
         <g v-for="(coords, i) in line" class="tooltip" :id="`tooltip_`+i" display="none">
           <rect
-            :x="xScale(coords.x) + 45"
-            :y="yScale(coords.y) + 2"
+            :x="xScale(coords.x) + spacing(`x`,`rect`,i, line.length)"
+            :y="yScale(coords.y) + spacing(`y`,`rect`,i, line.length)"
             width="65"
             height="30"
             rx="5"
@@ -90,8 +85,8 @@
             :stroke="colorLine(index)"
           ></rect>
           <text
-            :x="xScale(coords.x) + 55"
-            :y="yScale(coords.y) + 20"
+            :x="xScale(coords.x) + spacing(`x`,`text`,i, line.length)"
+            :y="yScale(coords.y) + spacing(`y`,`text`,i, line.length)"
           >{{coords.y.toFixed(2)}} {{unit}}</text>
         </g>
       </g>
@@ -232,12 +227,26 @@ export default {
     }
   },
   methods: {
-    hoverPoint: function(lineI, pointI) {
+    spacing: function(coord, div, i, len) {
+      // console.log(i)
+      if (div === "rect") {
+        if (coord === "y" && i !== len - 1 || this.legends.position !== "top") return 2
+        else if (coord === "y" && i === len - 1 ) return 4
+        if (coord === "x" && i !== len - 1 || this.legends.position !== "top") return 45
+        else if (coord === "x" && i === len - 1) return -50
+      }
+      if (div === "text") {
+        if (coord === "y" && i !== len - 1 || this.legends.position !== "top") return 20
+        else if (coord === "y" && i === len - 1) return 22
+        if (coord === "x" && i !== len - 1 || this.legends.position !== "top") return 55
+        else if (coord === "x" && i === len - 1) return -40
+      }
+    },
+    hoverPoint: function(lineI, pointI, line) {
       let point = select("#line_" + lineI + " #point_" + pointI);
       point.classed("hover", true);
 
       let tooltip = select("#tooltips_" + lineI + " #tooltip_" + pointI);
-      console.log(tooltip);
       tooltip.attr("display", null);
       tooltip.raise();
     },
@@ -255,7 +264,7 @@ export default {
       select("#yAxis").call(axisLeft(this.yScale));
     },
     _width: function() {
-      return this.legends.present
+      return this.legends.present && this.legends.position === "end"
         ? this.width - margin.left - margin.right - this.legends.width
         : this.width - margin.left - margin.right;
     },
@@ -281,6 +290,15 @@ export default {
       let xT = line[line.length - 1].x;
       let yT = line[line.length - 1].y;
       return `translate(${this.xScale(xT)}, ${this.yScale(yT)})`;
+    },
+    serieTranslate: function(index) {
+      let len = [];
+      select(legend)
+        .selectAll("text")
+        .each(function(d) {
+          len.push(this.getComputedTextLength());
+        });
+      return this.legends.present && this.legends.position === "top" ? "translate(" + len[index] * (index * -1) + "," + index * -20 + ")" : null;
     }
   },
   computed: {
@@ -291,8 +309,11 @@ export default {
       return "translate(0," + this._height() + ")";
     },
     frameTranslate: function() {
-      console.log("W", this._width());
-      return "translate(" + (this._width() + margin.right) + ",30)";
+      let posLegend =
+        this.legends.present && this.legends.position === "end"
+          ? 0
+          : this.legends.width + margin.right + 10;
+      return "translate(" + (this._width() - posLegend + margin.right) + ",0)";
     },
     xMax: function() {
       return this.getMax("x");

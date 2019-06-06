@@ -136,6 +136,7 @@ export default {
       spacingTop: "mt-2",
       legends: {
         present: true,
+        position: "end",
         display: "frame",
         names: ["Prévisions budgetaires", "Dépenses réalisées"],
         width: 115
