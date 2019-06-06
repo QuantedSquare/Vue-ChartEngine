@@ -72,6 +72,7 @@
               scale="time"
               :title="currentData.name"
               :legends="legends"
+              :unit="displaySunburst.sequence.endLabel.unit"
               v-model="linesData"
             />
           </v-flex>

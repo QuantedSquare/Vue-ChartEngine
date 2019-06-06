@@ -33,19 +33,19 @@
               @mouseleave="unhover(index, i)"
               stroke-width="20px"
             ></circle>
-            <g class="tooltip">
+            <!-- <g class="tooltip" :id="`tooltip_`+i" display="none">
               <rect
                 :x="xScale(coords.x) + 15"
                 :y="yScale(coords.y) - 20"
-                width="100"
+                width="65"
                 height="30"
                 rx="5"
                 ry="5"
                 fill="white"
                 :stroke="colorLine(index)"
               ></rect>
-              <text :x="xScale(coords.x) + 25" :y="yScale(coords.y) - 2">blabla</text>
-            </g>
+              <text :x="xScale(coords.x) + 25" :y="yScale(coords.y) - 2">{{coords.y.toFixed(2)}} {{unit}}</text>
+            </g>-->
           </g>
           <text
             v-if="legends.display === `endLine`"
@@ -75,6 +75,24 @@
               :style="`fill:` + colorLine(index)"
             ></circle>
           </g>
+        </g>
+      </g>
+      <g v-for="(line, index) in lines" class="tooltips" :id="`tooltips_`+index">
+        <g v-for="(coords, i) in line" class="tooltip" :id="`tooltip_`+i" display="none">
+          <rect
+            :x="xScale(coords.x) + 45"
+            :y="yScale(coords.y) + 2"
+            width="65"
+            height="30"
+            rx="5"
+            ry="5"
+            fill="white"
+            :stroke="colorLine(index)"
+          ></rect>
+          <text
+            :x="xScale(coords.x) + 55"
+            :y="yScale(coords.y) + 20"
+          >{{coords.y.toFixed(2)}} {{unit}}</text>
         </g>
       </g>
     </svg>
@@ -142,6 +160,10 @@ export default {
     legends: {
       type: Object,
       default: {}
+    },
+    unit: {
+      type: String,
+      default: null
     }
   },
   data: function() {
@@ -213,10 +235,18 @@ export default {
     hoverPoint: function(lineI, pointI) {
       let point = select("#line_" + lineI + " #point_" + pointI);
       point.classed("hover", true);
+
+      let tooltip = select("#tooltips_" + lineI + " #tooltip_" + pointI);
+      console.log(tooltip);
+      tooltip.attr("display", null);
+      tooltip.raise();
     },
     unhover: function(lineI, pointI) {
       let point = select("#line_" + lineI + " #point_" + pointI);
       point.classed("hover", false);
+
+      let tooltip = select("#tooltips_" + lineI + " #tooltip_" + pointI);
+      tooltip.attr("display", "none");
     },
     drawXAxis: function() {
       select("#xAxis").call(axisBottom(this.xScale));
@@ -299,10 +329,6 @@ export default {
   opacity: 0.5;
 }
 
-.tooltip {
-  display: none;
-}
-
 .nvtooltip {
   position: absolute;
   background-color: rgba(255, 255, 255, 1);
@@ -326,22 +352,5 @@ export default {
 
   -moz-border-radius: 15px;
   border-radius: 15px;
-}
-
-.nvtooltip h3 {
-  margin: 0;
-  padding: 0;
-  text-align: center;
-}
-
-.nvtooltip p {
-  margin: 0;
-  padding: 0;
-  text-align: center;
-}
-
-.nvtooltip span {
-  display: inline-block;
-  margin: 2px 0;
 }
 </style>
