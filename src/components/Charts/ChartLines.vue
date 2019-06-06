@@ -21,7 +21,7 @@
 import { select, scaleLinear, scaleTime, min, max, axisLeft, axisBottom } from 'd3'
 import * as shapes from 'd3-shape'
 
-let margin = { top: 40, right: 80, bottom: 20, left: 40 };
+let margin = { top: 40, right: 80, bottom: 40, left: 40 };
 
 export default {
     name: 'ChartLines',
@@ -44,7 +44,9 @@ export default {
                 return {
                     curve: 'curveLinear',
                     // events: [{x: 2, label: An Event}] // Events create a vertical ligne on the chart.
-                    isTime: false
+                    isTime: false,
+                    // min: 0 // Fix yScale Min
+                    // max: 1000 // Fix yScale Max
                 }
             }
         }
@@ -119,12 +121,16 @@ export default {
             return this.height - margin.top - margin.bottom;
         },
         getMax: function(axis) {
-            return max(this.data.map(line => {
+            let fixed = axis == 'y' && typeof(this.options.max) == 'number';
+
+            return fixed ? this.options.max : max(this.data.map(line => {
                 return max(line.points, (d) => d[axis]);
             }));
         },
         getMin: function(axis) {
-            return min(this.data.map(line => {
+            let fixed = axis == 'y' && typeof(this.options.min) == 'number';
+
+            return fixed ? this.options.min : min(this.data.map(line => {
                 return min(line.points, (d) => d[axis]);
             }));
         },
