@@ -21,18 +21,32 @@
         </g>
         <g v-for="(line, index) in lines" class="lines" :id="`line_`+index">
           <path class="line" :d="lineDrawer(line)" :style="`stroke:`+ colorLine(index)"></path>
-          <circle
-            v-for="(coords, i) in line"
-            :cx="xScale(coords.x)"
-            :cy="yScale(coords.y)"
-            class="point"
-            :id="`point_`+i"
-            r="2.5"
-            :fill="colorLine(index)"
-            @mouseover="hoverPoint(index, i)"
-            @mouseleave="unhover(index, i)"
-            stroke-width="20px"
-          ></circle>
+          <g v-for="(coords, i) in line">
+            <circle
+              :cx="xScale(coords.x)"
+              :cy="yScale(coords.y)"
+              class="point"
+              :id="`point_`+i"
+              r="2.5"
+              :fill="colorLine(index)"
+              @mouseover="hoverPoint(index, i)"
+              @mouseleave="unhover(index, i)"
+              stroke-width="20px"
+            ></circle>
+            <g class="tooltip">
+              <rect
+                :x="xScale(coords.x) + 15"
+                :y="yScale(coords.y) - 20"
+                width="100"
+                height="30"
+                rx="5"
+                ry="5"
+                fill="white"
+                :stroke="colorLine(index)"
+              ></rect>
+              <text :x="xScale(coords.x) + 25" :y="yScale(coords.y) - 2">blabla</text>
+            </g>
+          </g>
           <text
             v-if="legends.display === `endLine`"
             :transform="legendTranslate(line)"
@@ -197,16 +211,12 @@ export default {
   },
   methods: {
     hoverPoint: function(lineI, pointI) {
-      // console.log("point", pointI, lineI);
-      let line = document.getElementById("line_"+lineI)
-      let point = line.children[pointI + 1]
-      point.classList.add("hover")
+      let point = select("#line_" + lineI + " #point_" + pointI);
+      point.classed("hover", true);
     },
     unhover: function(lineI, pointI) {
-      let line = document.getElementById("line_"+lineI)
-      let point = line.children[pointI + 1]
-      point.classList.remove("hover")
-      // point.style.r = "2.5"
+      let point = select("#line_" + lineI + " #point_" + pointI);
+      point.classed("hover", false);
     },
     drawXAxis: function() {
       select("#xAxis").call(axisBottom(this.xScale));
@@ -278,6 +288,7 @@ export default {
 }
 
 .lines .point {
+  position: relative;
   transition: r 250ms linear;
   -moz-transition: r 250ms linear;
   -webkit-transition: r 250ms linear;
@@ -285,6 +296,52 @@ export default {
 
 .lines .point.hover {
   r: 10;
-  opacity: .5;
+  opacity: 0.5;
+}
+
+.tooltip {
+  display: none;
+}
+
+.nvtooltip {
+  position: absolute;
+  background-color: rgba(255, 255, 255, 1);
+  padding: 10px;
+  border: 1px solid #ddd;
+
+  font-family: Arial;
+  font-size: 13px;
+
+  transition: opacity 500ms linear;
+  -moz-transition: opacity 500ms linear;
+  -webkit-transition: opacity 500ms linear;
+
+  transition-delay: 500ms;
+  -moz-transition-delay: 500ms;
+  -webkit-transition-delay: 500ms;
+
+  -moz-box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.5);
+  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.5);
+
+  -moz-border-radius: 15px;
+  border-radius: 15px;
+}
+
+.nvtooltip h3 {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+.nvtooltip p {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+
+.nvtooltip span {
+  display: inline-block;
+  margin: 2px 0;
 }
 </style>
