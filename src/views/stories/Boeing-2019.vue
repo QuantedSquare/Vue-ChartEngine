@@ -70,6 +70,7 @@ export default {
                     // {label: '248.72', x: 'Boeing Mar 1, 2019', y: 248.72}
 
                 ],
+                options: { min: 0, max: 300 },
                 techTitle: 'Random numbers on Y by random numbers on X'
             }
         ];

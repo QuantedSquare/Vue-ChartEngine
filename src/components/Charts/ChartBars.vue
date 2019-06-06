@@ -36,6 +36,15 @@ export default {
         animationTime: {
             type: Number,
             default: 1000
+        },
+        options: {
+            type: Object,
+            default: function() {
+                return {
+                    // min: 0 // Fix yAxix Min
+                    // max: 1000 // Fix yAxis Max
+                }
+            }
         }
     },
     data: function() {
@@ -129,10 +138,10 @@ export default {
             return this.height - margin.top - margin.bottom;
         },
         getMax: function(axis) {
-            return max(this.data, (d) => d[axis]);
+            return this.options.max ? this.options.max : max(this.data, (d) => d[axis]);
         },
         getMin: function(axis) {
-            return min(this.data, (d) => d[axis]);
+            return !!(this.options.min + 1) ? this.options.min : min(this.data, (d) => d[axis]);
         },
         positiveOrZero: function(nb) {
             return nb > 0 ? nb : 0;
