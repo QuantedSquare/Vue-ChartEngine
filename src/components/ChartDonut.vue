@@ -102,8 +102,7 @@
               v-for="(legend, index) in legends.names"
               :transform="`translate(0, `+ 33 * index +`)`"
               @click="!displaySunburst.legends.clickable ? null : clicked(index + 1, idDonut)"
-              @mouseover="mLeave === 0 ? null : legendOver(index + 1)"
-              @mouseleave="lengendLeave"
+             
               :style="!displaySunburst.legends.clickable ? null : `cursor: pointer;`"
             >
               <rect
@@ -1037,44 +1036,44 @@ export default {
       return "top: " + tDiv + "px; left: " + lDiv + "px;";
     },
 
-    legendOver(index) {
-      let doc = this;
+    // legendOver(index) {
+    //   let doc = this;
       
-      function overChildren(slice, idDonut) {
-        if (slice.children && slice.children.length) {
-          slice.children.forEach(child => {
-            select("." + idDonut + " #slice" + child.position).style(
-              "opacity",
-              1
-            );
-            if (child.children && child.children.length)
-              overChildren(child, idDonut);
-          });
-        }
-      }
+    //   function overChildren(slice, idDonut) {
+    //     if (slice.children && slice.children.length) {
+    //       slice.children.forEach(child => {
+    //         select("." + idDonut + " #slice" + child.position).style(
+    //           "opacity",
+    //           1
+    //         );
+    //         if (child.children && child.children.length)
+    //           overChildren(child, idDonut);
+    //       });
+    //     }
+    //   }
 
-      selectAll("." + doc.idDonut + " #chart path").style("opacity", 0.3);
-      select("." + doc.idDonut + " #slice" + index).style("opacity", 1);
+    //   selectAll("." + doc.idDonut + " #chart path").style("opacity", 0.3);
+    //   select("." + doc.idDonut + " #slice" + index).style("opacity", 1);
 
-      overChildren(this.root.descendants()[index], this.idDonut);
-    },
+    //   overChildren(this.root.descendants()[index], this.idDonut);
+    // },
 
-    lengendLeave() {
-      let doc = this;
-      this.mLeave = true;
-      const turnOnHover = () => {
-          doc.mLeave = false;
-        };
-      // console.log("leave",this.mLeave)
-      selectAll("." + this.idDonut + " #chart path")
-        .transition()
-        .duration(500)
-        .style("opacity", 1)
-        .on("end", function() {
-          console.log("end")
-          turnOnHover();
-        });
-    },
+    // lengendLeave() {
+    //   let doc = this;
+    //   this.mLeave = true;
+    //   const turnOnHover = () => {
+    //       doc.mLeave = false;
+    //     };
+    //   // console.log("leave",this.mLeave)
+    //   selectAll("." + this.idDonut + " #chart path")
+    //     .transition()
+    //     .duration(500)
+    //     .style("opacity", 1)
+    //     .on("end", function() {
+    //       console.log("end")
+    //       turnOnHover();
+    //     });
+    // },
 
     mouseover(index) {
       let doc = this;
