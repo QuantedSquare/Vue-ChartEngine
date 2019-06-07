@@ -228,19 +228,14 @@ export default {
   },
   methods: {
     spacing: function(coord, div, i, len) {
-      // console.log(i)
-      if (div === "rect") {
-        if (coord === "y" && i !== len - 1 || this.legends.position !== "top") return 2
-        else if (coord === "y" && i === len - 1 ) return 4
-        if (coord === "x" && i !== len - 1 || this.legends.position !== "top") return 45
-        else if (coord === "x" && i === len - 1) return -50
-      }
-      if (div === "text") {
-        if (coord === "y" && i !== len - 1 || this.legends.position !== "top") return 20
-        else if (coord === "y" && i === len - 1) return 22
-        if (coord === "x" && i !== len - 1 || this.legends.position !== "top") return 55
-        else if (coord === "x" && i === len - 1) return -40
-      }
+        if (div === "rect") {
+          if (coord === "y") return i !== len - 1 ? 2 : 4;
+          if (coord === "x") return i !== len - 1 ? 45 : -50;
+        }
+        if (div === "text") {
+          if (coord === "y") return i !== len - 1 ? 20 : 22;
+          if (coord === "x") return i !== len - 1 ? 55 : -40;
+        }
     },
     hoverPoint: function(lineI, pointI, line) {
       let point = select("#line_" + lineI + " #point_" + pointI);
@@ -298,7 +293,9 @@ export default {
         .each(function(d) {
           len.push(this.getComputedTextLength());
         });
-      return this.legends.present && this.legends.position === "top" ? "translate(" + len[index] * (index * -1) + "," + index * -20 + ")" : null;
+      return this.legends.present && this.legends.position === "top"
+        ? "translate(" + len[index] * (index * -1) + "," + index * -20 + ")"
+        : null;
     }
   },
   computed: {
