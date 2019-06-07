@@ -102,6 +102,8 @@
               v-for="(legend, index) in legends.names"
               :transform="`translate(0, `+ 33 * index +`)`"
               @click="!displaySunburst.legends.clickable ? null : clicked(index + 1, idDonut)"
+              @mouseover="mLeave === 0 ? null : legendOver(index + 1)"
+              @mouseleave="lengendLeave"
               :style="!displaySunburst.legends.clickable ? null : `cursor: pointer;`"
             >
               <rect
@@ -414,31 +416,31 @@ export default {
       ) {
         transform.name = "AUTRES";
         transform.children.forEach(child => {
-          console.log(child)
-        // if (child.name === "AUTRES") {
+          console.log(child);
+          // if (child.name === "AUTRES") {
           // child.children.forEach(subchild => {
-            budgetProgess[0] = budgetProgess[0].map((num, i) => {
-              return num + child.budgetProgess[0][i].y;
-            });
-            budgetProgess[1] = budgetProgess[1].map((num, i) => {
-              return num + child.budgetProgess[1][i].y;
-            });
+          budgetProgess[0] = budgetProgess[0].map((num, i) => {
+            return num + child.budgetProgess[0][i].y;
           });
-          budgetProgess = budgetProgess.map(array =>
-            array.map((value, i) => {
-              return {
-                x: transform.children[0].budgetProgess[0][i].x,
-                y: value
-              };
-            })
-          );
-          console.log("budget progress", budgetProgess);
-          this.$emit("update:linesData", {
-            name: "AUTRES",
-            budgetProgess: budgetProgess
+          budgetProgess[1] = budgetProgess[1].map((num, i) => {
+            return num + child.budgetProgess[1][i].y;
           });
-          transform.budgetProgess = budgetProgess
-        }
+        });
+        budgetProgess = budgetProgess.map(array =>
+          array.map((value, i) => {
+            return {
+              x: transform.children[0].budgetProgess[0][i].x,
+              y: value
+            };
+          })
+        );
+        console.log("budget progress", budgetProgess);
+        this.$emit("update:linesData", {
+          name: "AUTRES",
+          budgetProgess: budgetProgess
+        });
+        transform.budgetProgess = budgetProgess;
+      }
       // });
       // }
       if (!this.displaySunburst.slices.supprSlices.keepData)
@@ -1033,6 +1035,45 @@ export default {
       currentDiv.removeChild(newDiv);
 
       return "top: " + tDiv + "px; left: " + lDiv + "px;";
+    },
+
+    legendOver(index) {
+      let doc = this;
+      
+      function overChildren(slice, idDonut) {
+        if (slice.children && slice.children.length) {
+          slice.children.forEach(child => {
+            select("." + idDonut + " #slice" + child.position).style(
+              "opacity",
+              1
+            );
+            if (child.children && child.children.length)
+              overChildren(child, idDonut);
+          });
+        }
+      }
+
+      selectAll("." + doc.idDonut + " #chart path").style("opacity", 0.3);
+      select("." + doc.idDonut + " #slice" + index).style("opacity", 1);
+
+      overChildren(this.root.descendants()[index], this.idDonut);
+    },
+
+    lengendLeave() {
+      let doc = this;
+      this.mLeave = true;
+      const turnOnHover = () => {
+          doc.mLeave = false;
+        };
+      // console.log("leave",this.mLeave)
+      selectAll("." + this.idDonut + " #chart path")
+        .transition()
+        .duration(500)
+        .style("opacity", 1)
+        .on("end", function() {
+          console.log("end")
+          turnOnHover();
+        });
     },
 
     mouseover(index) {
