@@ -190,7 +190,7 @@ export default {
           center: 30,
           sunburstW: 300,
           legendW: 300,
-          sequenceW: 300 + 300,
+          sequenceW: 600,
           offset: "offset-xs0 offset-sm2 offset-md4"
         },
         legends: {
@@ -266,7 +266,7 @@ export default {
           center: 150,
           sunburstW: 500,
           legendW: 300,
-          sequenceW: 500 + 300 + 30,
+          sequenceW: this.setSeqW(),
           offset: ""
         },
         legends: {
@@ -410,6 +410,23 @@ export default {
     }
   },
   methods: {
+    setSeqW() {
+      let screenW = window.innerWidth,
+          px5 = 48,
+          px1 = 4,
+          lg = 7,
+          md = 12
+      
+      let flexW = null;
+
+      console.log(((screenW - px5 * 2) / 12) * 7)
+      if (screenW > 1264) flexW = ((screenW - px5 * 2) / 12) * 7
+      else if (screenW > 600) flexW = (screenW - px5 * 2)
+      else flexW = screenW - px1 * 2
+
+      console.log(flexW)
+      return flexW
+    },
     setPadding() {
       if (window.innerWidth < 600) return "px-1";
       else return "px-5";

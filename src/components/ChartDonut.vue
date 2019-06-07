@@ -687,7 +687,7 @@ export default {
       return b;
     },
     legends: function() {
-      this.proportionTextSeq();
+      this.proportionTextSeq()
       let legendsNames = this.root
         .descendants()
         .filter(elem => elem.depth === 1)
@@ -746,7 +746,13 @@ export default {
     },
     onResize() {
       let doc = document.getElementsByClassName(this.idDonut);
-      // console.log(doc[0].children[0].children.sequence.offsetWidth)
+
+      let doc2 = select("."+this.idDonut+" #trail")
+      console.log("doc2",doc2.style('width'), doc2.node().offsetWidth)
+
+      let child = doc[0].children[0].children
+      let w = child.sequence.clientWidth
+      console.log("resize",child, w)
       this.displaySunburst.sizes.sequenceW =
         doc[0].children[0].children.sequence.offsetWidth;
 
@@ -860,6 +866,7 @@ export default {
     },
     proportionTextSeq: function() {
       let newSeqNames = this.sequences.seqNames;
+      console.log("seqname",newSeqNames)
       if (this.sequences.seqNames.length) {
         let array = this.sequences.seqNames.map(
           elem => elem[0].length * this.majW + 20
@@ -877,6 +884,7 @@ export default {
           endLabelP = 15;
 
         let sumW = array.reduce(reducer);
+        console.log("seqw", this.displaySunburst.sizes.sequenceW)
         // console.log("Wendlabel",endLabelW, array, sumW, this.displaySunburst.sizes.sequenceW - endLabelW - endLabelP)
 
         if (
@@ -1132,7 +1140,7 @@ export default {
         arrayName.push(elem);
         return arrayName;
       });
-      // console.log("seq", this.sequences.seqNames);
+
       let budget = this.root.descendants()[index].data.value
         ? this.root.descendants()[index].data.value / 1000000
         : this.root.descendants()[index].data.budget / 1000000;
