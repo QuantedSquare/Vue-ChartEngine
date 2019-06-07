@@ -162,7 +162,7 @@ export default {
     }
   },
   data: function() {
-    console.log("lines", this.lines);
+    // console.log("lines", this.lines);
 
     // let colorScale = scaleOrdinal(schemeCategory10);
     let interpolator = interpolateRgb(
@@ -267,7 +267,6 @@ export default {
       return this.height - margin.top - margin.bottom;
     },
     getMax: function(axis) {
-      // console.log("lines",this.lines);
       return max(
         this.lines.map(line => {
           return max(line, d => d[axis]);
@@ -288,13 +287,14 @@ export default {
     },
     serieTranslate: function(index) {
       let len = [];
-      select(legend)
+      select(".legend")
         .selectAll("text")
         .each(function(d) {
+          // console.log(this.getComputedTextLength())
           len.push(this.getComputedTextLength());
         });
       return this.legends.present && this.legends.position === "top"
-        ? "translate(" + len[index] * (index * -1) + "," + index * -20 + ")"
+        ? "translate(" + len[index] * (index * -1.3) + "," + index * -20 + ")"
         : null;
     }
   },

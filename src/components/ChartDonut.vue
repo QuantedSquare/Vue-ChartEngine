@@ -102,7 +102,6 @@
               v-for="(legend, index) in legends.names"
               :transform="`translate(0, `+ 33 * index +`)`"
               @click="!displaySunburst.legends.clickable ? null : clicked(index + 1, idDonut)"
-             
               :style="!displaySunburst.legends.clickable ? null : `cursor: pointer;`"
             >
               <rect
@@ -379,23 +378,8 @@ export default {
           ) {
             subChild.push(child);
             budget += child.budget;
-            // budgetProgess[0] = budgetProgess[0].map((num, i) => {
-            //   return num + child.budgetProgess[0][i].y;
-            // });
-            // budgetProgess[1] = budgetProgess[1].map((num, i) => {
-            //   return num + child.budgetProgess[1][i].y;
-            // });
           } else newChildren.push(child);
         });
-        // budgetProgess = budgetProgess.map(array =>
-        //   array.map((value, i) => {
-        //     return {
-        //       x: transform.children[0].budgetProgess[0][i].x,
-        //       y: value
-        //     };
-        //   })
-        // );
-        // console.log(budgetProgess)
         newChildren.push({
           budget: budget,
           // budgetProgess: budgetProgess,
@@ -403,21 +387,14 @@ export default {
           children: subChild
         });
         transform.children = newChildren;
-        // this.$emit("update:linesData", {
-        //   name: "AUTRES",
-        //   budgetProgess: budgetProgess
-        // });
       }
-      console.log(transform.children);
+      // console.log(transform.children);
       if (
         !this.displaySunburst.slices.supprSlices.keepData &&
         !this.displaySunburst.slices.joinSlices.present
       ) {
         transform.name = "AUTRES";
         transform.children.forEach(child => {
-          console.log(child);
-          // if (child.name === "AUTRES") {
-          // child.children.forEach(subchild => {
           budgetProgess[0] = budgetProgess[0].map((num, i) => {
             return num + child.budgetProgess[0][i].y;
           });
@@ -433,7 +410,7 @@ export default {
             };
           })
         );
-        console.log("budget progress", budgetProgess);
+        // console.log("budget progress", budgetProgess);
         this.$emit("update:linesData", {
           name: "AUTRES",
           budgetProgess: budgetProgess
@@ -463,7 +440,7 @@ export default {
               };
             })
           );
-          console.log("budget progress", budgetProgess);
+          // console.log("budget progress", budgetProgess);
           child["budgetProgess"] = budgetProgess;
           this.$emit("update:linesData", {
             name: "AUTRES",
@@ -475,7 +452,7 @@ export default {
       return transform;
     },
     root: function() {
-      console.log("trnaformData", this.transformData);
+      // console.log("trnaformData", this.transformData);
       let root = hierarchy(this.transformData)
         .sum(d => {
           return d.value;
@@ -484,7 +461,7 @@ export default {
 
       this.partition(root);
       // console.log("root", root.descendants());
-      console.log("root", root);
+      // console.log("root", root);
 
       let i = -1;
       root.each(d => {

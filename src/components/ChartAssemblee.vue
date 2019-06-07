@@ -310,7 +310,6 @@ export default {
       let name = elem.Libellé;
       let budget = parseInt(elem["Réalisé 2017"].replace(/\s/g, ""));
       let budgetProgess = [[], []];
-      console.log("je passe par extract");
       Object.keys(elem)
         .filter(key => key.search("Budget") >= 0)
         .forEach(budget => {
@@ -400,7 +399,7 @@ export default {
         });
       }
     });
-    console.log("donut", this.donutBudget);
+    // console.log("donut", this.donutBudget);
 
     this.isLoaded = true;
   },
@@ -427,7 +426,7 @@ export default {
       else this.spacingTop = "mt-2";
     },
     searchYearsData(yearsData, idDonut, index) {
-      console.log("data years", yearsData, idDonut);
+      // console.log("data years", yearsData, idDonut);
       if (idDonut === "donut1") {
         this.displaySunburst.slices.supprSlices.keepData =
           yearsData.data.name === "AUTRES" ? null : yearsData.data.name;
