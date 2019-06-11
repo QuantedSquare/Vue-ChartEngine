@@ -237,6 +237,7 @@ export default {
   },
   data: function() {
     return {
+      notResize: true,
       targetIndex: 0,
       currentRing: 0,
       tweenedCoord: [],
@@ -687,7 +688,7 @@ export default {
       return b;
     },
     legends: function() {
-      this.proportionTextSeq()
+      this.proportionTextSeq();
       let legendsNames = this.root
         .descendants()
         .filter(elem => elem.depth === 1)
@@ -747,15 +748,14 @@ export default {
     onResize() {
       let doc = document.getElementsByClassName(this.idDonut);
 
-      let doc2 = select("."+this.idDonut+" #trail")
-      console.log("doc2",doc2.style('width'), doc2.node().offsetWidth)
-
-      let child = doc[0].children[0].children
-      let w = child.sequence.clientWidth
-      console.log("resize",child, w)
-      this.displaySunburst.sizes.sequenceW =
-        doc[0].children[0].children.sequence.offsetWidth;
-
+      let child = doc[0].children[0].children;
+      let w = child.sequence.offsetWidth;
+      // console.log("resize", child, w, this.displaySunburst.sizes.sequenceW);
+      if (this.notResize === false) {
+        this.displaySunburst.sizes.sequenceW =
+          doc[0].children[0].children.sequence.offsetWidth;
+      }
+      else this.notResize = false
       this.explanationsPos = this.setExplanationsPos();
 
       if (window.innerWidth > 600 && this.displaySunburst.legends.present)
@@ -866,7 +866,7 @@ export default {
     },
     proportionTextSeq: function() {
       let newSeqNames = this.sequences.seqNames;
-      console.log("seqname",newSeqNames)
+      console.log("seqname", newSeqNames);
       if (this.sequences.seqNames.length) {
         let array = this.sequences.seqNames.map(
           elem => elem[0].length * this.majW + 20
@@ -884,7 +884,7 @@ export default {
           endLabelP = 15;
 
         let sumW = array.reduce(reducer);
-        console.log("seqw", this.displaySunburst.sizes.sequenceW)
+        console.log("seqw", this.displaySunburst.sizes.sequenceW);
         // console.log("Wendlabel",endLabelW, array, sumW, this.displaySunburst.sizes.sequenceW - endLabelW - endLabelP)
 
         if (
@@ -1023,7 +1023,7 @@ export default {
 
     // legendOver(index) {
     //   let doc = this;
-      
+
     //   function overChildren(slice, idDonut) {
     //     if (slice.children && slice.children.length) {
     //       slice.children.forEach(child => {
