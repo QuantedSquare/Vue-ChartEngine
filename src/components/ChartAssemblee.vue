@@ -32,21 +32,21 @@
                     <span class="firstLetter">57%</span> en
                     <b>Charges parlementaires</b>
                   </span>
-                  <br>blabla
+                  <!-- <br>blabla -->
                 </p>
                 <p class="textPara">
                   <span style="color: rgb(200, 7, 178)">
                     <span class="firstLetter">30%</span> en
                     <b>Charges de personnel</b>
                   </span>
-                  <br>blabla
+                  <!-- <br>blabla -->
                 </p>
                 <p class="textPara">
                   <span style="color: rgb(172, 1, 207)">
                     <span class="firstLetter">13%</span> pour
                     <b>d'autres charges</b>
                   </span>
-                  <br>blabla
+                  <!-- <br>blabla -->
                 </p>
               </v-flex>
             </v-layout>
