@@ -1028,13 +1028,18 @@ export default {
       let allLength = allNames.map(elem => elem.length);
       let maxL = Math.max(...allLength);
 
+      // console.log(maxL, allNames)
+
       let ySpanScale = scaleLinear();
-      ySpanScale.range([(maxL + 1) * 5, 15]).domain([1, maxL - 1]);
-      return sequence.length === maxL
+      ySpanScale.range([(maxL + 1) * 5, 15]).domain([1, maxL]);
+      // console.log(ySpanScale(sequence.length))
+      let a = sequence.length === maxL
         ? maxL === 1
           ? 15
           : 13
         : ySpanScale(sequence.length);
+      // console.log(sequence, a)
+      return a
     },
     clicked(index, idDonut) {
       if (idDonut === "donut2") {
