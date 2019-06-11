@@ -2,9 +2,9 @@
   <v-container pa-0 fill-height :class="idDonut">
     <v-layout wrap id="donutChart">
       <v-flex xs12 class="width_text" :style="fontSlices+`;color: transparent;`">
-        <span id="maj">ACHATS DE</span>
-        <span id="min">achats de</span>
-        <span id="mix">Achats de</span>
+        <span id="maj">ACHATS DE CONTRACTUEL</span>
+        <span id="min">achats de contractuel</span>
+        <span id="mix">Achats de contractuel</span>
         <span id="label" :style="fontEndLabel">14.52 {{displaySunburst.sequence.endLabel.unit}}</span>
       </v-flex>
       <v-flex xs12 id="sequence" v-if="displaySunburst.sequence.present" v-resize="onResize">
@@ -93,14 +93,14 @@
           </g>
         </svg>
       </v-flex>
-      <v-flex xs10 sm2 pl-3 pt-5 id="sidebar" v-if="displaySunburst.legends.present">
+      <v-flex xs10 sm4 pl-3 pt-5 id="sidebar" v-if="displaySunburst.legends.present">
         Legend
         <br>
         <div id="legend">
-          <svg :width="legends.width * majW + 20" :height="legends.names.length * 33">
+          <svg :width="displaySunburst.sizes.legendW" :height="legends.nbSpan * 33">
             <g
-              v-for="(legend, index) in legends.names"
-              :transform="`translate(0, `+ 33 * index +`)`"
+              v-for="(legend, index) in legends.arrayNames"
+              :transform="translateLegend(legends.arrayNames, index, legend)"
               @click="!displaySunburst.legends.clickable ? null : clicked(index + 1, idDonut)"
               :style="!displaySunburst.legends.clickable ? null : `cursor: pointer;`"
             >
@@ -109,10 +109,16 @@
                 ry="3"
                 width="18"
                 height="18"
-                :fill="colorScale(legend)"
+                :fill="colorScale(legends.names[index])"
                 :fill-opacity="displaySunburst.color.opacity"
               ></rect>
-              <text x="22" y="9" dy="0.35em" :style="fontSlices">{{legend.toUpperCase()}}</text>
+              <text
+                v-for="(partName, i) in legend"
+                x="22"
+                :y="9 + (16 * i)"
+                dy="0.35em"
+                :style="fontSlices"
+              >{{partName.toUpperCase()}}</text>
             </g>
           </svg>
         </div>
@@ -287,9 +293,9 @@ export default {
     this.explanationsPos = this.setExplanationsPos();
   },
   mounted: function() {
-    this.majW = document.getElementById("maj").offsetWidth / 9;
-    this.minW = document.getElementById("min").offsetWidth / 9;
-    this.mixW = document.getElementById("mix").offsetWidth / 9;
+    this.majW = document.getElementById("maj").offsetWidth / 21;
+    this.minW = document.getElementById("min").offsetWidth / 21;
+    this.mixW = document.getElementById("mix").offsetWidth / 21;
     this.labelW = document.getElementById("label").offsetWidth / 8;
     this.fontHeight = document.getElementById("mix").offsetHeight;
     this.explanationsPos = this.setExplanationsPos();
@@ -312,7 +318,7 @@ export default {
           this.displaySunburst.color.colorMax
         );
     },
-    colorScale: function() {
+    colorScale: function(bla) {
       return scaleOrdinal(
         quantize(this.interpolator, this.transformData.children.length + 1)
       );
@@ -693,14 +699,39 @@ export default {
         .descendants()
         .filter(elem => elem.depth === 1)
         .map(elem => elem.data.name);
-      let longestName = 0;
 
-      legendsNames.forEach(elem => {
-        if (longestName < elem.length) longestName = elem.length;
+      let arrayName = [],
+        arrayLegendsNames = [];
+      let nbSpan = 0,
+        rectSize = 18 + 4;
+
+      legendsNames.forEach(name => {
+        // console.log(name.length * this.majW, this.majW, name.length, name, this.displaySunburst.sizes.legendW);
+        if (
+          name.length * this.majW >
+          this.displaySunburst.sizes.legendW - rectSize
+        )
+          arrayName = this.reduceLegendTxt(
+            name,
+            this.displaySunburst.sizes.legendW - rectSize
+          );
+        else arrayName = [name];
+        nbSpan += arrayName.length;
+        arrayLegendsNames.push(arrayName);
+      });
+
+      let longestName = 0;
+      arrayLegendsNames.forEach(name => {
+        name.forEach(elem => {
+          // console.log(elem.length)
+          if (longestName < elem.length) longestName = elem.length;
+        });
       });
       return {
         names: legendsNames,
-        width: longestName
+        arrayNames: arrayLegendsNames,
+        width: longestName,
+        nbSpan: nbSpan
       };
     }
   },
@@ -736,6 +767,41 @@ export default {
     }
   },
   methods: {
+    translateLegend: function(names, index, legend) {
+      let h = 0;
+      // console.log("names", names, legend.join(" ").trim());
+      if (index === 0) return `translate(0, ` + 33 * index + `)`;
+      else {
+        for (let i = 0; i < index; i++) {
+          if (names[i].length === 1) h += 18 + 15;
+          else h += 2.5 + names[i].length * 12 + (names[i].length - 1) + 15;
+        }
+        return `translate(0, ` + h + `)`;
+      }
+    },
+    reduceLegendTxt: function(name, legendTxtSize) {
+      let words = name.split(/\s+/),
+        partName = "",
+        arrayName = [],
+        a = 0;
+
+      words.some((word, i) => {
+        if (partName.concat(" ", word).length * this.majW < legendTxtSize)
+          partName = partName.concat(" ", word).trim();
+        else if (a === 0) return (a = i);
+      });
+
+      if (a) {
+        arrayName.push(partName);
+        words = words.slice(a);
+        if (words.join(" ").length * this.majW > legendTxtSize) {
+          this.reduceLegendTxt(words.join(" ").trim(), arrayName);
+        } else {
+          arrayName.push(words.join(" ").trim());
+        }
+      } else arrayName.push(name);
+      return arrayName;
+    },
     setChartPos: function() {
       let proportion =
         window.innerWidth > 600 && this.displaySunburst.legends.present
@@ -749,13 +815,13 @@ export default {
       let doc = document.getElementsByClassName(this.idDonut);
 
       let child = doc[0].children[0].children;
-      let w = child.sequence.offsetWidth;
-      // console.log("resize", child, w, this.displaySunburst.sizes.sequenceW);
+      let seqW = child.sequence.offsetWidth;
+      let legW = child.sidebar ? child.sidebar.offsetWidth : null;
+      // console.log("resize", child, legW, this.displaySunburst.sizes.legendW, this.displaySunburst.sizes.sequenceW);
       if (this.notResize === false) {
-        this.displaySunburst.sizes.sequenceW =
-          doc[0].children[0].children.sequence.offsetWidth;
-      }
-      else this.notResize = false
+        this.displaySunburst.sizes.sequenceW = seqW;
+        this.displaySunburst.sizes.legendW = legW;
+      } else this.notResize = false;
       this.explanationsPos = this.setExplanationsPos();
 
       if (window.innerWidth > 600 && this.displaySunburst.legends.present)
@@ -866,7 +932,7 @@ export default {
     },
     proportionTextSeq: function() {
       let newSeqNames = this.sequences.seqNames;
-      console.log("seqname", newSeqNames);
+      // console.log("seqname", newSeqNames);
       if (this.sequences.seqNames.length) {
         let array = this.sequences.seqNames.map(
           elem => elem[0].length * this.majW + 20
@@ -884,7 +950,7 @@ export default {
           endLabelP = 15;
 
         let sumW = array.reduce(reducer);
-        console.log("seqw", this.displaySunburst.sizes.sequenceW);
+        // console.log("seqw", this.displaySunburst.sizes.sequenceW);
         // console.log("Wendlabel",endLabelW, array, sumW, this.displaySunburst.sizes.sequenceW - endLabelW - endLabelP)
 
         if (

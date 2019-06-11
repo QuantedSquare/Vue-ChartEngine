@@ -265,7 +265,7 @@ export default {
           maxW: 500,
           center: 150,
           sunburstW: 500,
-          legendW: 300,
+          legendW: this.setLegendW(),
           sequenceW: this.setSeqW(),
           offset: ""
         },
@@ -418,14 +418,22 @@ export default {
           md = 12
       
       let flexW = null;
-
-      console.log(((screenW - px5 * 2) / 12) * 7)
       if (screenW > 1264) flexW = ((screenW - px5 * 2) / 12) * 7
       else if (screenW > 600) flexW = (screenW - px5 * 2)
       else flexW = screenW - px1 * 2
-
-      console.log(flexW)
       return flexW
+    },
+    setLegendW() {
+      let screenW = window.innerWidth,
+          pl3 = 16
+      
+      let flexW = this.setSeqW();
+      let sidebarW = null;
+      if (screenW > 600) sidebarW = ((flexW / 12) * 4) - pl3
+      else sidebarW = ((flexW / 12) * 10) - pl3
+
+      // console.log("sidebarW", sidebarW, flexW)
+      return sidebarW
     },
     setPadding() {
       if (window.innerWidth < 600) return "px-1";
