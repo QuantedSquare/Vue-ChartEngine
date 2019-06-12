@@ -894,9 +894,9 @@ export default {
     ) {
       let fullNameLength = allWordsArr.map(arrayW => arrayW.join(" ").length);
       allWordsArr = allWordsArr.map((arrayW, i) => {
-        // console.log("maxLen", maxWordLength[i], arrayW.join(" ").length, arrayW.join(" "), Math.max(...fullNameLength))
+        console.log("maxLen", maxWordLength[i], arrayW.join(" ").length, arrayW.join(" "), Math.max(...fullNameLength))
         if (
-          arrayW.join(" ").length === Math.max(...fullNameLength) ||
+          arrayW.join(" ").length === Math.max(...fullNameLength) &&
           arrayW.join(" ").length > maxWordLength[i]
         )
           arrayW = arrayW.slice(0, arrayW.length - 1);
@@ -909,10 +909,10 @@ export default {
           : maxWordLength[i];
         // return arrayW.join(" ").length * this.majW + 20
       });
-      console.log("array", array, array.reduce(reducer), sizeSeq - sizeLabel);
+      console.log("array", array, array.reduce(reducer) * this.majW + (maxWordLength.length * 25), sizeSeq - sizeLabel);
 
       let sumW = array.reduce(reducer);
-      if (sumW * this.majW + maxWordLength.length * 25 > sizeSeq - sizeLabel)
+      if (((sumW * this.majW) + (maxWordLength.length * 25)) > sizeSeq - sizeLabel)
         return this.smallestFirstWordsArr(
           allWordsArr,
           reducer,
