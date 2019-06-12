@@ -681,7 +681,7 @@ export default {
     translatePolygon: function() {
       let antL = 0;
       let b = [];
-      console.log("polygon",this.sequences.seqNames)
+      console.log("polygon", this.sequences.seqNames);
       this.sequences.seqNames.forEach((elem, i) => {
         let l = 0;
         if (i !== 0) l = antL * this.majW + 2 + b[i - 1] + 20;
@@ -885,56 +885,83 @@ export default {
         }
       }
     },
-    smallestFirstWordsArr(allWordsArr, reducer, sizeSeq, sizeLabel, maxWordLength) {
+    smallestFirstWordsArr(
+      allWordsArr,
+      reducer,
+      sizeSeq,
+      sizeLabel,
+      maxWordLength
+    ) {
       let fullNameLength = allWordsArr.map(arrayW => arrayW.join(" ").length);
       allWordsArr = allWordsArr.map((arrayW, i) => {
         // console.log("maxLen", maxWordLength[i], arrayW.join(" ").length, arrayW.join(" "), Math.max(...fullNameLength))
-        if (arrayW.join(" ").length === Math.max(...fullNameLength) || arrayW.join(" ").length > maxWordLength[i])
+        if (
+          arrayW.join(" ").length === Math.max(...fullNameLength) ||
+          arrayW.join(" ").length > maxWordLength[i]
+        )
           arrayW = arrayW.slice(0, arrayW.length - 1);
         return arrayW;
       });
-      let array = allWordsArr.map(
-        (arrayW, i) => {
-          // console.log("join",arrayW.join(" ").length, maxWordLength[i], arrayW.join(" ").length > maxWordLength[i] ? arrayW.join(" ").length : maxWordLength[i])
-          return arrayW.join(" ").length > maxWordLength[i] ? arrayW.join(" ").length : maxWordLength[i]
-          // return arrayW.join(" ").length * this.majW + 20
-          }
-      );
+      let array = allWordsArr.map((arrayW, i) => {
+        // console.log("join",arrayW.join(" ").length, maxWordLength[i], arrayW.join(" ").length > maxWordLength[i] ? arrayW.join(" ").length : maxWordLength[i])
+        return arrayW.join(" ").length > maxWordLength[i]
+          ? arrayW.join(" ").length
+          : maxWordLength[i];
+        // return arrayW.join(" ").length * this.majW + 20
+      });
       console.log("array", array, array.reduce(reducer), sizeSeq - sizeLabel);
 
       let sumW = array.reduce(reducer);
-      if ((sumW * this.majW) + (maxWordLength.length * 25) > sizeSeq - sizeLabel)
-        return this.smallestFirstWordsArr(allWordsArr, reducer, sizeSeq, sizeLabel, maxWordLength);
+      if (sumW * this.majW + maxWordLength.length * 25 > sizeSeq - sizeLabel)
+        return this.smallestFirstWordsArr(
+          allWordsArr,
+          reducer,
+          sizeSeq,
+          sizeLabel,
+          maxWordLength
+        );
 
       allWordsArr = allWordsArr.map(arrayW => arrayW.join(" "));
       return allWordsArr;
     },
     reduceNbW(allWordsArr, sizeSeq, sizeLabel) {
-      console.log(allWordsArr);
+      console.log("reduceNB", allWordsArr);
       let nbWords = allWordsArr.map(arrayW => arrayW.length);
       let maxWordLength = allWordsArr.map(arrayW =>
         Math.max(...arrayW.map(word => word.length))
       );
-      
+
       const reducer = (accumulator, currentValue) => accumulator + currentValue;
-      // console.log(
-      //   maxWordLength,
-      //   maxWordLength.reduce(reducer),
-      //   this.majW,
-      //   maxWordLength.reduce(reducer) * this.majW,
-      //   sizeSeq - sizeLabel,
-      //   sizeSeq,
-      //   allWordsArr
-      // );
-      if ((maxWordLength.reduce(reducer) * this.majW) + (maxWordLength.length * 25) < sizeSeq - sizeLabel) {
-        return allWordsArr = this.smallestFirstWordsArr(allWordsArr, reducer, sizeSeq, sizeLabel, maxWordLength)
+      console.log(
+        maxWordLength,
+        maxWordLength.reduce(reducer),
+        this.majW,
+        maxWordLength.reduce(reducer) * this.majW,
+        sizeSeq - sizeLabel,
+        sizeSeq,
+        allWordsArr
+      );
+      if (
+        maxWordLength.reduce(reducer) * this.majW + maxWordLength.length * 25 <
+        sizeSeq - sizeLabel
+      ) {
+        return (allWordsArr = this.smallestFirstWordsArr(
+          allWordsArr,
+          reducer,
+          sizeSeq,
+          sizeLabel,
+          maxWordLength
+        ));
       } else return;
     },
     reduceSecondLine: function(word, tspan, newSpan) {
+      console.log("here");
       let splitSpan = tspan.split(/\s+/);
       let l = 0,
         index = 0;
+      console.log(tspan);
       splitSpan.forEach((spanWord, i) => {
+        console.log("spanW", spanWord);
         l += spanWord.length + 1;
         if (l <= word.length + 1) index = i;
       });
@@ -949,6 +976,41 @@ export default {
         return this.reduceSecondLine(word, newSpan2, newSpan);
       else if (newSpan2) newSpan.push(newSpan2);
       return newSpan;
+    },
+    blabla(endLabelW, endLabelP, seqNamesBase) {
+      let wordAr = seqNamesBase.map(elem => elem[0].split(/\s+/));
+      wordAr = this.reduceNbW(
+        wordAr,
+        this.displaySunburst.sizes.sequenceW,
+        endLabelW + endLabelP
+      );
+      console.log("wordAr", wordAr);
+
+      if (wordAr) {
+        return seqNamesBase.map((elem, i) => {
+          console.log("seqbase", elem, elem[0], wordAr[i]);
+          if (elem[0] !== wordAr[i]) {
+            let tspan = elem[0].split(wordAr[i] + " ");
+            console.log("tspan", tspan);
+            elem = [wordAr[i], tspan[1]];
+            console.log("elem here",elem)
+            if (tspan[1] && wordAr[i].length < tspan[1].length) {
+              let newSpan = [];
+              newSpan = this.reduceSecondLine(wordAr[i], tspan[1], newSpan);
+              elem = [wordAr[i]].concat(newSpan);
+            }
+            else if (tspan[0] !== "")
+              elem = tspan
+          }
+          return elem;
+        });
+      } else {
+        let newSeqNames = seqNamesBase.map((elem, i) => {
+          if (i !== seqNamesBase.length - 1) elem = ["..."];
+          return elem;
+        });
+        return this.blabla(endLabelW, endLabelP, newSeqNames);
+      }
     },
     proportionTextSeq: function() {
       let newSeqNames = this.sequences.seqNames;
@@ -983,53 +1045,63 @@ export default {
           sumW >
           this.displaySunburst.sizes.sequenceW - endLabelW - endLabelP
         ) {
-          let wordAr = this.sequences.seqNames.map(elem =>
-            elem[0].split(/\s+/)
+          // wordAr = this.reduceNbW(
+          //   wordAr,
+          //   this.displaySunburst.sizes.sequenceW,
+          //   endLabelW + endLabelP
+          // );
+          // console.log("wordAr", wordAr);
+
+          // if (wordAr) {
+          // newSeqNames = this.sequences.seqNames.map((elem, i) => {
+          //       // console.log(elem, wordAr[i])
+          //       if (elem[0] !== wordAr[i]) {
+          //         let tspan = elem[0].split(wordAr[i] + " ");
+          //         elem = [wordAr[i], tspan[1]];
+          //         if (wordAr[i].length < tspan[1].length) {
+          //           let newSpan = [];
+          //           newSpan = this.reduceSecondLine(
+          //             wordAr[i],
+          //             tspan[1],
+          //             newSpan
+          //           );
+          //           elem = [wordAr[i]].concat(newSpan);
+          //         }
+          //       }
+          //       return elem;
+          //     })
+          // }
+          // else {
+          //   newSeqNames = this.sequences.seqNames.map((elem, i) => {
+          //     if(i !== this.sequences.seqNames.length - 1)
+          //       elem = ["..."]
+          //     return elem
+          //   });
+
+          // }
+          let newSeqNames = this.blabla(
+            endLabelW,
+            endLabelP,
+            this.sequences.seqNames
           );
-          wordAr = this.reduceNbW(
-            wordAr,
-            this.displaySunburst.sizes.sequenceW,
-            endLabelW + endLabelP
-          );
-          console.log("wordAr", wordAr);
-          newSeqNames = wordAr
-            ? this.sequences.seqNames.map((elem, i) => {
-                // console.log(elem, wordAr[i])
-                if (elem[0] !== wordAr[i]) {
-                  let tspan = elem[0].split(wordAr[i] + " ");
-                  elem = [wordAr[i], tspan[1]];
-                  if (wordAr[i].length < tspan[1].length) {
-                    let newSpan = [];
-                    newSpan = this.reduceSecondLine(
-                      wordAr[i],
-                      tspan[1],
-                      newSpan
-                    );
-                    elem = [wordAr[i]].concat(newSpan);
-                  }
-                }
-                return elem;
-              })
-            : [];
           this.sequences.seqNames = newSeqNames;
-          console.log("new",newSeqNames)
+          // console.log("new",newSeqNames)
         }
       }
     },
     notCenter(names) {
-      console.log("notcenter", names, names[0][0], this.root.descendants()[0].data.name.toUpperCase())
+      // console.log("notcenter", names, names[0][0], this.root.descendants()[0].data.name.toUpperCase())
       if (
         names[0][0] === this.root.descendants()[0].data.name.toUpperCase() &&
-        !this.displaySunburst.slices.center.visibility && names.length === 1
+        !this.displaySunburst.slices.center.visibility &&
+        names.length === 1
       ) {
-        console.log("false")
         return false;
       }
-      console.log("true")
       return true;
     },
     polygonPoints(allSpan, allNames) {
-      console.log("points", allNames)
+      // console.log("points", allNames)
       let nbSpanText = allNames.map(span => span.length);
       let maxLSpan = Math.max(...allSpan.map(span => span.length));
       let maxH = Math.max(...nbSpanText);
