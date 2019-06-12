@@ -419,6 +419,7 @@ export default {
       
       let flexW = null;
       if (screenW > 1264) flexW = ((screenW - px5 * 2) / 12) * 7
+      else if (screenW > 996) flexW = 900
       else if (screenW > 600) flexW = (screenW - px5 * 2)
       else flexW = screenW - px1 * 2
       return flexW

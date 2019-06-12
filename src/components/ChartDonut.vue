@@ -10,7 +10,7 @@
       <v-flex xs12 id="sequence" v-if="displaySunburst.sequence.present" v-resize="onResize">
         <svg width="100%" height="80" id="trail">
           <text
-            v-if="sequences.seqNames.length && notCenter(sequences.seqNames) && displaySunburst.sequence.endLabel.present"
+            v-if="sequences.seqNames.length > 0 && notCenter(sequences.seqNames) && displaySunburst.sequence.endLabel.present"
             id="endlabel"
             :x="translatePolygon[translatePolygon.length - 1] + 15"
             y="15"
@@ -681,6 +681,7 @@ export default {
     translatePolygon: function() {
       let antL = 0;
       let b = [];
+      console.log("polygon",this.sequences.seqNames)
       this.sequences.seqNames.forEach((elem, i) => {
         let l = 0;
         if (i !== 0) l = antL * this.majW + 2 + b[i - 1] + 20;
@@ -884,30 +885,49 @@ export default {
         }
       }
     },
-    reduceNbW(wordAr, sizeSeq, sizeLabel) {
-      // console.log(wordAr);
-      let nbWords = wordAr.map(arrayW => arrayW.length);
-      let wordLength = wordAr.map(arrayW =>
-        Math.max(...arrayW.map(word => word.length + 20))
+    smallestFirstWordsArr(allWordsArr, reducer, sizeSeq, sizeLabel, maxWordLength) {
+      let fullNameLength = allWordsArr.map(arrayW => arrayW.join(" ").length);
+      allWordsArr = allWordsArr.map((arrayW, i) => {
+        // console.log("maxLen", maxWordLength[i], arrayW.join(" ").length, arrayW.join(" "), Math.max(...fullNameLength))
+        if (arrayW.join(" ").length === Math.max(...fullNameLength) || arrayW.join(" ").length > maxWordLength[i])
+          arrayW = arrayW.slice(0, arrayW.length - 1);
+        return arrayW;
+      });
+      let array = allWordsArr.map(
+        (arrayW, i) => {
+          // console.log("join",arrayW.join(" ").length, maxWordLength[i], arrayW.join(" ").length > maxWordLength[i] ? arrayW.join(" ").length : maxWordLength[i])
+          return arrayW.join(" ").length > maxWordLength[i] ? arrayW.join(" ").length : maxWordLength[i]
+          // return arrayW.join(" ").length * this.majW + 20
+          }
       );
+      console.log("array", array, array.reduce(reducer), sizeSeq - sizeLabel);
+
+      let sumW = array.reduce(reducer);
+      if ((sumW * this.majW) + (maxWordLength.length * 25) > sizeSeq - sizeLabel)
+        return this.smallestFirstWordsArr(allWordsArr, reducer, sizeSeq, sizeLabel, maxWordLength);
+
+      allWordsArr = allWordsArr.map(arrayW => arrayW.join(" "));
+      return allWordsArr;
+    },
+    reduceNbW(allWordsArr, sizeSeq, sizeLabel) {
+      console.log(allWordsArr);
+      let nbWords = allWordsArr.map(arrayW => arrayW.length);
+      let maxWordLength = allWordsArr.map(arrayW =>
+        Math.max(...arrayW.map(word => word.length))
+      );
+      
       const reducer = (accumulator, currentValue) => accumulator + currentValue;
-      // console.log(wordLength, wordLength.reduce(reducer) * this.majW, sizeSeq - sizeLabel, sizeSeq, wordAr);
-      if (wordLength.reduce(reducer) * this.majW < sizeSeq - sizeLabel) {
-        // console.log("je passe la")
-        let maxNbWords = Math.max(...nbWords);
-        wordAr = wordAr.map(elem => {
-          if (elem.length === maxNbWords) elem = elem.slice(0, elem.length - 1);
-          return elem;
-        });
-        let array = wordAr.map(elem => elem.join(" ").length * this.majW + 20);
-        // console.log(wordAr);
-
-        let sumW = array.reduce(reducer);
-        if (sumW > sizeSeq - sizeLabel)
-          return this.reduceNbW(wordAr, sizeSeq, sizeLabel);
-
-        wordAr = wordAr.map(elem => elem.join(" "));
-        return wordAr;
+      // console.log(
+      //   maxWordLength,
+      //   maxWordLength.reduce(reducer),
+      //   this.majW,
+      //   maxWordLength.reduce(reducer) * this.majW,
+      //   sizeSeq - sizeLabel,
+      //   sizeSeq,
+      //   allWordsArr
+      // );
+      if ((maxWordLength.reduce(reducer) * this.majW) + (maxWordLength.length * 25) < sizeSeq - sizeLabel) {
+        return allWordsArr = this.smallestFirstWordsArr(allWordsArr, reducer, sizeSeq, sizeLabel, maxWordLength)
       } else return;
     },
     reduceSecondLine: function(word, tspan, newSpan) {
@@ -951,7 +971,13 @@ export default {
 
         let sumW = array.reduce(reducer);
         // console.log("seqw", this.displaySunburst.sizes.sequenceW);
-        // console.log("Wendlabel",endLabelW, array, sumW, this.displaySunburst.sizes.sequenceW - endLabelW - endLabelP)
+        // console.log(
+        //   "Wendlabel",
+        //   endLabelW,
+        //   array,
+        //   sumW,
+        //   this.displaySunburst.sizes.sequenceW - endLabelW - endLabelP
+        // );
 
         if (
           sumW >
@@ -965,6 +991,7 @@ export default {
             this.displaySunburst.sizes.sequenceW,
             endLabelW + endLabelP
           );
+          console.log("wordAr", wordAr);
           newSeqNames = wordAr
             ? this.sequences.seqNames.map((elem, i) => {
                 // console.log(elem, wordAr[i])
@@ -985,20 +1012,24 @@ export default {
               })
             : [];
           this.sequences.seqNames = newSeqNames;
-          // console.log("new",newSeqNames)
+          console.log("new",newSeqNames)
         }
       }
     },
     notCenter(names) {
+      console.log("notcenter", names, names[0][0], this.root.descendants()[0].data.name.toUpperCase())
       if (
         names[0][0] === this.root.descendants()[0].data.name.toUpperCase() &&
-        !this.displaySunburst.slices.center.visibility
+        !this.displaySunburst.slices.center.visibility && names.length === 1
       ) {
+        console.log("false")
         return false;
       }
+      console.log("true")
       return true;
     },
     polygonPoints(allSpan, allNames) {
+      console.log("points", allNames)
       let nbSpanText = allNames.map(span => span.length);
       let maxLSpan = Math.max(...allSpan.map(span => span.length));
       let maxH = Math.max(...nbSpanText);
@@ -1033,13 +1064,14 @@ export default {
       let ySpanScale = scaleLinear();
       ySpanScale.range([(maxL + 1) * 5, 15]).domain([1, maxL]);
       // console.log(ySpanScale(sequence.length))
-      let a = sequence.length === maxL
-        ? maxL === 1
-          ? 15
-          : 13
-        : ySpanScale(sequence.length);
+      let a =
+        sequence.length === maxL
+          ? maxL === 1
+            ? 15
+            : 13
+          : ySpanScale(sequence.length);
       // console.log(sequence, a)
-      return a
+      return a;
     },
     clicked(index, idDonut) {
       if (idDonut === "donut2") {
