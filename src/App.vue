@@ -24,7 +24,7 @@ export default {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-align: center;
-    color: #2c3e50;
+    color: rgba(15, 17, 32, 1);
 }
 
 #app a {
@@ -37,7 +37,7 @@ export default {
 
 #nav a {
     font-weight: bold;
-    color: #2c3e50;
+    color: rgba(15, 17, 32, 1);
 }
 
 #nav a.router-link-exact-active {

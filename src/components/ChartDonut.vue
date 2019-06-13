@@ -1352,6 +1352,9 @@ export default {
 #explanation {
   position: absolute;
   text-align: center;
-  color: rgb(94, 94, 94);
+}
+
+#legend {
+  padding-top: 10px
 }
 </style>

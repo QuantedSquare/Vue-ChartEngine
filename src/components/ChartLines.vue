@@ -228,14 +228,14 @@ export default {
   },
   methods: {
     spacing: function(coord, div, i, len) {
-        if (div === "rect") {
-          if (coord === "y") return i !== len - 1 ? 2 : 4;
-          if (coord === "x") return i !== len - 1 ? 45 : -50;
-        }
-        if (div === "text") {
-          if (coord === "y") return i !== len - 1 ? 20 : 22;
-          if (coord === "x") return i !== len - 1 ? 55 : -40;
-        }
+      if (div === "rect") {
+        if (coord === "y") return i !== len - 1 ? 2 : 4;
+        if (coord === "x") return i !== len - 1 ? 45 : -50;
+      }
+      if (div === "text") {
+        if (coord === "y") return i !== len - 1 ? 20 : 22;
+        if (coord === "x") return i !== len - 1 ? 55 : -40;
+      }
     },
     hoverPoint: function(lineI, pointI, line) {
       let point = select("#line_" + lineI + " #point_" + pointI);
@@ -306,11 +306,19 @@ export default {
       return "translate(0," + this._height() + ")";
     },
     frameTranslate: function() {
-      let posLegend =
+      let xPosLegend =
         this.legends.present && this.legends.position === "end"
           ? 0
-          : this.legends.width + margin.right + 10;
-      return "translate(" + (this._width() - posLegend + margin.right) + ",0)";
+          : this.legends.width + margin.right + 15;
+      let yPosLegend =
+        this.legends.present && this.legends.position === "end" ? 0 : -5;
+      return (
+        "translate(" +
+        (this._width() - xPosLegend + margin.right) +
+        "," +
+        yPosLegend +
+        ")"
+      );
     },
     xMax: function() {
       return this.getMax("x");

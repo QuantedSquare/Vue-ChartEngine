@@ -22,7 +22,7 @@
                   <br>En 2017 l'assemblée nationale a dépensé au total
                   <span
                     class="firstLetter"
-                    style="color: rgb(12, 162, 249)"
+                    style="color: rgb(255, 0, 111)"
                   >576,29 M€</span>
                   <br>
                   <b>Comment sont-elles réparties ?</b>
@@ -166,7 +166,7 @@ export default {
           text: {
             present: true,
             font: {
-              size: 10,
+              size: 11,
               family: 'Poppins'
             },
             rotation: "transform string"
@@ -199,7 +199,7 @@ export default {
         sequence: {
           present: true,
           font: {
-            size: 10,
+            size: 11,
             family: 'Poppins'
           },
           position: "top",
@@ -242,7 +242,7 @@ export default {
           text: {
             present: false,
             font: {
-              size: 10,
+              size: 11,
               family: 'Poppins'
             },
             rotation: "transform string"
@@ -275,7 +275,7 @@ export default {
         sequence: {
           present: true,
           font: {
-            size: 10,
+            size: 11,
             family: 'Poppins'
           },
           position: "top",

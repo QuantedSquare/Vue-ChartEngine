@@ -8,18 +8,17 @@
     <div class="chart">
       <ChartAssemblee/>
     </div>
-    <v-footer class="text-xs-center footer" height="auto" color="rgba(162, 255, 174, 0.5)">
+    <v-footer class="text-xs-center footer white--text" height="auto" color="rgba(15, 17, 32, 1)">
       <v-card-text class="pt-1">
         Data storytelling réalisé par
         <b>
-          <a href="http://quantedsquare.com/" style="color: rgb(12, 162, 249);">Quanted Square</a>
+          <a href="http://quantedsquare.com/" style="color: rgb(255, 0, 111);">Quanted Square</a>
         </b>, 2019.     |    
-        <a href="mailto:julien@quantedsquare.com" style="color: rgb(12, 162, 249);">julien@quantedsquare.com</a>,
-        <a href="mailto:fabien@quantedsquare.com" style="color: rgb(12, 162, 249);">fabien@quantedsquare.com</a>
+        <a href="mailto:contact@quantedsquare.com" style="color: rgb(255, 0, 111);">contact@quantedsquare.com</a>,
         <br>Source
         <a
           href="http://data.assemblee-nationale.fr/autres/le-budget-de-l-assemblee-nationale/le-budget-de-l-assemblee-nationale"
-          style="color: rgb(12, 162, 249);"
+          style="color: rgb(255, 0, 111);"
         >données officiels de l'Assemblée Générale</a>
       </v-card-text>
     </v-footer>
