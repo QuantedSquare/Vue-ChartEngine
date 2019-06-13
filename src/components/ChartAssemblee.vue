@@ -12,6 +12,7 @@
                   @onClick="searchYearsData"
                   :displaySunburst="smallDonut"
                   v-model="linesData"
+                  :formatTxt="formatTxt"
                 />
               </v-flex>
               <v-flex xs12 sm8 xl9 class="text-xs-left pl-3">
@@ -82,6 +83,7 @@
               :dataDonut="donutBudget"
               @onClick="searchYearsData"
               :displaySunburst="displaySunburst"
+              :formatTxt="formatTxt"
             />
           </v-flex>
         </v-layout>
@@ -117,6 +119,7 @@ export default {
   },
   data: function() {
     return {
+      formatTxt: "upCase",
       linesData: {
         name: null,
         yearsData: []
@@ -345,7 +348,7 @@ export default {
             this.donutBudget.children[index_1]["children"] = [];
           }
           this.donutBudget.children[index_1].children.push({
-            name: this.Ucfirst(name),
+            name: this.formatTxt === "upCase" ? name.toUpperCase() : this.Ucfirst(name),
             code: code,
             budget: budget,
             budgetProgess: budgetProgess
@@ -360,7 +363,7 @@ export default {
             ] = [];
           }
           this.donutBudget.children[index_1].children[index_2].children.push({
-            name: this.Ucfirst(name),
+            name: this.formatTxt === "upCase" ? name.toUpperCase() : this.Ucfirst(name),
             code: code,
             value: budget,
             budgetProgess: budgetProgess
@@ -391,7 +394,7 @@ export default {
           this.donutBudget["children"] = [];
         }
         this.donutBudget.children.push({
-          name: this.Ucfirst(name),
+          name: this.formatTxt === "upCase" ? name.toUpperCase() : this.Ucfirst(name),
           code: code,
           budget: budget,
           budgetProgess: budgetProgess
@@ -453,8 +456,9 @@ export default {
     searchYearsData(yearsData, idDonut, index) {
       // console.log("data years", yearsData, idDonut);
       if (idDonut === "donut1") {
+        let n = this.formatTxt === "upCase"? "AUTRES CHARGES" : "Autres charges"
         this.displaySunburst.slices.supprSlices.keepData =
-          yearsData.data.name === "Autres charges" ? null : yearsData.data.name;
+          yearsData.data.name === n ? null : yearsData.data.name;
         this.displaySunburst.targetIndex = 0;
       } else this.displaySunburst.targetIndex = index;
       this.currentData.yearsData = yearsData.data.budgetProgess

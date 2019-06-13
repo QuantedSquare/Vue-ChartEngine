@@ -161,6 +161,10 @@ export default {
       type: String,
       default: "donut"
     },
+    formatTxt: {
+      type: String,
+      default: "upCase"
+    },
     dataDonut: Object,
     displaySunburst: {
       type: Object,
@@ -294,7 +298,7 @@ export default {
     this.explanationsPos = this.setExplanationsPos();
   },
   mounted: function() {
-    this.majW = document.getElementById("maj").offsetWidth / 21;
+    this.majW = this.formatTxt === "upCase" ? document.getElementById("maj").offsetWidth / 21 : document.getElementById("mix").offsetWidth / 21;
     this.minW = document.getElementById("min").offsetWidth / 21;
     this.mixW = document.getElementById("mix").offsetWidth / 21;
     this.labelW = document.getElementById("label").offsetWidth / 8;
@@ -391,7 +395,7 @@ export default {
         newChildren.push({
           budget: budget,
           // budgetProgess: budgetProgess,
-          name: "Autres charges",
+          name: this.formatTxt === "upCase"? "AUTRES CHARGES" : "Autres charges",
           children: subChild
         });
         transform.children = newChildren;
@@ -401,7 +405,7 @@ export default {
         !this.displaySunburst.slices.supprSlices.keepData &&
         !this.displaySunburst.slices.joinSlices.present
       ) {
-        transform.name = "Autres charges";
+        transform.name = this.formatTxt === "upCase"? "AUTRES CHARGES" : "Autres charges";
         transform.children.forEach(child => {
           budgetProgess[0] = budgetProgess[0].map((num, i) => {
             return num + child.budgetProgess[0][i].y;
@@ -420,7 +424,7 @@ export default {
         );
         // console.log("budget progress", budgetProgess);
         this.$emit("update:linesData", {
-          name: "Autres charges",
+          name: this.formatTxt === "upCase"? "AUTRES CHARGES" : "Autres charges",
           budgetProgess: budgetProgess
         });
         transform.budgetProgess = budgetProgess;
@@ -431,7 +435,8 @@ export default {
         transform.children.forEach(child => (transform.budget += child.budget));
 
       transform.children.forEach(child => {
-        if (child.name === "Autres charges") {
+        let n = this.formatTxt === "upCase"? "AUTRES CHARGES" : "Autres charges"
+        if (child.name === n) {
           child.children.forEach(subchild => {
             budgetProgess[0] = budgetProgess[0].map((num, i) => {
               return num + subchild.budgetProgess[0][i].y;
@@ -451,7 +456,7 @@ export default {
           // console.log("budget progress", budgetProgess);
           child["budgetProgess"] = budgetProgess;
           this.$emit("update:linesData", {
-            name: "Autres charges",
+            name: this.formatTxt === "upCase"? "AUTRES CHARGES" : "Autres charges",
             budgetProgess: budgetProgess
           });
         }
