@@ -913,7 +913,7 @@ export default {
       // console.log("array", array, array.reduce(reducer) * this.majW + (maxWordLength.length * 25), sizeSeq - sizeLabel);
 
       let sumW = array.reduce(reducer);
-      if (((sumW * this.majW) + (maxWordLength.length * 25)) > sizeSeq - sizeLabel)
+      if (sumW * this.majW + maxWordLength.length * 25 > sizeSeq - sizeLabel)
         return this.smallestFirstWordsArr(
           allWordsArr,
           reducer,
@@ -998,9 +998,7 @@ export default {
               let newSpan = [];
               newSpan = this.reduceSecondLine(wordAr[i], tspan[1], newSpan);
               elem = [wordAr[i]].concat(newSpan);
-            }
-            else if (tspan[0] !== "")
-              elem = tspan
+            } else if (tspan[0] !== "") elem = tspan;
           }
           return elem;
         });
@@ -1045,47 +1043,35 @@ export default {
           sumW >
           this.displaySunburst.sizes.sequenceW - endLabelW - endLabelP
         ) {
-          // wordAr = this.reduceNbW(
-          //   wordAr,
-          //   this.displaySunburst.sizes.sequenceW,
-          //   endLabelW + endLabelP
-          // );
-          // console.log("wordAr", wordAr);
-
-          // if (wordAr) {
-          // newSeqNames = this.sequences.seqNames.map((elem, i) => {
-          //       // console.log(elem, wordAr[i])
-          //       if (elem[0] !== wordAr[i]) {
-          //         let tspan = elem[0].split(wordAr[i] + " ");
-          //         elem = [wordAr[i], tspan[1]];
-          //         if (wordAr[i].length < tspan[1].length) {
-          //           let newSpan = [];
-          //           newSpan = this.reduceSecondLine(
-          //             wordAr[i],
-          //             tspan[1],
-          //             newSpan
-          //           );
-          //           elem = [wordAr[i]].concat(newSpan);
-          //         }
-          //       }
-          //       return elem;
-          //     })
-          // }
-          // else {
-          //   newSeqNames = this.sequences.seqNames.map((elem, i) => {
-          //     if(i !== this.sequences.seqNames.length - 1)
-          //       elem = ["..."]
-          //     return elem
-          //   });
-
-          // }
           let newSeqNames = this.blabla(
             endLabelW,
             endLabelP,
             this.sequences.seqNames
           );
+
+          newSeqNames = newSeqNames.map(arrName => {
+              console.log(arrName)
+              if (arrName.length > 6) {
+                let maxLenSpan = Math.max(...arrName.map(span => span.length))
+                arrName = arrName.slice(0, 6)
+                if (arrName[5].length + 4 > maxLenSpan) {
+                  let span5 = arrName[5].split(/\s+/)
+                  let name = ""
+                  span5.forEach((word, i) => {
+                    if (name.length + word.length + 4 <= maxLenSpan)
+                      name = i === 0 ? name.concat("", word) : name.concat(" ", word)
+                  })
+                  if (name === "")
+                    name = "..."
+                  arrName[5] = name
+                }
+                else
+                  arrName[5] = arrName[5].concat(" ...");
+              }
+              return arrName
+            });
           this.sequences.seqNames = newSeqNames;
-          // console.log("new",newSeqNames)
+          console.log("new", newSeqNames);
         }
       }
     },
@@ -1131,7 +1117,7 @@ export default {
       let allLength = allNames.map(elem => elem.length);
       let maxL = Math.max(...allLength);
 
-      console.log(sequence, allNames)
+      // console.log(sequence, allNames)
 
       let ySpanScale = scaleLinear();
       ySpanScale.range([(maxL + 1) * 5, 15]).domain([1, maxL]);
