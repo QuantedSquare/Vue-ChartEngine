@@ -1,6 +1,6 @@
 <template>
   <v-container pa-0 fill-height :class="idDonut">
-    <v-layout wrap id="donutChart">
+    <v-layout wrap align-center justify-center id="donutChart">
       <v-flex xs12 class="width_text" :style="fontSlices+`;color: transparent;`">
         <span id="maj">ACHATS DE CONTRACTUEL</span>
         <span id="min">achats de contractuel</span>
@@ -93,7 +93,7 @@
           </g>
         </svg>
       </v-flex>
-      <v-flex xs10 sm4 pl-3 pt-5 id="sidebar" v-if="displaySunburst.legends.present">
+      <v-flex xs10 sm4 pl-3 id="sidebar" v-if="displaySunburst.legends.present">
         Legend
         <br>
         <div id="legend">
@@ -391,7 +391,7 @@ export default {
         newChildren.push({
           budget: budget,
           // budgetProgess: budgetProgess,
-          name: "AUTRES",
+          name: "AUTRES CHARGES",
           children: subChild
         });
         transform.children = newChildren;
@@ -401,7 +401,7 @@ export default {
         !this.displaySunburst.slices.supprSlices.keepData &&
         !this.displaySunburst.slices.joinSlices.present
       ) {
-        transform.name = "AUTRES";
+        transform.name = "AUTRES CHARGES";
         transform.children.forEach(child => {
           budgetProgess[0] = budgetProgess[0].map((num, i) => {
             return num + child.budgetProgess[0][i].y;
@@ -420,7 +420,7 @@ export default {
         );
         // console.log("budget progress", budgetProgess);
         this.$emit("update:linesData", {
-          name: "AUTRES",
+          name: "AUTRES CHARGES",
           budgetProgess: budgetProgess
         });
         transform.budgetProgess = budgetProgess;
@@ -431,7 +431,7 @@ export default {
         transform.children.forEach(child => (transform.budget += child.budget));
 
       transform.children.forEach(child => {
-        if (child.name === "AUTRES") {
+        if (child.name === "AUTRES CHARGES") {
           child.children.forEach(subchild => {
             budgetProgess[0] = budgetProgess[0].map((num, i) => {
               return num + subchild.budgetProgess[0][i].y;
@@ -451,7 +451,7 @@ export default {
           // console.log("budget progress", budgetProgess);
           child["budgetProgess"] = budgetProgess;
           this.$emit("update:linesData", {
-            name: "AUTRES",
+            name: "AUTRES CHARGES",
             budgetProgess: budgetProgess
           });
         }
@@ -822,8 +822,12 @@ export default {
       // console.log("resize", child, legW, this.displaySunburst.sizes.legendW, this.displaySunburst.sizes.sequenceW);
       if (this.notResize === false) {
         this.displaySunburst.sizes.sequenceW = seqW;
-        this.displaySunburst.sizes.legendW = legW;
-      } else this.notResize = false;
+        this.displaySunburst.sizes.legendW = legW > this.legends.width * this.majW + 25 ? this.legends.width * this.majW + 25 : legW;
+      } else {
+        // console.log(this.legends.width, this.majW)
+        this.notResize = false;
+        this.displaySunburst.sizes.legendW = this.displaySunburst.sizes.legendW > this.legends.width * 6.4 + 25 ? this.legends.width * 6.4 + 25 : this.displaySunburst.sizes.legendW;
+      }
       this.explanationsPos = this.setExplanationsPos();
 
       if (window.innerWidth > 600 && this.displaySunburst.legends.present)
@@ -1008,7 +1012,13 @@ export default {
         });
       } else {
         let alreadyPass = false;
+        let nbpoints = 0;
+        // let emptyArr = [[]]
         if (seqNamesBase[0][0] === "...") alreadyPass = true;
+        seqNamesBase.forEach(elem => {
+          if (elem[0] === "...") nbpoints += 1;
+        });
+        if (nbpoints === seqNamesBase.length) return []
         let newSeqNames = seqNamesBase.map((elem, i) => {
           if (i !== seqNamesBase.length - 1 || alreadyPass) elem = ["..."];
           return elem;

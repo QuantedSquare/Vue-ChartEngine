@@ -54,13 +54,12 @@
         </v-card>
       </v-flex>
       <v-flex xs12 mt-4 v-resize="onResize2">
-        <v-layout wrap justify-center :class="padding">
+        <v-layout wrap align-center justify-center :class="padding">
           <v-flex
             v-if="currentData.yearsData.length"
             xs12
             lg5
             mb-4
-            :class="spacingTop"
             id="chartLines"
             v-resize="onResize"
           >
@@ -133,7 +132,6 @@ export default {
       padding: this.setPadding(),
       linesW: 500,
       linesH: 200,
-      spacingTop: "mt-2",
       legends: {
         present: true,
         position: "top",
@@ -447,9 +445,6 @@ export default {
       let lines = document.getElementById("chartLines");
       if (lines.offsetWidth < 375) this.linesW = 372;
       else this.linesW = lines.offsetWidth;
-
-      if (window.innerWidth > 1264) this.spacingTop = "mt-5 pt-5";
-      else this.spacingTop = "mt-2";
     },
     searchYearsData(yearsData, idDonut, index) {
       // console.log("data years", yearsData, idDonut);
