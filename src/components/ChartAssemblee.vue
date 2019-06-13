@@ -158,7 +158,7 @@ export default {
           width: 140,
           font: {
             size: 15,
-            family: "sans-serif"
+            family: 'Poppins'
           }
         },
         slices: {
@@ -167,7 +167,7 @@ export default {
             present: true,
             font: {
               size: 10,
-              family: "sans-serif"
+              family: 'Poppins'
             },
             rotation: "transform string"
           },
@@ -200,14 +200,14 @@ export default {
           present: true,
           font: {
             size: 10,
-            family: "sans-serif"
+            family: 'Poppins'
           },
           position: "top",
           center: true,
           endLabel: {
             font: {
               size: 12,
-              family: "sans-serif",
+              family: 'Poppins',
               weight: "bold"
             },
             present: true,
@@ -234,7 +234,7 @@ export default {
           width: 140,
           font: {
             size: 15,
-            family: "sans-serif"
+            family: 'Poppins'
           }
         },
         slices: {
@@ -243,7 +243,7 @@ export default {
             present: false,
             font: {
               size: 10,
-              family: "sans-serif"
+              family: 'Poppins'
             },
             rotation: "transform string"
           },
@@ -276,14 +276,14 @@ export default {
           present: true,
           font: {
             size: 10,
-            family: "sans-serif"
+            family: 'Poppins'
           },
           position: "top",
           center: false,
           endLabel: {
             font: {
               size: 12,
-              family: "sans-serif",
+              family: 'Poppins',
               weight: "bold"
             },
             present: true,
@@ -465,7 +465,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
 text {
-  font: 10px sans-serif;
+  font: 10px  'Poppins';
 }
 
 .intro {
@@ -483,6 +483,7 @@ text {
 }
 
 .back {
+  /* background: linear-gradient(10deg, rgba(15, 17, 32, 1), rgba(15, 17, 32, 1)); */
   background: linear-gradient(10deg, rgb(162, 255, 174), rgb(12, 205, 249));
   /* background: linear-gradient(45deg, rgb(136, 0, 163), rgb(255, 0, 111)); */
 }
@@ -491,7 +492,7 @@ text {
   font-size: calc(40px + (80 - 40) * ((100vw - 300px) / (1600 - 300)));
   /* font-size: 20px; */
   font-weight: bold; 
-  font-family: sans-serif; 
+  /* font-family: sans-serif;  */
   line-height: 1.125;
 }
 

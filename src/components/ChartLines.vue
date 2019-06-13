@@ -346,29 +346,4 @@ export default {
   r: 10;
   opacity: 0.5;
 }
-
-.nvtooltip {
-  position: absolute;
-  background-color: rgba(255, 255, 255, 1);
-  padding: 10px;
-  border: 1px solid #ddd;
-
-  font-family: Arial;
-  font-size: 13px;
-
-  transition: opacity 500ms linear;
-  -moz-transition: opacity 500ms linear;
-  -webkit-transition: opacity 500ms linear;
-
-  transition-delay: 500ms;
-  -moz-transition-delay: 500ms;
-  -webkit-transition-delay: 500ms;
-
-  -moz-box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.5);
-  -webkit-box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.5);
-  box-shadow: 4px 4px 12px rgba(0, 0, 0, 0.5);
-
-  -moz-border-radius: 15px;
-  border-radius: 15px;
-}
 </style>

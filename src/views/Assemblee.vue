@@ -40,4 +40,7 @@ export default {
   /* color: #A2FFAE; */
   background: rgba(162, 255, 174, 0.596);
 }
+#app {
+    font-family: 'Poppins', sans-serif !important;
+}
 </style>
