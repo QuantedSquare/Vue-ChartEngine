@@ -893,7 +893,9 @@ export default {
       sizeLabel,
       maxWordLength
     ) {
-      let fullNameLength = allWordsArr.map(arrayW => arrayW.join(" ").length);
+      let fullNameLength = allWordsArr.map(arrayW =>
+        arrayW.length === 1 ? 1 : arrayW.join(" ").length
+      );
       allWordsArr = allWordsArr.map((arrayW, i) => {
         // console.log("maxLen", maxWordLength[i], arrayW.join(" ").length, arrayW.join(" "), Math.max(...fullNameLength))
         if (
@@ -910,7 +912,7 @@ export default {
           : maxWordLength[i];
         // return arrayW.join(" ").length * this.majW + 20
       });
-      // console.log("array", array, array.reduce(reducer) * this.majW + (maxWordLength.length * 25), sizeSeq - sizeLabel);
+      // console.log("array", allWordsArr, array, array.reduce(reducer) * this.majW + (maxWordLength.length * 25), sizeSeq - sizeLabel);
 
       let sumW = array.reduce(reducer);
       if (sumW * this.majW + maxWordLength.length * 25 > sizeSeq - sizeLabel)
@@ -934,6 +936,7 @@ export default {
 
       const reducer = (accumulator, currentValue) => accumulator + currentValue;
       // console.log(
+      //   "reduceNbW",
       //   maxWordLength,
       //   maxWordLength.reduce(reducer),
       //   this.majW,
@@ -946,6 +949,7 @@ export default {
         maxWordLength.reduce(reducer) * this.majW + maxWordLength.length * 25 <
         sizeSeq - sizeLabel
       ) {
+        // console.log(allWordsArr, maxWordLength)
         return (allWordsArr = this.smallestFirstWordsArr(
           allWordsArr,
           reducer,
@@ -1003,8 +1007,10 @@ export default {
           return elem;
         });
       } else {
+        let alreadyPass = false;
+        if (seqNamesBase[0][0] === "...") alreadyPass = true;
         let newSeqNames = seqNamesBase.map((elem, i) => {
-          if (i !== seqNamesBase.length - 1) elem = ["..."];
+          if (i !== seqNamesBase.length - 1 || alreadyPass) elem = ["..."];
           return elem;
         });
         return this.blabla(endLabelW, endLabelP, newSeqNames);
@@ -1015,7 +1021,7 @@ export default {
       // console.log("seqname", newSeqNames);
       if (this.sequences.seqNames.length) {
         let array = this.sequences.seqNames.map(
-          elem => elem[0].length * this.majW + 20
+          elem => elem[0].length * this.majW + 25
         );
         // pas encore en span
 
@@ -1050,28 +1056,26 @@ export default {
           );
 
           newSeqNames = newSeqNames.map(arrName => {
-              console.log(arrName)
-              if (arrName.length > 6) {
-                let maxLenSpan = Math.max(...arrName.map(span => span.length))
-                arrName = arrName.slice(0, 6)
-                if (arrName[5].length + 4 > maxLenSpan) {
-                  let span5 = arrName[5].split(/\s+/)
-                  let name = ""
-                  span5.forEach((word, i) => {
-                    if (name.length + word.length + 4 <= maxLenSpan)
-                      name = i === 0 ? name.concat("", word) : name.concat(" ", word)
-                  })
-                  if (name === "")
-                    name = "..."
-                  arrName[5] = name
-                }
-                else
-                  arrName[5] = arrName[5].concat(" ...");
-              }
-              return arrName
-            });
+            // console.log(arrName)
+            if (arrName.length > 6) {
+              let maxLenSpan = Math.max(...arrName.map(span => span.length));
+              arrName = arrName.slice(0, 6);
+              if (arrName[5].length + 4 > maxLenSpan) {
+                let span5 = arrName[5].split(/\s+/);
+                let name = "";
+                span5.forEach((word, i) => {
+                  if (name.length + word.length + 4 <= maxLenSpan)
+                    name =
+                      i === 0 ? name.concat("", word) : name.concat(" ", word);
+                });
+                if (name === "") name = "...";
+                arrName[5] = name;
+              } else arrName[5] = arrName[5].concat(" ...");
+            }
+            return arrName;
+          });
           this.sequences.seqNames = newSeqNames;
-          console.log("new", newSeqNames);
+          // console.log("new", newSeqNames);
         }
       }
     },
