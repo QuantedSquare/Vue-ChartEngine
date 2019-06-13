@@ -1,7 +1,7 @@
 <template>
   <div>
     <div v-if="title">
-      <span>{{title}}</span>
+      <span><b>{{title}}</b></span>
     </div>
     <div v-else>
       <span>xMax: {{xMax}}, yMax: {{yMax}}, xMin: {{xMin}}, yMin: {{yMin}}</span>

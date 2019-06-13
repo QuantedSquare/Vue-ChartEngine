@@ -47,7 +47,7 @@
           :style="fontExplanations + explanationsPos"
           v-if="displaySunburst.explanationsCenter.present"
         >
-          {{sequences.currentHover ? sequences.currentHover.toUpperCase() : transformData.name}}
+          {{sequences.currentHover ? sequences.currentHover : transformData.name}}
           <br>
           <br>
           <span id="labelBugdet">{{displayBudget}} {{displaySunburst.sequence.endLabel.unit}}</span>
@@ -118,7 +118,7 @@
                 :y="9 + (16 * i)"
                 dy="0.35em"
                 :style="fontSlices"
-              >{{partName.toUpperCase()}}</text>
+              >{{partName}}</text>
             </g>
           </svg>
         </div>
@@ -337,7 +337,7 @@ export default {
     },
     transformData: function() {
       let transform = {
-        name: this.dataDonut.name.toUpperCase(),
+        name: this.dataDonut.name,
         children: [],
         budgetProgess: [],
         budget: 0
@@ -391,7 +391,7 @@ export default {
         newChildren.push({
           budget: budget,
           // budgetProgess: budgetProgess,
-          name: "AUTRES CHARGES",
+          name: "Autres charges",
           children: subChild
         });
         transform.children = newChildren;
@@ -401,7 +401,7 @@ export default {
         !this.displaySunburst.slices.supprSlices.keepData &&
         !this.displaySunburst.slices.joinSlices.present
       ) {
-        transform.name = "AUTRES CHARGES";
+        transform.name = "Autres charges";
         transform.children.forEach(child => {
           budgetProgess[0] = budgetProgess[0].map((num, i) => {
             return num + child.budgetProgess[0][i].y;
@@ -420,7 +420,7 @@ export default {
         );
         // console.log("budget progress", budgetProgess);
         this.$emit("update:linesData", {
-          name: "AUTRES CHARGES",
+          name: "Autres charges",
           budgetProgess: budgetProgess
         });
         transform.budgetProgess = budgetProgess;
@@ -431,7 +431,7 @@ export default {
         transform.children.forEach(child => (transform.budget += child.budget));
 
       transform.children.forEach(child => {
-        if (child.name === "AUTRES CHARGES") {
+        if (child.name === "Autres charges") {
           child.children.forEach(subchild => {
             budgetProgess[0] = budgetProgess[0].map((num, i) => {
               return num + subchild.budgetProgess[0][i].y;
@@ -451,7 +451,7 @@ export default {
           // console.log("budget progress", budgetProgess);
           child["budgetProgess"] = budgetProgess;
           this.$emit("update:linesData", {
-            name: "AUTRES CHARGES",
+            name: "Autres charges",
             budgetProgess: budgetProgess
           });
         }
@@ -1090,9 +1090,9 @@ export default {
       }
     },
     notCenter(names) {
-      // console.log("notcenter", names, names[0][0], this.root.descendants()[0].data.name.toUpperCase())
+      // console.log("notcenter", names, names[0][0], this.root.descendants()[0].data.name)
       if (
-        names[0][0] === this.root.descendants()[0].data.name.toUpperCase() &&
+        names[0][0] === this.root.descendants()[0].data.name &&
         !this.displaySunburst.slices.center.visibility &&
         names.length === 1
       ) {
@@ -1160,7 +1160,7 @@ export default {
         ? this.sequences.currentHover
         : this.transformData.name;
       newDiv.innerHTML =
-        name.toUpperCase() +
+        name +
         "<br><br><span>" +
         this.sequences.labelBudget +
         " " +
@@ -1282,7 +1282,7 @@ export default {
       }
       function setSequence(slice) {
         if (slice.parent && slice.parent.depth > 0) {
-          seqNames.push(slice.parent.data.name.toUpperCase());
+          seqNames.push(slice.parent.data.name);
           setSequence(slice.parent);
         }
       }
@@ -1307,7 +1307,7 @@ export default {
       this.explanationsPos = this.setExplanationsPos();
 
       let seqNames = [];
-      seqNames.push(this.root.descendants()[index].data.name.toUpperCase());
+      seqNames.push(this.root.descendants()[index].data.name);
       setSequence(this.root.descendants()[index]);
       seqNames = seqNames.reverse();
       this.sequences.seqNames = seqNames.map(elem => {

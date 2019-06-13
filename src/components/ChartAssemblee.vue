@@ -15,9 +15,10 @@
                 />
               </v-flex>
               <v-flex xs12 sm8 xl9 class="text-xs-left pl-3">
-                <span
-                id="title"
-                >Dépenses de <br>l'Assemblée</span>
+                <span id="title">
+                  Dépenses de
+                  <br>l'Assemblée
+                </span>
                 <p class="textPara intro">
                   <br>En 2017 l'assemblée nationale a dépensé au total
                   <span
@@ -158,7 +159,7 @@ export default {
           width: 140,
           font: {
             size: 15,
-            family: 'Poppins'
+            family: "Poppins"
           }
         },
         slices: {
@@ -167,7 +168,7 @@ export default {
             present: true,
             font: {
               size: 11,
-              family: 'Poppins'
+              family: "Poppins"
             },
             rotation: "transform string"
           },
@@ -200,14 +201,14 @@ export default {
           present: true,
           font: {
             size: 11,
-            family: 'Poppins'
+            family: "Poppins"
           },
           position: "top",
           center: true,
           endLabel: {
             font: {
               size: 12,
-              family: 'Poppins',
+              family: "Poppins",
               weight: "bold"
             },
             present: true,
@@ -234,7 +235,7 @@ export default {
           width: 140,
           font: {
             size: 15,
-            family: 'Poppins'
+            family: "Poppins"
           }
         },
         slices: {
@@ -243,7 +244,7 @@ export default {
             present: false,
             font: {
               size: 11,
-              family: 'Poppins'
+              family: "Poppins"
             },
             rotation: "transform string"
           },
@@ -276,14 +277,14 @@ export default {
           present: true,
           font: {
             size: 11,
-            family: 'Poppins'
+            family: "Poppins"
           },
           position: "top",
           center: false,
           endLabel: {
             font: {
               size: 12,
-              family: 'Poppins',
+              family: "Poppins",
               weight: "bold"
             },
             present: true,
@@ -344,7 +345,7 @@ export default {
             this.donutBudget.children[index_1]["children"] = [];
           }
           this.donutBudget.children[index_1].children.push({
-            name: name,
+            name: this.Ucfirst(name),
             code: code,
             budget: budget,
             budgetProgess: budgetProgess
@@ -359,7 +360,7 @@ export default {
             ] = [];
           }
           this.donutBudget.children[index_1].children[index_2].children.push({
-            name: name,
+            name: this.Ucfirst(name),
             code: code,
             value: budget,
             budgetProgess: budgetProgess
@@ -390,7 +391,7 @@ export default {
           this.donutBudget["children"] = [];
         }
         this.donutBudget.children.push({
-          name: name,
+          name: this.Ucfirst(name),
           code: code,
           budget: budget,
           budgetProgess: budgetProgess
@@ -404,35 +405,38 @@ export default {
   watch: {
     linesData: function(newLines) {
       this.currentData.name = newLines.name;
-      this.currentData.yearsData = newLines.budgetProgess
+      this.currentData.yearsData = newLines.budgetProgess;
     }
   },
   methods: {
+    Ucfirst(string) {
+      return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+    },
     setSeqW() {
       let screenW = window.innerWidth,
-          px5 = 48,
-          px1 = 4,
-          lg = 7,
-          md = 12
-      
+        px5 = 48,
+        px1 = 4,
+        lg = 7,
+        md = 12;
+
       let flexW = null;
-      if (screenW > 1264) flexW = ((screenW - px5 * 2) / 12) * 7
-      else if (screenW > 996) flexW = 900
-      else if (screenW > 600) flexW = (screenW - px5 * 2)
-      else flexW = screenW - px1 * 2
-      return flexW
+      if (screenW > 1264) flexW = ((screenW - px5 * 2) / 12) * 7;
+      else if (screenW > 996) flexW = 900;
+      else if (screenW > 600) flexW = screenW - px5 * 2;
+      else flexW = screenW - px1 * 2;
+      return flexW;
     },
     setLegendW() {
       let screenW = window.innerWidth,
-          pl3 = 16
-      
+        pl3 = 16;
+
       let flexW = this.setSeqW();
       let sidebarW = null;
-      if (screenW > 600) sidebarW = ((flexW / 12) * 4) - pl3
-      else sidebarW = ((flexW / 12) * 10) - pl3
+      if (screenW > 600) sidebarW = (flexW / 12) * 4 - pl3;
+      else sidebarW = (flexW / 12) * 10 - pl3;
 
       // console.log("sidebarW", sidebarW, flexW)
-      return sidebarW
+      return sidebarW;
     },
     setPadding() {
       if (window.innerWidth < 600) return "px-1";
@@ -450,7 +454,7 @@ export default {
       // console.log("data years", yearsData, idDonut);
       if (idDonut === "donut1") {
         this.displaySunburst.slices.supprSlices.keepData =
-          yearsData.data.name === "AUTRES" ? null : yearsData.data.name;
+          yearsData.data.name === "Autres charges" ? null : yearsData.data.name;
         this.displaySunburst.targetIndex = 0;
       } else this.displaySunburst.targetIndex = index;
       this.currentData.yearsData = yearsData.data.budgetProgess
@@ -465,7 +469,7 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
 text {
-  font: 10px  'Poppins';
+  font: 10px "Poppins";
 }
 
 .intro {
@@ -491,9 +495,8 @@ text {
 #title {
   font-size: calc(40px + (80 - 40) * ((100vw - 300px) / (1600 - 300)));
   /* font-size: 20px; */
-  font-weight: bold; 
+  font-weight: bold;
   /* font-family: sans-serif;  */
   line-height: 1.125;
 }
-
 </style>
