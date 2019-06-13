@@ -13,7 +13,7 @@
             v-if="sequences.seqNames.length > 0 && notCenter(sequences.seqNames) && displaySunburst.sequence.endLabel.present"
             id="endlabel"
             :x="translatePolygon[translatePolygon.length - 1] + 15"
-            y="15"
+            :y="ySpan(span, sequences.seqNames)"
             dy="0.35em"
             text-anchor="start"
             fill="rgb(0, 0, 0);"
@@ -243,6 +243,7 @@ export default {
   },
   data: function() {
     return {
+      span: ["span"],
       notResize: true,
       targetIndex: 0,
       currentRing: 0,
@@ -681,7 +682,7 @@ export default {
     translatePolygon: function() {
       let antL = 0;
       let b = [];
-      console.log("polygon", this.sequences.seqNames);
+      // console.log("polygon", this.sequences.seqNames);
       this.sequences.seqNames.forEach((elem, i) => {
         let l = 0;
         if (i !== 0) l = antL * this.majW + 2 + b[i - 1] + 20;
@@ -894,7 +895,7 @@ export default {
     ) {
       let fullNameLength = allWordsArr.map(arrayW => arrayW.join(" ").length);
       allWordsArr = allWordsArr.map((arrayW, i) => {
-        console.log("maxLen", maxWordLength[i], arrayW.join(" ").length, arrayW.join(" "), Math.max(...fullNameLength))
+        // console.log("maxLen", maxWordLength[i], arrayW.join(" ").length, arrayW.join(" "), Math.max(...fullNameLength))
         if (
           arrayW.join(" ").length === Math.max(...fullNameLength) &&
           arrayW.join(" ").length > maxWordLength[i]
@@ -909,7 +910,7 @@ export default {
           : maxWordLength[i];
         // return arrayW.join(" ").length * this.majW + 20
       });
-      console.log("array", array, array.reduce(reducer) * this.majW + (maxWordLength.length * 25), sizeSeq - sizeLabel);
+      // console.log("array", array, array.reduce(reducer) * this.majW + (maxWordLength.length * 25), sizeSeq - sizeLabel);
 
       let sumW = array.reduce(reducer);
       if (((sumW * this.majW) + (maxWordLength.length * 25)) > sizeSeq - sizeLabel)
@@ -925,22 +926,22 @@ export default {
       return allWordsArr;
     },
     reduceNbW(allWordsArr, sizeSeq, sizeLabel) {
-      console.log("reduceNB", allWordsArr);
+      // console.log("reduceNB", allWordsArr);
       let nbWords = allWordsArr.map(arrayW => arrayW.length);
       let maxWordLength = allWordsArr.map(arrayW =>
         Math.max(...arrayW.map(word => word.length))
       );
 
       const reducer = (accumulator, currentValue) => accumulator + currentValue;
-      console.log(
-        maxWordLength,
-        maxWordLength.reduce(reducer),
-        this.majW,
-        maxWordLength.reduce(reducer) * this.majW,
-        sizeSeq - sizeLabel,
-        sizeSeq,
-        allWordsArr
-      );
+      // console.log(
+      //   maxWordLength,
+      //   maxWordLength.reduce(reducer),
+      //   this.majW,
+      //   maxWordLength.reduce(reducer) * this.majW,
+      //   sizeSeq - sizeLabel,
+      //   sizeSeq,
+      //   allWordsArr
+      // );
       if (
         maxWordLength.reduce(reducer) * this.majW + maxWordLength.length * 25 <
         sizeSeq - sizeLabel
@@ -955,13 +956,12 @@ export default {
       } else return;
     },
     reduceSecondLine: function(word, tspan, newSpan) {
-      console.log("here");
       let splitSpan = tspan.split(/\s+/);
       let l = 0,
         index = 0;
-      console.log(tspan);
+      // console.log(tspan);
       splitSpan.forEach((spanWord, i) => {
-        console.log("spanW", spanWord);
+        // console.log("spanW", spanWord);
         l += spanWord.length + 1;
         if (l <= word.length + 1) index = i;
       });
@@ -984,16 +984,16 @@ export default {
         this.displaySunburst.sizes.sequenceW,
         endLabelW + endLabelP
       );
-      console.log("wordAr", wordAr);
+      // console.log("wordAr", wordAr);
 
       if (wordAr) {
         return seqNamesBase.map((elem, i) => {
-          console.log("seqbase", elem, elem[0], wordAr[i]);
+          // console.log("seqbase", elem, elem[0], wordAr[i]);
           if (elem[0] !== wordAr[i]) {
             let tspan = elem[0].split(wordAr[i] + " ");
-            console.log("tspan", tspan);
+            // console.log("tspan", tspan);
             elem = [wordAr[i], tspan[1]];
-            console.log("elem here",elem)
+            // console.log("elem here",elem)
             if (tspan[1] && wordAr[i].length < tspan[1].length) {
               let newSpan = [];
               newSpan = this.reduceSecondLine(wordAr[i], tspan[1], newSpan);
@@ -1131,7 +1131,7 @@ export default {
       let allLength = allNames.map(elem => elem.length);
       let maxL = Math.max(...allLength);
 
-      // console.log(maxL, allNames)
+      console.log(sequence, allNames)
 
       let ySpanScale = scaleLinear();
       ySpanScale.range([(maxL + 1) * 5, 15]).domain([1, maxL]);
