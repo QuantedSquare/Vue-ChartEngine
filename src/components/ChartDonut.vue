@@ -1072,20 +1072,20 @@ export default {
 
           newSeqNames = newSeqNames.map(arrName => {
             // console.log(arrName)
-            if (arrName.length > 6) {
+            if (arrName.length > 5) {
               let maxLenSpan = Math.max(...arrName.map(span => span.length));
-              arrName = arrName.slice(0, 6);
-              if (arrName[5].length + 4 > maxLenSpan) {
-                let span5 = arrName[5].split(/\s+/);
+              arrName = arrName.slice(0, 5);
+              if (arrName[4].length + 4 > maxLenSpan) {
+                let span4 = arrName[4].split(/\s+/);
                 let name = "";
-                span5.forEach((word, i) => {
+                span4.forEach((word, i) => {
                   if (name.length + word.length + 4 <= maxLenSpan)
                     name =
                       i === 0 ? name.concat("", word) : name.concat(" ", word);
                 });
                 if (name === "") name = "...";
-                arrName[5] = name;
-              } else arrName[5] = arrName[5].concat(" ...");
+                arrName[4] = name;
+              } else arrName[4] = arrName[4].concat(" ...");
             }
             return arrName;
           });
@@ -1113,8 +1113,8 @@ export default {
       // console.log("span",allSpan, maxLSpan)
       let a = maxLSpan * this.majW + 20, //padding
         b = a + 10, //pointe
-        c = maxH > 2 ? (maxH + 1) * 10 : 30,
-        d = maxH > 2 ? 5 + maxH * 5 : 15;
+        c = maxH > 2 ? (maxH + 1) * this.displaySunburst.sequence.font.size : 30,
+        d = c / 2;
       return (
         "0,0 " +
         a +
