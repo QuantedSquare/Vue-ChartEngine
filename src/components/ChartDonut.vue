@@ -788,6 +788,29 @@ export default {
     }
   },
   methods: {
+    createDivText: function(text, font) {
+      let newDiv = document.createElement("div");
+      newDiv.innerHTML = "<span class='toto'>" + text + "</span>";
+      newDiv.style.fontFamily = "Poppins";
+      newDiv.style.fontSize = "11px";
+      // newDiv.children[0].setAttribute("class", "toto")
+
+      let currentDiv = document.getElementById("app");
+      currentDiv.appendChild(newDiv);
+
+      console.log("childDiv", newDiv.children, newDiv.children[0].offsetWidth, font)
+
+      let hDiv = newDiv.children[0].offsetHeight;
+      let lDiv = newDiv.children[0].offsetWidth;
+      
+      // console.log("toto",document.querySelector(".toto"))
+      // currentDiv.removeChild(newDiv);
+
+      // return {
+      //   height: hDiv,
+      //   width: lDiv
+      // };
+    },
     translateLegend: function(names, index, legend) {
       let h = 0;
       // console.log("names", names, legend.join(" ").trim());
@@ -834,6 +857,7 @@ export default {
     },
     onResize() {
       let doc = document.getElementsByClassName(this.idDonut);
+            this.createDivText("name", this.fontSlices)
 
       let child = doc[0].children[0].children;
       let seqW = child.sequence.offsetWidth;
@@ -1210,7 +1234,7 @@ export default {
 
       let donut = document.getElementsByClassName(this.idDonut),
         chartW = donut[0].children[0].children.chart.offsetWidth;
-
+      
       // console.log(chartW, this.displaySunburst.sizes.maxW)
       if (chartW > 200 && chartW < this.displaySunburst.sizes.maxW) {
         this.displaySunburst.sizes.sunburstW = chartW;
@@ -1393,5 +1417,8 @@ export default {
 
 #legend {
   padding-top: 10px;
+}
+.toto {
+  font: 11px 'Poppins'
 }
 </style>
