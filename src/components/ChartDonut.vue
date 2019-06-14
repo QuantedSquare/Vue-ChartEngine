@@ -46,7 +46,7 @@
           id="explanation"
           :style="fontExplanations + explanationsPos"
           v-if="displaySunburst.explanationsCenter.present"
-          @click="clicked(currentPathCenter, idDonut)"
+          @click="!displaySunburst.slices.zoomable ? null : clicked(currentPathCenter, idDonut)"
         >
           {{sequences.currentHover ? sequences.currentHover : transformData.name}}
           <br>
@@ -1175,18 +1175,18 @@ export default {
       console.log(ring);
     },
     clicked(index, idDonut) {
-      if (idDonut === "donut2") {
-        let posParent =
-          this.root.descendants()[index] &&
-          this.root.descendants()[index].parent
+      if (this.root.descendants()[index]) {
+        if (idDonut === "donut2") {
+          let posParent = this.root.descendants()[index].parent
             ? this.root.descendants()[index].parent.position
             : 0;
-        this.currentPathCenter = posParent;
+          this.currentPathCenter = posParent;
 
-        this.currentRing = this.root.descendants()[index].depth;
+          this.currentRing = this.root.descendants()[index].depth;
+        }
+        // console.log("dataDonut in click", this.root.descendants()[index])
+        this.$emit("onClick", this.root.descendants()[index], idDonut, index);
       }
-      // console.log("dataDonut in click", this.root.descendants()[index])
-      this.$emit("onClick", this.root.descendants()[index], idDonut, index);
     },
 
     setExplanationsPos: function() {
