@@ -119,7 +119,7 @@ export default {
   },
   data: function() {
     return {
-      formatTxt: "upCase",/* "ucFirst",*/
+      formatTxt: /*"upCase",*/ "ucFirst",
       linesData: {
         name: null,
         yearsData: []

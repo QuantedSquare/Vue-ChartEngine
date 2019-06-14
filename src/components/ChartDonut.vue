@@ -46,6 +46,7 @@
           id="explanation"
           :style="fontExplanations + explanationsPos"
           v-if="displaySunburst.explanationsCenter.present"
+          @click="clicked(currentPathCenter, idDonut)"
         >
           {{sequences.currentHover ? sequences.currentHover : transformData.name}}
           <br>
@@ -94,7 +95,7 @@
         </svg>
       </v-flex>
       <v-flex xs10 sm4 pl-3 id="sidebar" v-if="displaySunburst.legends.present">
-        Legend
+        <b>Legend</b>
         <br>
         <div id="legend">
           <svg :width="displaySunburst.sizes.legendW" :height="legends.nbSpan * 33">
@@ -251,6 +252,7 @@ export default {
       notResize: true,
       targetIndex: 0,
       currentRing: 0,
+      currentPathCenter: null,
       tweenedCoord: [],
       targetCoords: [],
       mLeave: false,
@@ -298,7 +300,10 @@ export default {
     this.explanationsPos = this.setExplanationsPos();
   },
   mounted: function() {
-    this.majW = this.formatTxt === "upCase" ? document.getElementById("maj").offsetWidth / 21 : document.getElementById("mix").offsetWidth / 21;
+    this.majW =
+      this.formatTxt === "upCase"
+        ? document.getElementById("maj").offsetWidth / 21
+        : document.getElementById("mix").offsetWidth / 21;
     this.minW = document.getElementById("min").offsetWidth / 21;
     this.mixW = document.getElementById("mix").offsetWidth / 21;
     this.labelW = document.getElementById("label").offsetWidth / 8;
@@ -329,6 +334,9 @@ export default {
       );
     },
     fontExplanations: function() {
+      let cursor = !this.displaySunburst.slices.zoomable
+        ? null
+        : ` cursor: pointer;`;
       return (
         "font: " +
         this.displaySunburst.explanationsCenter.font.size +
@@ -336,7 +344,8 @@ export default {
         this.displaySunburst.explanationsCenter.font.family +
         "; width: " +
         (this.displaySunburst.radiusCenter - 10) +
-        "px;"
+        "px;" +
+        cursor
       );
     },
     transformData: function() {
@@ -395,7 +404,8 @@ export default {
         newChildren.push({
           budget: budget,
           // budgetProgess: budgetProgess,
-          name: this.formatTxt === "upCase"? "AUTRES CHARGES" : "Autres charges",
+          name:
+            this.formatTxt === "upCase" ? "AUTRES CHARGES" : "Autres charges",
           children: subChild
         });
         transform.children = newChildren;
@@ -405,7 +415,8 @@ export default {
         !this.displaySunburst.slices.supprSlices.keepData &&
         !this.displaySunburst.slices.joinSlices.present
       ) {
-        transform.name = this.formatTxt === "upCase"? "AUTRES CHARGES" : "Autres charges";
+        transform.name =
+          this.formatTxt === "upCase" ? "AUTRES CHARGES" : "Autres charges";
         transform.children.forEach(child => {
           budgetProgess[0] = budgetProgess[0].map((num, i) => {
             return num + child.budgetProgess[0][i].y;
@@ -424,7 +435,8 @@ export default {
         );
         // console.log("budget progress", budgetProgess);
         this.$emit("update:linesData", {
-          name: this.formatTxt === "upCase"? "AUTRES CHARGES" : "Autres charges",
+          name:
+            this.formatTxt === "upCase" ? "AUTRES CHARGES" : "Autres charges",
           budgetProgess: budgetProgess
         });
         transform.budgetProgess = budgetProgess;
@@ -435,7 +447,8 @@ export default {
         transform.children.forEach(child => (transform.budget += child.budget));
 
       transform.children.forEach(child => {
-        let n = this.formatTxt === "upCase"? "AUTRES CHARGES" : "Autres charges"
+        let n =
+          this.formatTxt === "upCase" ? "AUTRES CHARGES" : "Autres charges";
         if (child.name === n) {
           child.children.forEach(subchild => {
             budgetProgess[0] = budgetProgess[0].map((num, i) => {
@@ -456,7 +469,8 @@ export default {
           // console.log("budget progress", budgetProgess);
           child["budgetProgess"] = budgetProgess;
           this.$emit("update:linesData", {
-            name: this.formatTxt === "upCase"? "AUTRES CHARGES" : "Autres charges",
+            name:
+              this.formatTxt === "upCase" ? "AUTRES CHARGES" : "Autres charges",
             budgetProgess: budgetProgess
           });
         }
@@ -827,11 +841,17 @@ export default {
       // console.log("resize", child, legW, this.displaySunburst.sizes.legendW, this.displaySunburst.sizes.sequenceW);
       if (this.notResize === false) {
         this.displaySunburst.sizes.sequenceW = seqW;
-        this.displaySunburst.sizes.legendW = legW > this.legends.width * this.majW + 25 ? this.legends.width * this.majW + 25 : legW;
+        this.displaySunburst.sizes.legendW =
+          legW > this.legends.width * this.majW + 25
+            ? this.legends.width * this.majW + 25
+            : legW;
       } else {
         // console.log(this.legends.width, this.majW)
         this.notResize = false;
-        this.displaySunburst.sizes.legendW = this.displaySunburst.sizes.legendW > this.legends.width * 6.4 + 25 ? this.legends.width * 6.4 + 25 : this.displaySunburst.sizes.legendW;
+        this.displaySunburst.sizes.legendW =
+          this.displaySunburst.sizes.legendW > this.legends.width * 6.4 + 25
+            ? this.legends.width * 6.4 + 25
+            : this.displaySunburst.sizes.legendW;
       }
       this.explanationsPos = this.setExplanationsPos();
 
@@ -1023,7 +1043,7 @@ export default {
         seqNamesBase.forEach(elem => {
           if (elem[0] === "...") nbpoints += 1;
         });
-        if (nbpoints === seqNamesBase.length) return []
+        if (nbpoints === seqNamesBase.length) return [];
         let newSeqNames = seqNamesBase.map((elem, i) => {
           if (i !== seqNamesBase.length - 1 || alreadyPass) elem = ["..."];
           return elem;
@@ -1113,7 +1133,8 @@ export default {
       // console.log("span",allSpan, maxLSpan)
       let a = maxLSpan * this.majW + 20, //padding
         b = a + 10, //pointe
-        c = maxH > 2 ? (maxH + 1) * this.displaySunburst.sequence.font.size : 30,
+        c =
+          maxH > 2 ? (maxH + 1) * this.displaySunburst.sequence.font.size : 30,
         d = c / 2;
       return (
         "0,0 " +
@@ -1150,8 +1171,18 @@ export default {
       // console.log(sequence, a)
       return a;
     },
+    bou(ring) {
+      console.log(ring);
+    },
     clicked(index, idDonut) {
       if (idDonut === "donut2") {
+        let posParent =
+          this.root.descendants()[index] &&
+          this.root.descendants()[index].parent
+            ? this.root.descendants()[index].parent.position
+            : 0;
+        this.currentPathCenter = posParent;
+
         this.currentRing = this.root.descendants()[index].depth;
       }
       // console.log("dataDonut in click", this.root.descendants()[index])
@@ -1356,10 +1387,11 @@ export default {
 }
 #explanation {
   position: absolute;
+  z-index: 1;
   text-align: center;
 }
 
 #legend {
-  padding-top: 10px
+  padding-top: 10px;
 }
 </style>
