@@ -66,8 +66,8 @@
               :fill-opacity="visibleArc(index, slice)"
               :id="`slice`+index"
               :d="arcSlice(slice)"
-              :style="!displaySunburst.slices.zoomable ? null : `cursor: pointer;`"
-              @click="!displaySunburst.slices.zoomable ? null : clicked(index, idDonut)"
+              :style="!displaySunburst.slices.zoomable ? null : idDonut === `donut1` && index === 0 ? null : `cursor: pointer;`"
+              @click="!displaySunburst.slices.zoomable ? null : idDonut === `donut1` && index === 0 ? null : clicked(index, idDonut)"
               @mouseover="mLeave === 0 ? null : mouseover(index)"
             ></path>
           </g>
