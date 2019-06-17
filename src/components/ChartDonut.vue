@@ -1,10 +1,17 @@
 <template>
   <v-container pa-0 fill-height :class="idDonut">
     <v-layout wrap align-center justify-center id="donutChart">
-      <v-flex xs12 class="width_text" :style="fontSlices+`;color: transparent;`">
+      <v-flex
+        xs12
+        class="width_text"
+        :style="fontSlices+`;color: transparent; white-space: nowrap;`"
+      >
         <span id="maj">ACHATS DE CONTRACTUEL</span>
+        <br>
         <span id="min">achats de contractuel</span>
-        <span id="mix">Achats de contractuel</span>
+        <br>
+        <span id="mix">Abcde f ghijklmnopqrstuvwxyz</span>
+        <br>
         <span id="label" :style="fontEndLabel">14.52 {{displaySunburst.sequence.endLabel.unit}}</span>
       </v-flex>
       <v-flex xs12 id="sequence" v-if="displaySunburst.sequence.present" v-resize="onResize">
@@ -298,17 +305,25 @@ export default {
   },
   updated: function() {
     this.explanationsPos = this.setExplanationsPos();
+    // this.createDivText("text", this.fontSlices)
   },
   mounted: function() {
+    this.minW = document.getElementById("min").offsetWidth / 21;
+    this.mixW = document.getElementById("mix").offsetWidth / 28;
+    let e = this.mixW + (this.mixW * 30) / 100;
     this.majW =
       this.formatTxt === "upCase"
         ? document.getElementById("maj").offsetWidth / 21
-        : document.getElementById("mix").offsetWidth / 21;
-    this.minW = document.getElementById("min").offsetWidth / 21;
-    this.mixW = document.getElementById("mix").offsetWidth / 21;
+        : e;
     this.labelW = document.getElementById("label").offsetWidth / 8;
     this.fontHeight = document.getElementById("mix").offsetHeight;
     this.explanationsPos = this.setExplanationsPos();
+    // this.createDivText("text", this.fontSlices)
+    console.log(
+      "majW mounted",
+      this.majW,
+      document.getElementById("mix").offsetWidth
+    );
   },
   computed: {
     displayBudget: function() {
@@ -725,9 +740,11 @@ export default {
         arrayLegendsNames = [];
       let nbSpan = 0,
         rectSize = 18 + 4;
+      let longestName = 0;
 
       legendsNames.forEach(name => {
-        // console.log(name.length * this.majW, this.majW, name.length, name, this.displaySunburst.sizes.legendW);
+        console.log("in legends computed",name.length * this.majW, this.majW, name.length, name, this.displaySunburst.sizes.legendW);
+        if (longestName < name.length) longestName = name.length;
         if (
           name.length * this.majW >
           this.displaySunburst.sizes.legendW - rectSize
@@ -741,13 +758,13 @@ export default {
         arrayLegendsNames.push(arrayName);
       });
 
-      let longestName = 0;
-      arrayLegendsNames.forEach(name => {
-        name.forEach(elem => {
-          // console.log(elem.length)
-          if (longestName < elem.length) longestName = elem.length;
-        });
-      });
+      
+      // arrayLegendsNames.forEach(name => {
+      //   name.forEach(elem => {
+      //     // console.log(elem.length)
+      //     if (longestName < elem.length) longestName = elem.length;
+      //   });
+      // });
       return {
         names: legendsNames,
         arrayNames: arrayLegendsNames,
@@ -798,11 +815,16 @@ export default {
       let currentDiv = document.getElementById("app");
       currentDiv.appendChild(newDiv);
 
-      console.log("childDiv", newDiv.children, newDiv.children[0].offsetWidth, font)
+      console.log(
+        "childDiv",
+        newDiv.children,
+        newDiv.children[0].offsetWidth,
+        font
+      );
 
       let hDiv = newDiv.children[0].offsetHeight;
       let lDiv = newDiv.children[0].offsetWidth;
-      
+
       // console.log("toto",document.querySelector(".toto"))
       // currentDiv.removeChild(newDiv);
 
@@ -857,12 +879,13 @@ export default {
     },
     onResize() {
       let doc = document.getElementsByClassName(this.idDonut);
-            this.createDivText("name", this.fontSlices)
+      // this.createDivText("name", this.fontSlices)
+      console.log("majW", this.majW);
 
       let child = doc[0].children[0].children;
       let seqW = child.sequence.offsetWidth;
       let legW = child.sidebar ? child.sidebar.offsetWidth : null;
-      // console.log("resize", child, legW, this.displaySunburst.sizes.legendW, this.displaySunburst.sizes.sequenceW);
+      console.log("resize before", legW, this.displaySunburst.sizes.legendW, this.legends.width * 6.4 + 25);
       if (this.notResize === false) {
         this.displaySunburst.sizes.sequenceW = seqW;
         this.displaySunburst.sizes.legendW =
@@ -877,6 +900,7 @@ export default {
             ? this.legends.width * 6.4 + 25
             : this.displaySunburst.sizes.legendW;
       }
+      console.log("legW after", this.displaySunburst.sizes.legendW)
       this.explanationsPos = this.setExplanationsPos();
 
       if (window.innerWidth > 600 && this.displaySunburst.legends.present)
@@ -1195,9 +1219,6 @@ export default {
       // console.log(sequence, a)
       return a;
     },
-    bou(ring) {
-      console.log(ring);
-    },
     clicked(index, idDonut) {
       if (this.root.descendants()[index]) {
         if (idDonut === "donut2") {
@@ -1234,7 +1255,7 @@ export default {
 
       let donut = document.getElementsByClassName(this.idDonut),
         chartW = donut[0].children[0].children.chart.offsetWidth;
-      
+
       // console.log(chartW, this.displaySunburst.sizes.maxW)
       if (chartW > 200 && chartW < this.displaySunburst.sizes.maxW) {
         this.displaySunburst.sizes.sunburstW = chartW;
@@ -1419,6 +1440,6 @@ export default {
   padding-top: 10px;
 }
 .toto {
-  font: 11px 'Poppins'
+  font: 11px "Poppins";
 }
 </style>

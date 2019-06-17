@@ -438,7 +438,7 @@ export default {
       if (screenW > 600) sidebarW = (flexW / 12) * 4 - pl3;
       else sidebarW = (flexW / 12) * 10 - pl3;
 
-      // console.log("sidebarW", sidebarW, flexW)
+      console.log("sidebarW", sidebarW, flexW)
       return sidebarW;
     },
     setPadding() {
