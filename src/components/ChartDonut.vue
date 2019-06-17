@@ -319,11 +319,11 @@ export default {
     this.fontHeight = document.getElementById("mix").offsetHeight;
     this.explanationsPos = this.setExplanationsPos();
     // this.createDivText("text", this.fontSlices)
-    console.log(
-      "majW mounted",
-      this.majW,
-      document.getElementById("mix").offsetWidth
-    );
+    // console.log(
+    //   "majW mounted",
+    //   this.majW,
+    //   document.getElementById("mix").offsetWidth
+    // );
   },
   computed: {
     displayBudget: function() {
@@ -743,7 +743,7 @@ export default {
       let longestName = 0;
 
       legendsNames.forEach(name => {
-        console.log("in legends computed",name.length * this.majW, this.majW, name.length, name, this.displaySunburst.sizes.legendW);
+        // console.log("in legends computed",name.length * this.majW, this.majW, name.length, name, this.displaySunburst.sizes.legendW);
         if (longestName < name.length) longestName = name.length;
         if (
           name.length * this.majW >
@@ -815,12 +815,12 @@ export default {
       let currentDiv = document.getElementById("app");
       currentDiv.appendChild(newDiv);
 
-      console.log(
-        "childDiv",
-        newDiv.children,
-        newDiv.children[0].offsetWidth,
-        font
-      );
+      // console.log(
+      //   "childDiv",
+      //   newDiv.children,
+      //   newDiv.children[0].offsetWidth,
+      //   font
+      // );
 
       let hDiv = newDiv.children[0].offsetHeight;
       let lDiv = newDiv.children[0].offsetWidth;
@@ -880,12 +880,12 @@ export default {
     onResize() {
       let doc = document.getElementsByClassName(this.idDonut);
       // this.createDivText("name", this.fontSlices)
-      console.log("majW", this.majW);
+      // console.log("majW", this.majW);
 
       let child = doc[0].children[0].children;
       let seqW = child.sequence.offsetWidth;
       let legW = child.sidebar ? child.sidebar.offsetWidth : null;
-      console.log("resize before", legW, this.displaySunburst.sizes.legendW, this.legends.width * 6.4 + 25);
+      // console.log("resize before", legW, this.displaySunburst.sizes.legendW, this.legends.width * 6.4 + 25);
       if (this.notResize === false) {
         this.displaySunburst.sizes.sequenceW = seqW;
         this.displaySunburst.sizes.legendW =
@@ -900,7 +900,7 @@ export default {
             ? this.legends.width * 6.4 + 25
             : this.displaySunburst.sizes.legendW;
       }
-      console.log("legW after", this.displaySunburst.sizes.legendW)
+      // console.log("legW after", this.displaySunburst.sizes.legendW)
       this.explanationsPos = this.setExplanationsPos();
 
       if (window.innerWidth > 600 && this.displaySunburst.legends.present)

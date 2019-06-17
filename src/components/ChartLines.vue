@@ -290,8 +290,9 @@ export default {
       select(".legend")
         .selectAll("text")
         .each(function(d) {
-          // console.log(this.getComputedTextLength())
-          len.push(this.getComputedTextLength());
+          let e = this.getComputedTextLength() < 91 ? this.getComputedTextLength() * 20 /100 : 0;
+          // console.log("here",this.getComputedTextLength())
+          len.push(this.getComputedTextLength() + e);
         });
       return this.legends.present && this.legends.position === "top"
         ? "translate(" + len[index] * (index * -1.3) + "," + index * -20 + ")"
