@@ -758,7 +758,6 @@ export default {
         arrayLegendsNames.push(arrayName);
       });
 
-      
       // arrayLegendsNames.forEach(name => {
       //   name.forEach(elem => {
       //     // console.log(elem.length)
@@ -956,10 +955,10 @@ export default {
         wordAr = wordAr.slice(a + 1);
         if (str) strArr.push(str);
         // console.log("ici", str, wordAr, wordAr.join(" ").length);
-        if (wordAr.join(" ").length * this.majW > ringSize) {
+        if (wordAr.join(" ").trim().length * this.majW > ringSize) {
           this.reduceSliceText(wordAr, ringSize, strArr);
         } else {
-          if (wordAr.length) strArr.push(wordAr.join(" "));
+          if (wordAr.length) strArr.push(wordAr.join(" ").trim());
         }
       }
     },
@@ -971,25 +970,37 @@ export default {
       maxWordLength
     ) {
       let fullNameLength = allWordsArr.map(arrayW =>
-        arrayW.length === 1 ? 1 : arrayW.join(" ").length
+        arrayW.length === 1 ? 1 : arrayW.join(" ").trim().length
       );
       allWordsArr = allWordsArr.map((arrayW, i) => {
-        // console.log("maxLen", maxWordLength[i], arrayW.join(" ").length, arrayW.join(" "), Math.max(...fullNameLength))
+        // console.log("maxLen", maxWordLength[i], arrayW.join(" ").trim().length, arrayW.join(" ").trim(), Math.max(...fullNameLength))
         if (
-          arrayW.join(" ").length === Math.max(...fullNameLength) &&
-          arrayW.join(" ").length > maxWordLength[i]
+          arrayW.join(" ").trim().length === Math.max(...fullNameLength) &&
+          arrayW.join(" ").trim().length > maxWordLength[i]
+        )
+          arrayW = arrayW.slice(0, arrayW.length - 1);
+        if (
+          Math.max(...fullNameLength) === Math.max(...maxWordLength) &&
+          arrayW.join(" ").trim().length < Math.max(...fullNameLength) &&
+          arrayW.join(" ").trim().length > maxWordLength[i]
         )
           arrayW = arrayW.slice(0, arrayW.length - 1);
         return arrayW;
       });
       let array = allWordsArr.map((arrayW, i) => {
         // console.log("join",arrayW.join(" ").length, maxWordLength[i], arrayW.join(" ").length > maxWordLength[i] ? arrayW.join(" ").length : maxWordLength[i])
-        return arrayW.join(" ").length > maxWordLength[i]
-          ? arrayW.join(" ").length
+        return arrayW.join(" ").trim().length > maxWordLength[i]
+          ? arrayW.join(" ").trim().length
           : maxWordLength[i];
         // return arrayW.join(" ").length * this.majW + 20
       });
-      // console.log("array", allWordsArr, array, array.reduce(reducer) * this.majW + (maxWordLength.length * 25), sizeSeq - sizeLabel);
+      // console.log(
+      //   "array",
+      //   allWordsArr,
+      //   array,
+      //   array.reduce(reducer) * this.majW + maxWordLength.length * 25,
+      //   sizeSeq - sizeLabel
+      // );
 
       let sumW = array.reduce(reducer);
       if (sumW * this.majW + maxWordLength.length * 25 > sizeSeq - sizeLabel)
@@ -1001,7 +1012,7 @@ export default {
           maxWordLength
         );
 
-      allWordsArr = allWordsArr.map(arrayW => arrayW.join(" "));
+      allWordsArr = allWordsArr.map(arrayW => arrayW.join(" ").trim());
       return allWordsArr;
     },
     reduceNbW(allWordsArr, sizeSeq, sizeLabel) {
@@ -1015,11 +1026,8 @@ export default {
       // console.log(
       //   "reduceNbW",
       //   maxWordLength,
-      //   maxWordLength.reduce(reducer),
-      //   this.majW,
-      //   maxWordLength.reduce(reducer) * this.majW,
+      //   maxWordLength.reduce(reducer) * this.majW + maxWordLength.length * 25,
       //   sizeSeq - sizeLabel,
-      //   sizeSeq,
       //   allWordsArr
       // );
       if (
@@ -1046,10 +1054,10 @@ export default {
         l += spanWord.length + 1;
         if (l <= word.length + 1) index = i;
       });
-      let newSpan1 = splitSpan.slice(0, index + 1).join(" ");
+      let newSpan1 = splitSpan.slice(0, index + 1).join(" ").trim();
       let newSpan2 =
         splitSpan.length > 1
-          ? splitSpan.slice(index + 1, splitSpan.length).join(" ")
+          ? splitSpan.slice(index + 1, splitSpan.length).join(" ").trim()
           : null;
       newSpan.push(newSpan1);
 
