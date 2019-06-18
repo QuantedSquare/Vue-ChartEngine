@@ -6,7 +6,7 @@
     <div v-else>
       <span>xMax: {{xMax}}, yMax: {{yMax}}, xMin: {{xMin}}, yMin: {{yMin}}</span>
     </div>
-    <svg :height="height" :width="width">
+    <svg :viewBox="'0 0 ' + width + ' ' + height">
       <g :transform="display">
         <g id="xAxis" :transform="bottomTranslate"></g>
         <g id="yAxis">
