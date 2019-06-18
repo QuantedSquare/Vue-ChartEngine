@@ -89,6 +89,21 @@
         </v-layout>
       </v-flex>
     </v-layout>
+    <v-layout id="container" hidden-sm-and-up>
+      <v-btn color="pink" dark @click.stop="drawer = !drawer">Infos</v-btn>
+    </v-layout>
+
+    <v-navigation-drawer
+      v-model="drawer"
+      absolute
+      temporary
+      style="height: 150px; margin-top: 0px; width: 230px; padding: 12px;"
+      hidden-sm-and-up
+    >
+      Pour explorer et visualiser plus d'informations cliquez sur les arcs des diagrammes, les points des courbes graphiques et les légendes
+      <br>
+      <b>BONNE VISITE !</b>
+    </v-navigation-drawer>
   </v-container>
 </template>
 <script>
@@ -119,6 +134,7 @@ export default {
   },
   data: function() {
     return {
+      drawer: this.setDrawer(),
       formatTxt: /*"upCase",*/ "ucFirst",
       linesData: {
         name: null,
@@ -348,7 +364,10 @@ export default {
             this.donutBudget.children[index_1]["children"] = [];
           }
           this.donutBudget.children[index_1].children.push({
-            name: this.formatTxt === "upCase" ? name.toUpperCase() : this.Ucfirst(name),
+            name:
+              this.formatTxt === "upCase"
+                ? name.toUpperCase()
+                : this.Ucfirst(name),
             code: code,
             budget: budget,
             budgetProgess: budgetProgess
@@ -363,7 +382,10 @@ export default {
             ] = [];
           }
           this.donutBudget.children[index_1].children[index_2].children.push({
-            name: this.formatTxt === "upCase" ? name.toUpperCase() : this.Ucfirst(name),
+            name:
+              this.formatTxt === "upCase"
+                ? name.toUpperCase()
+                : this.Ucfirst(name),
             code: code,
             value: budget,
             budgetProgess: budgetProgess
@@ -394,7 +416,10 @@ export default {
           this.donutBudget["children"] = [];
         }
         this.donutBudget.children.push({
-          name: this.formatTxt === "upCase" ? name.toUpperCase() : this.Ucfirst(name),
+          name:
+            this.formatTxt === "upCase"
+              ? name.toUpperCase()
+              : this.Ucfirst(name),
           code: code,
           budget: budget,
           budgetProgess: budgetProgess
@@ -414,6 +439,9 @@ export default {
   methods: {
     Ucfirst(string) {
       return string.charAt(0).toUpperCase() + string.slice(1).toLowerCase();
+    },
+    setDrawer() {
+      return window.innerWidth <= 600 ? true : false;
     },
     setSeqW() {
       let screenW = window.innerWidth,
@@ -456,7 +484,8 @@ export default {
     searchYearsData(yearsData, idDonut, index) {
       // console.log("data years", yearsData, idDonut);
       if (idDonut === "donut1") {
-        let n = this.formatTxt === "upCase"? "AUTRES CHARGES" : "Autres charges"
+        let n =
+          this.formatTxt === "upCase" ? "AUTRES CHARGES" : "Autres charges";
         this.displaySunburst.slices.supprSlices.keepData =
           yearsData.data.name === n ? null : yearsData.data.name;
         this.displaySunburst.targetIndex = 0;
@@ -502,5 +531,20 @@ text {
   font-weight: bold;
   /* font-family: sans-serif;  */
   line-height: 1.125;
+}
+
+#container {
+  position: absolute;
+}
+#container button {
+  transform: rotate(270deg);
+  top: 25px;
+  left: -30px;
+  min-width: 0;
+  height: 25px;
+  text-transform: none;
+}
+.chart {
+  position: relative;
 }
 </style>
