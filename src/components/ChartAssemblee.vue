@@ -154,15 +154,15 @@ export default {
       linesH: 200,
       legends: {
         present: true,
-        position: "top",
-        display: "frame",
+        position: "top", /* "end" */
+        display: "frame", /* "endLine" */
         names: ["Prévisions budgetaires", "Dépenses réalisées"],
         width: 115
       },
       smallDonut: {
         targetIndex: 0,
         color: {
-          colorScale: "interpolateRgb",
+          colorScale: "interpolateRgb", /* or whatever you want in existing scales, or you own color gradient with colorMin and Max below */
           colorMin: "rgba(255, 18, 120, 1)",
           colorMax: "rgba(172, 1, 207, 1)",
           opacity: 1,
@@ -342,7 +342,6 @@ export default {
       Object.keys(elem)
         .filter(key => key.search("Réalisé") >= 0)
         .forEach(budget => {
-          // console.log("elem budget",elem[budget], )
           budgetProgess[1].push({
             x: new Date(parseInt(budget.match(/20\d\d/)[0]), 0),
             y:
@@ -466,7 +465,6 @@ export default {
       if (screenW > 600) sidebarW = (flexW / 12) * 4 - pl3;
       else sidebarW = (flexW / 12) * 10 - pl3;
 
-      // console.log("sidebarW", sidebarW, flexW)
       return sidebarW;
     },
     setPadding() {
@@ -482,7 +480,6 @@ export default {
       else this.linesW = lines.offsetWidth;
     },
     searchYearsData(yearsData, idDonut, index) {
-      // console.log("data years", yearsData, idDonut);
       if (idDonut === "donut1") {
         let n =
           this.formatTxt === "upCase" ? "AUTRES CHARGES" : "Autres charges";
@@ -494,12 +491,10 @@ export default {
         ? yearsData.data.budgetProgess
         : [];
       this.currentData.name = yearsData.data.name ? yearsData.data.name : null;
-      // console.log("dataBudget", this.donutBudget.children[8].budget)
     }
   }
 };
 </script>
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
 text {
   font: 10px "Poppins";
@@ -527,9 +522,7 @@ text {
 
 #title {
   font-size: calc(40px + (80 - 40) * ((100vw - 300px) / (1600 - 300)));
-  /* font-size: 20px; */
   font-weight: bold;
-  /* font-family: sans-serif;  */
   line-height: 1.125;
 }
 

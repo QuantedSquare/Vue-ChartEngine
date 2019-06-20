@@ -39,7 +39,7 @@
             <text :id="`text_`+index" text-anchor="middle" :style="fontSeq">
               <tspan
                 v-for="(name, index) in sequence"
-                :x="((Math.max(...sequence.map(span => span.length)) * majW + 10) / 2)+10"
+                :x="((Math.max(...sequence.map(span => span.length)) * txtWidth + 10) / 2)+10"
                 :y="ySpan(sequence, sequences.seqNames)"
                 :dy="sequence.length > 1 ? (index * 1.1) + `em` : `0.35em`"
               >{{name}}</tspan>
@@ -48,7 +48,6 @@
         </svg>
       </v-flex>
       <v-flex :class="chartPos" id="chart" style="position: relative">
-        <!-- <div> -->
         <div
           id="explanation"
           :style="fontExplanations + explanationsPos"
@@ -273,7 +272,7 @@ export default {
         name: null,
         value: null
       },
-      majW: null,
+      txtWidth: null,
       minW: null,
       mixW: null,
       labelW: null,
@@ -305,29 +304,21 @@ export default {
   },
   updated: function() {
     this.explanationsPos = this.setExplanationsPos();
-    // this.createDivText("text", this.fontSlices)
   },
   mounted: function() {
     this.minW = document.getElementById("min").offsetWidth / 21;
     this.mixW = document.getElementById("mix").offsetWidth / 28;
     let e = this.mixW + (this.mixW * 30) / 100;
-    this.majW =
+    this.txtWidth =
       this.formatTxt === "upCase"
         ? document.getElementById("maj").offsetWidth / 21
         : e;
     this.labelW = document.getElementById("label").offsetWidth / 8;
     this.fontHeight = document.getElementById("mix").offsetHeight;
     this.explanationsPos = this.setExplanationsPos();
-    // this.createDivText("text", this.fontSlices)
-    // console.log(
-    //   "majW mounted",
-    //   this.majW,
-    //   document.getElementById("mix").offsetWidth
-    // );
   },
   computed: {
     displayBudget: function() {
-      // transform.budget = (transform.budget / 1000000).toFixed(2);
       return this.sequences.currentHover
         ? this.sequences.labelBudget
         : (this.transformData.budget / 1000000).toFixed(2);
@@ -418,14 +409,12 @@ export default {
         });
         newChildren.push({
           budget: budget,
-          // budgetProgess: budgetProgess,
           name:
             this.formatTxt === "upCase" ? "AUTRES CHARGES" : "Autres charges",
           children: subChild
         });
         transform.children = newChildren;
       }
-      // console.log(transform.children);
       if (
         !this.displaySunburst.slices.supprSlices.keepData &&
         !this.displaySunburst.slices.joinSlices.present
@@ -448,7 +437,6 @@ export default {
             };
           })
         );
-        // console.log("budget progress", budgetProgess);
         this.$emit("update:linesData", {
           name:
             this.formatTxt === "upCase" ? "AUTRES CHARGES" : "Autres charges",
@@ -456,8 +444,6 @@ export default {
         });
         transform.budgetProgess = budgetProgess;
       }
-      // });
-      // }
       if (!this.displaySunburst.slices.supprSlices.keepData)
         transform.children.forEach(child => (transform.budget += child.budget));
 
@@ -481,7 +467,6 @@ export default {
               };
             })
           );
-          // console.log("budget progress", budgetProgess);
           child["budgetProgess"] = budgetProgess;
           this.$emit("update:linesData", {
             name:
@@ -494,7 +479,6 @@ export default {
       return transform;
     },
     root: function() {
-      // console.log("trnaformData", this.transformData);
       let root = hierarchy(this.transformData)
         .sum(d => {
           return d.value;
@@ -502,8 +486,6 @@ export default {
         .sort((a, b) => b.value - a.value);
 
       this.partition(root);
-      // console.log("root", root.descendants());
-      // console.log("root", root);
 
       let i = -1;
       root.each(d => {
@@ -514,7 +496,6 @@ export default {
       if (this.displaySunburst.targetIndex) {
         let p = root.descendants()[this.displaySunburst.targetIndex];
         let maxDepth = this.searchMaxDepth(p);
-        // console.log(maxDepth - p.depth + 1, this.displaySunburst.nbRing)
         let radiusDivider =
           this.displaySunburst.nbRing === "all" ||
           maxDepth - p.depth + 1 <= this.displaySunburst.nbRing
@@ -562,7 +543,6 @@ export default {
                 : newX1 - newX0 === 2 * Math.PI && d.data.name !== p.data.name
                 ? this.displaySunburst.radiusCenter
                 : r1Scale(d.depth);
-          // console.log(d.depth, maxDomain, newX1 - newX0, 2 * Math.PI, d.data.name, p.data.name, r0Scale(d.depth))
           return (d.target = {
             x0: newX0,
             x1: newX1,
@@ -609,7 +589,6 @@ export default {
       }
 
       let maxDepth = this.searchMaxDepth(this.root);
-      // console.log(maxDepth - p.depth + 1, this.displaySunburst.nbRing)
       let newPartY =
         (this.radius - this.displaySunburst.radiusCenter) / maxDepth;
       let r0Scale = scaleLinear();
@@ -650,8 +629,7 @@ export default {
               ? 0
               : this.displaySunburst.nbRing === "all"
               ? r1Scale(slice.depth)
-              : //slice.y1 + this.displaySunburst.radiusCenter / 2 // all rings at the begining
-                this.radius // if just 1 ring at the begining
+              : this.radius // if just 1 ring at the begining
         };
         return slice;
       });
@@ -661,7 +639,6 @@ export default {
       }
       if (this.displaySunburst.targetIndex === 0)
         this.targetCoords = this.currentCoords;
-      // console.log("here", amppedSlices[0].target, this.currentCoords, this.targetCoords, this.displaySunburst.targetIndex)
       // nb d'anneaux au sunburst
       if (this.displaySunburst.nbRing !== "all")
         amppedSlices = amppedSlices.filter(
@@ -684,19 +661,12 @@ export default {
         })`;
         let name = [];
         name.push(d.data.name);
-        // console.log(name.length * this.majW, y1 - y0, name, d.depth, this.currentRing, this.displaySunburst.targetIndex, i);
-        if (name[0].length * this.majW > y1 - y0 && y1 - y0 !== 0) {
+        if (name[0].length * this.txtWidth > y1 - y0 && y1 - y0 !== 0) {
           let wordAr = name[0].split(/\s+/);
           let strArr = [];
           this.reduceSliceText(wordAr, y1 - y0, strArr);
           name = strArr;
         }
-        // console.log(
-        //   name.length * this.fontHeight,
-        //   ((y0 + y1) / 2) * (x1 - x0),
-        //   y0,
-        //   name
-        // );
         let display =
           ((y0 + y1) / 2) * (x1 - x0) > 10 &&
           y0 !== 0 &&
@@ -715,19 +685,17 @@ export default {
     },
     translatePolygon: function() {
       let antL = 0;
-      let b = [];
-      // console.log("polygon", this.sequences.seqNames);
+      let polyPos = [];
       this.sequences.seqNames.forEach((elem, i) => {
         let l = 0;
-        if (i !== 0) l = antL * this.majW + 2 + b[i - 1] + 20;
-        b.push(l);
+        if (i !== 0) l = antL * this.txtWidth + 2 + polyPos[i - 1] + 20;
+        polyPos.push(l);
         antL = Math.max(...elem.map(span => span.length));
         i++;
       });
-      // x label budget
-      b.push(antL * this.majW + 2 + b[b.length - 1] + 20);
-      // console.log(b)
-      return b;
+      // for x label budget
+      polyPos.push(antL * this.txtWidth + 2 + polyPos[polyPos.length - 1] + 20);
+      return polyPos;
     },
     legends: function() {
       this.proportionTextSeq();
@@ -739,35 +707,28 @@ export default {
       let arrayName = [],
         arrayLegendsNames = [];
       let nbSpan = 0,
-        rectSize = 18 + 4;
+        rectColorSize = 18 + 4;
       let longestName = 0;
 
       legendsNames.forEach(name => {
-        // console.log("in legends computed",name.length * this.majW, this.majW, name.length, name, this.displaySunburst.sizes.legendW);
         if (longestName < name.length) longestName = name.length;
         if (
-          name.length * this.majW >
-          this.displaySunburst.sizes.legendW - rectSize
+          name.length * this.txtWidth >
+          this.displaySunburst.sizes.legendW - rectColorSize
         )
           arrayName = this.reduceLegendTxt(
             name,
-            this.displaySunburst.sizes.legendW - rectSize
+            this.displaySunburst.sizes.legendW - rectColorSize
           );
         else arrayName = [name];
         nbSpan += arrayName.length;
         arrayLegendsNames.push(arrayName);
       });
 
-      // arrayLegendsNames.forEach(name => {
-      //   name.forEach(elem => {
-      //     // console.log(elem.length)
-      //     if (longestName < elem.length) longestName = elem.length;
-      //   });
-      // });
       return {
         names: legendsNames,
         arrayNames: arrayLegendsNames,
-        width: longestName,
+        longestName: longestName,
         nbSpan: nbSpan
       };
     }
@@ -779,7 +740,6 @@ export default {
           requestAnimationFrame(animate);
         }
       }
-      // console.log("newSet",newSet, oldSet)
       newSet.forEach((elem, i) => {
         new TWEEN.Tween(
           oldSet.length && oldSet[i] ? oldSet[i] : this.currentCoords[i]
@@ -804,7 +764,7 @@ export default {
     }
   },
   methods: {
-    createDivText: function(text, font) {
+    createDivText: function(text, font) { //unused offsetWidth on load incorrect...
       let newDiv = document.createElement("div");
       newDiv.innerHTML = "<span class='toto'>" + text + "</span>";
       newDiv.style.fontFamily = "Poppins";
@@ -834,12 +794,11 @@ export default {
     },
     translateLegend: function(names, index, legend) {
       let h = 0;
-      // console.log("names", names, legend.join(" ").trim());
       if (index === 0) return `translate(0, ` + 33 * index + `)`;
       else {
-        for (let i = 0; i < index; i++) {
+        for (let i = 0; i < index; i++) { // 18 => size of rectColor ; 15 => padding between legendTxt ; 2.5 => padding top legendTxt
           if (names[i].length === 1) h += 18 + 15;
-          else h += 2.5 + names[i].length * 12 + (names[i].length - 1) + 15;
+          else h += 2.5 + names[i].length * this.displaySunburst.slices.text.font.size + (names[i].length - 1) + 15;
         }
         return `translate(0, ` + h + `)`;
       }
@@ -851,7 +810,7 @@ export default {
         a = 0;
 
       words.some((word, i) => {
-        if (partName.concat(" ", word).length * this.majW < legendTxtSize)
+        if (partName.concat(" ", word).length * this.txtWidth < legendTxtSize)
           partName = partName.concat(" ", word).trim();
         else if (a === 0) return (a = i);
       });
@@ -859,7 +818,7 @@ export default {
       if (a) {
         arrayName.push(partName);
         words = words.slice(a);
-        if (words.join(" ").length * this.majW > legendTxtSize) {
+        if (words.join(" ").length * this.txtWidth > legendTxtSize) {
           this.reduceLegendTxt(words.join(" ").trim(), arrayName);
         } else {
           arrayName.push(words.join(" ").trim());
@@ -878,28 +837,23 @@ export default {
     },
     onResize() {
       let doc = document.getElementsByClassName(this.idDonut);
-      // this.createDivText("name", this.fontSlices)
-      // console.log("majW", this.majW);
 
       let child = doc[0].children[0].children;
       let seqW = child.sequence.offsetWidth;
       let legW = child.sidebar ? child.sidebar.offsetWidth : null;
-      // console.log("resize before", legW, this.displaySunburst.sizes.legendW, this.legends.width * 6.4 + 25);
       if (this.notResize === false) {
         this.displaySunburst.sizes.sequenceW = seqW;
         this.displaySunburst.sizes.legendW =
-          legW > this.legends.width * this.majW + 25
-            ? this.legends.width * this.majW + 25
+          legW > this.legends.longestName * this.txtWidth + 25
+            ? this.legends.longestName * this.txtWidth + 25
             : legW;
-      } else {
-        // console.log(this.legends.width, this.majW)
+      } else { // 6.4 => txtWidth calcul when offsetWidth don't work ; 25 => rectColorSize + padding
         this.notResize = false;
         this.displaySunburst.sizes.legendW =
-          this.displaySunburst.sizes.legendW > this.legends.width * 6.4 + 25
-            ? this.legends.width * 6.4 + 25
+          this.displaySunburst.sizes.legendW > this.legends.longestName * 6.4 + 25
+            ? this.legends.longestName * 6.4 + 25
             : this.displaySunburst.sizes.legendW;
       }
-      // console.log("legW after", this.displaySunburst.sizes.legendW)
       this.explanationsPos = this.setExplanationsPos();
 
       if (window.innerWidth > 600 && this.displaySunburst.legends.present)
@@ -935,7 +889,7 @@ export default {
     sizeWords(wordAr, ringSize) {
       let sizeOk = true;
       wordAr.forEach(word => {
-        if (word.length * this.majW > ringSize) sizeOk = false;
+        if (word.length * this.txtWidth > ringSize) sizeOk = false;
       });
       return sizeOk;
     },
@@ -945,17 +899,16 @@ export default {
 
       if (this.sizeWords(wordAr, ringSize)) {
         wordAr.forEach((word, i) => {
-          if (i === 0 && str.concat("", word).length * this.majW < ringSize) {
+          if (i === 0 && str.concat("", word).length * this.txtWidth < ringSize) {
             str = str.concat("", word);
-          } else if (str.concat(" ", word).length * this.majW < ringSize) {
+          } else if (str.concat(" ", word).length * this.txtWidth < ringSize) {
             str = str.concat(" ", word);
             a = i;
           }
         });
         wordAr = wordAr.slice(a + 1);
         if (str) strArr.push(str);
-        // console.log("ici", str, wordAr, wordAr.join(" ").length);
-        if (wordAr.join(" ").trim().length * this.majW > ringSize) {
+        if (wordAr.join(" ").trim().length * this.txtWidth > ringSize) {
           this.reduceSliceText(wordAr, ringSize, strArr);
         } else {
           if (wordAr.length) strArr.push(wordAr.join(" ").trim());
@@ -973,7 +926,6 @@ export default {
         arrayW.length === 1 ? 1 : arrayW.join(" ").trim().length
       );
       allWordsArr = allWordsArr.map((arrayW, i) => {
-        // console.log("maxLen", maxWordLength[i], arrayW.join(" ").trim().length, arrayW.join(" ").trim(), Math.max(...fullNameLength))
         if (
           arrayW.join(" ").trim().length === Math.max(...fullNameLength) &&
           arrayW.join(" ").trim().length > maxWordLength[i]
@@ -987,23 +939,14 @@ export default {
           arrayW = arrayW.slice(0, arrayW.length - 1);
         return arrayW;
       });
-      let array = allWordsArr.map((arrayW, i) => {
-        // console.log("join",arrayW.join(" ").length, maxWordLength[i], arrayW.join(" ").length > maxWordLength[i] ? arrayW.join(" ").length : maxWordLength[i])
+      let arrLenSpanFinal = allWordsArr.map((arrayW, i) => {
         return arrayW.join(" ").trim().length > maxWordLength[i]
           ? arrayW.join(" ").trim().length
           : maxWordLength[i];
-        // return arrayW.join(" ").length * this.majW + 20
       });
-      // console.log(
-      //   "array",
-      //   allWordsArr,
-      //   array,
-      //   array.reduce(reducer) * this.majW + maxWordLength.length * 25,
-      //   sizeSeq - sizeLabel
-      // );
 
-      let sumW = array.reduce(reducer);
-      if (sumW * this.majW + maxWordLength.length * 25 > sizeSeq - sizeLabel)
+      let sumW = arrLenSpanFinal.reduce(reducer);
+      if (sumW * this.txtWidth + maxWordLength.length * 25 > sizeSeq - sizeLabel)
         return this.smallestFirstWordsArr(
           allWordsArr,
           reducer,
@@ -1016,25 +959,16 @@ export default {
       return allWordsArr;
     },
     reduceNbW(allWordsArr, sizeSeq, sizeLabel) {
-      // console.log("reduceNB", allWordsArr);
       let nbWords = allWordsArr.map(arrayW => arrayW.length);
       let maxWordLength = allWordsArr.map(arrayW =>
         Math.max(...arrayW.map(word => word.length))
       );
 
       const reducer = (accumulator, currentValue) => accumulator + currentValue;
-      // console.log(
-      //   "reduceNbW",
-      //   maxWordLength,
-      //   maxWordLength.reduce(reducer) * this.majW + maxWordLength.length * 25,
-      //   sizeSeq - sizeLabel,
-      //   allWordsArr
-      // );
       if (
-        maxWordLength.reduce(reducer) * this.majW + maxWordLength.length * 25 <
+        maxWordLength.reduce(reducer) * this.txtWidth + maxWordLength.length * 25 <
         sizeSeq - sizeLabel
-      ) {
-        // console.log(allWordsArr, maxWordLength)
+      ) { // if sum of all longest word's seq < div size
         return (allWordsArr = this.smallestFirstWordsArr(
           allWordsArr,
           reducer,
@@ -1048,9 +982,7 @@ export default {
       let splitSpan = tspan.split(/\s+/);
       let l = 0,
         index = 0;
-      // console.log(tspan);
       splitSpan.forEach((spanWord, i) => {
-        // console.log("spanW", spanWord);
         l += spanWord.length + 1;
         if (l <= word.length + 1) index = i;
       });
@@ -1066,53 +998,47 @@ export default {
       else if (newSpan2) newSpan.push(newSpan2);
       return newSpan;
     },
-    blabla(endLabelW, endLabelP, seqNamesBase) {
-      let wordAr = seqNamesBase.map(elem => elem[0].split(/\s+/));
+    splitSeqNames(endLabelW, endLabelP, seqNamesBase) {
+      let wordAr = seqNamesBase.map(nameSeq => nameSeq[0].split(/\s+/));
       wordAr = this.reduceNbW(
         wordAr,
         this.displaySunburst.sizes.sequenceW,
         endLabelW + endLabelP
       );
-      // console.log("wordAr", wordAr);
 
       if (wordAr) {
-        return seqNamesBase.map((elem, i) => {
-          // console.log("seqbase", elem, elem[0], wordAr[i]);
-          if (elem[0] !== wordAr[i]) {
-            let tspan = elem[0].split(wordAr[i] + " ");
-            // console.log("tspan", tspan);
-            elem = [wordAr[i], tspan[1]];
-            // console.log("elem here",elem)
+        return seqNamesBase.map((nameSeq, i) => {
+          if (nameSeq[0] !== wordAr[i]) {
+            let tspan = nameSeq[0].split(wordAr[i] + " ");
+            nameSeq = [wordAr[i], tspan[1]];
             if (tspan[1] && wordAr[i].length < tspan[1].length) {
               let newSpan = [];
               newSpan = this.reduceSecondLine(wordAr[i], tspan[1], newSpan);
-              elem = [wordAr[i]].concat(newSpan);
-            } else if (tspan[0] !== "") elem = tspan;
+              nameSeq = [wordAr[i]].concat(newSpan);
+            } else if (tspan[0] !== "") nameSeq = tspan;
           }
-          return elem;
+          return nameSeq;
         });
       } else {
         let alreadyPass = false;
         let nbpoints = 0;
-        // let emptyArr = [[]]
         if (seqNamesBase[0][0] === "...") alreadyPass = true;
-        seqNamesBase.forEach(elem => {
-          if (elem[0] === "...") nbpoints += 1;
+        seqNamesBase.forEach(nameSeq => {
+          if (nameSeq[0] === "...") nbpoints += 1;
         });
         if (nbpoints === seqNamesBase.length) return [];
-        let newSeqNames = seqNamesBase.map((elem, i) => {
-          if (i !== seqNamesBase.length - 1 || alreadyPass) elem = ["..."];
-          return elem;
+        let newSeqNames = seqNamesBase.map((nameSeq, i) => {
+          if (i !== seqNamesBase.length - 1 || alreadyPass) nameSeq = ["..."];
+          return nameSeq;
         });
-        return this.blabla(endLabelW, endLabelP, newSeqNames);
+        return this.splitSeqNames(endLabelW, endLabelP, newSeqNames);
       }
     },
     proportionTextSeq: function() {
       let newSeqNames = this.sequences.seqNames;
-      // console.log("seqname", newSeqNames);
-      if (this.sequences.seqNames.length) {
+      if (this.sequences.seqNames.length) { // 25 => padding left/right
         let array = this.sequences.seqNames.map(
-          elem => elem[0].length * this.majW + 25
+          nameSeq => nameSeq[0].length * this.txtWidth + 25
         );
         // pas encore en span
 
@@ -1126,28 +1052,19 @@ export default {
             this.labelW,
           endLabelP = 15;
 
-        let sumW = array.reduce(reducer);
-        // console.log("seqw", this.displaySunburst.sizes.sequenceW);
-        // console.log(
-        //   "Wendlabel",
-        //   endLabelW,
-        //   array,
-        //   sumW,
-        //   this.displaySunburst.sizes.sequenceW - endLabelW - endLabelP
-        // );
+        let sumW = array.reduce(reducer); // in line without /n
 
         if (
           sumW >
           this.displaySunburst.sizes.sequenceW - endLabelW - endLabelP
         ) {
-          let newSeqNames = this.blabla(
+          let newSeqNames = this.splitSeqNames(
             endLabelW,
             endLabelP,
             this.sequences.seqNames
           );
 
           newSeqNames = newSeqNames.map(arrName => {
-            // console.log(arrName)
             if (arrName.length > 5) {
               let maxLenSpan = Math.max(...arrName.map(span => span.length));
               arrName = arrName.slice(0, 5);
@@ -1166,12 +1083,10 @@ export default {
             return arrName;
           });
           this.sequences.seqNames = newSeqNames;
-          // console.log("new", newSeqNames);
         }
       }
     },
     notCenter(names) {
-      // console.log("notcenter", names, names[0][0], this.root.descendants()[0].data.name)
       if (
         names[0][0] === this.root.descendants()[0].data.name &&
         !this.displaySunburst.slices.center.visibility &&
@@ -1182,13 +1097,11 @@ export default {
       return true;
     },
     polygonPoints(allSpan, allNames) {
-      // console.log("points", allNames)
       let nbSpanText = allNames.map(span => span.length);
       let maxLSpan = Math.max(...allSpan.map(span => span.length));
       let maxH = Math.max(...nbSpanText);
-      // console.log("span",allSpan, maxLSpan)
-      let a = maxLSpan * this.majW + 20, //padding
-        b = a + 10, //pointe
+      let a = maxLSpan * this.txtWidth + 20, //20 => padding
+        b = a + 10, //10 => pointe
         c =
           maxH > 2 ? (maxH + 1) * this.displaySunburst.sequence.font.size : 30,
         d = c / 2;
@@ -1213,18 +1126,14 @@ export default {
       let allLength = allNames.map(elem => elem.length);
       let maxL = Math.max(...allLength);
 
-      // console.log(sequence, allNames)
-
       let ySpanScale = scaleLinear();
       ySpanScale.range([(maxL + 1) * 5, 15]).domain([1, maxL]);
-      // console.log(ySpanScale(sequence.length))
       let a =
         sequence.length === maxL
           ? maxL === 1
             ? 15
             : 13
           : ySpanScale(sequence.length);
-      // console.log(sequence, a)
       return a;
     },
     clicked(index, idDonut) {
@@ -1237,14 +1146,12 @@ export default {
 
           this.currentRing = this.root.descendants()[index].depth;
         }
-        // console.log("dataDonut in click", this.root.descendants()[index])
         this.$emit("onClick", this.root.descendants()[index], idDonut, index);
       }
     },
 
     setExplanationsPos: function() {
       let newDiv = document.createElement("div");
-      // console.log(this.sequences, this.transformData)
       let name = this.sequences.currentHover
         ? this.sequences.currentHover
         : this.transformData.name;
@@ -1264,7 +1171,6 @@ export default {
       let donut = document.getElementsByClassName(this.idDonut),
         chartW = donut[0].children[0].children.chart.offsetWidth;
 
-      // console.log(chartW, this.displaySunburst.sizes.maxW)
       if (chartW > 200 && chartW < this.displaySunburst.sizes.maxW) {
         this.displaySunburst.sizes.sunburstW = chartW;
         this.displaySunburst.radiusCenter =
@@ -1430,11 +1336,7 @@ export default {
   }
 };
 </script>
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style>
-/* #chart {
-  display: flex;
-} */
 .width_text {
   height: 0px;
 }
@@ -1443,11 +1345,10 @@ export default {
   z-index: 1;
   text-align: center;
 }
-
 #legend {
   padding-top: 10px;
 }
-.toto {
+/* .toto {
   font: 11px "Poppins";
-}
+} */
 </style>

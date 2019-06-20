@@ -291,10 +291,9 @@ export default {
         .selectAll("text")
         .each(function(d) {
           let e = this.getComputedTextLength() < 91 ? this.getComputedTextLength() * 20 /100 : 0;
-          // console.log("here",this.getComputedTextLength())
           len.push(this.getComputedTextLength() + e);
         });
-      return this.legends.present && this.legends.position === "top"
+      return this.legends.present && this.legends.position === "top" && len[index] * (index * -1.3)
         ? "translate(" + len[index] * (index * -1.3) + "," + index * -20 + ")"
         : null;
     }
@@ -336,7 +335,6 @@ export default {
   }
 };
 </script>
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .line {
   fill: none;
