@@ -2,7 +2,10 @@
     <svg :viewBox="'0 0 ' + width + ' ' + height">
         <g :transform="display">
             <g :transform="center">
-                <path v-for="(path, i) in displayedPaths" :d="arc(path)" :fill="color(i)" class="arc-path"></path>
+                <template v-for="(path, i) in displayedPaths">
+                    <path :d="arc(path)" :fill="color(path.index)" class="arc-path"></path>
+                    <text v-if="moreThan25(path)" class="pie-label" :transform="arcCentroid(path)" text-anchor="middle">{{path.data.label}}</text>
+                </template>
             </g>
         </g>
     </svg>
@@ -50,6 +53,8 @@ export default {
 
         let _pie = pie().value(d => d.y);
 
+        console.log(_pie(this.data));
+
         let color = scaleOrdinal().domain(this.data.map(d => d.x))
             .range(quantize(t => colorInterpolator(t), this.data.length).reverse());
 
@@ -87,6 +92,12 @@ export default {
         },
         radius: function() {
             return Math.min(this._width(), this._height()) / 2 - 1
+        },
+        arcCentroid: function(path) {
+            return 'translate(' + this.arc.centroid(path) + ')';
+        },
+        moreThan25: function(path) {
+            return (path.endAngle - path.startAngle) > 0.25
         }
     },
     computed: {
@@ -109,11 +120,8 @@ export default {
     stroke-width: .5px;
 }
 
-.arc-path-label {
-    opacity: 0.5;
+.pie-label {
+    /*opacity: 0.5;*/
+    font-size: 12px;
 }
-
-/*.bar:hover {
-    fill: $chart-color-4;
-}*/
 </style>
