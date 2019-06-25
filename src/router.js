@@ -4,7 +4,8 @@ import Home from './views/Home.vue'
 
 Vue.use(Router);
 
-let devRoutes = [ // Charts
+let devRoutes = [
+    // Charts
     {
         path: '/bars',
         name: 'bars',
@@ -19,6 +20,11 @@ let devRoutes = [ // Charts
         path: '/number',
         name: 'number',
         component: () => import('./views/charts/Number.vue')
+    },
+    {
+        path: '/pie',
+        name: 'pie',
+        component: () => import('./views/charts/Pie.vue')
     },
     // Story Player
     {
