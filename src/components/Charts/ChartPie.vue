@@ -91,7 +91,7 @@ export default {
             return this.height - margin.top - margin.bottom;
         },
         radius: function() {
-            return Math.min(this._width(), this._height()) / 2 - 1
+            return Math.min(this._width(), this._height()) / 2;
         },
         arcCentroid: function(path) {
             return 'translate(' + this.arc.centroid(path) + ')';
