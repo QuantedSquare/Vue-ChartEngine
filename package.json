@@ -1,12 +1,13 @@
 {
   "name": "quantedsquare-viz",
-  "version": "0.1.0",
+  "version": "0.1.3",
   "private": false,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build"
+    "build": "vue-cli-service build",
+    "build-lib": "vue-cli-service build --target lib --name quantedsquare-viz --dest lib/dist lib/wrapper.js"
   },
-  "main": "lib/wrapper.js",
+  "main": "lib/dist/quantedsquare-viz.common.js",
   "dependencies": {
     "d3": "^5.9.2",
     "vue": "^2.6.10",
