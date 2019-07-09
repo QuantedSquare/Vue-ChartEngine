@@ -112,8 +112,6 @@ export default {
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-@import '@/assets/charts.scss';
-
 .arc-path {
     /*fill: $chart-color-2-s100;*/
     stroke: white;

@@ -5,7 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "build": "vue-cli-service build",
-    "build-lib": "vue-cli-service build --target lib --name quantedsquare-viz --dest lib/dist lib/wrapper.js"
+    "build-lib": "vue-cli-service build  --report --target lib --name quantedsquare-viz --dest lib/dist lib/wrapper.js"
   },
   "main": "lib/dist/quantedsquare-viz.common.js",
   "dependencies": {
