@@ -9,12 +9,12 @@
         <g :transform="display">
             <g :transform="center">
                 <template v-for="(path, i) in displayedPaths">
-                    <g @mouseover="showHighlight(i)" @mouseleave="hideHighlight">
+                    <g @mouseover="showHighlight(i)" @mouseleave="hideHighlight" class="path-group">
                         <path :d="arc(path)" :fill="color(path.index)" class="arc-path"></path>
                         <text v-if="moreThan25(path)" class="pie-label" :transform="arcCentroid(path)" text-anchor="middle">{{path.data.label}}</text>
                     </g>
                 </template>
-                <text y="" class="highlight-val" text-anchor="middle">
+                <text class="highlight-val" text-anchor="middle">
                     {{centerData.val}}
                 </text>
                 <text y="24" class="highlight-text" text-anchor="middle">
@@ -95,6 +95,8 @@ export default {
             this.displayedPaths = this.pie(this.data);
             this.color.domain(this.data.map(d => d.x))
                 .range(quantize(t => colorInterpolator(t), this.data.length).reverse());
+
+            this.hideHighlight();
         }
     },
     methods: {
@@ -121,7 +123,6 @@ export default {
             return (path.endAngle - path.startAngle) > 0.25
         },
         showHighlight: function(pointIndex) {
-            console.log(pointIndex, this.data[pointIndex]);
             this.centerData = {
                 val: this.data[pointIndex].y,
                 text: this.data[pointIndex].label
@@ -156,6 +157,10 @@ export default {
     /*opacity: 0.5;*/
     font-size: 12px;
     /*color: white;*/
+}
+
+.path-group {
+    cursor: pointer;
 }
 
 .highlight-val {
