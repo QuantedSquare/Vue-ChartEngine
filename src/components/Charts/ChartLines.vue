@@ -1,9 +1,6 @@
 <template>
     <div>
-        <div>
-            <!-- <span>xMax: {{xMax}}, yMax: {{yMax}}, xMin: {{xMin}}, yMin: {{yMin}}</span> -->
-        </div>
-        <svg :viewBox="'0 0 ' + width + ' ' + height">
+        <svg :viewBox="'0 0 ' + width + ' ' + height" @mousemove="showVals" @mouseleave="hideVals">
             <g :transform="display">
                 <g id="xAxis" :transform="bottomTranslate"></g>
                 <g id="yAxis"></g>
@@ -13,6 +10,16 @@
                     <text v-for="event in options.events" :x="xScale(event.x)" :y="yScale(yMax) - 5" text-anchor="middle" class="event-label">{{event.label}}</text>
                     <line v-for="event in options.events" class="event-line" :x1="xScale(event.x)" :x2="xScale(event.x)" :y1="yScale(0)" :y2="yScale(yMax)" stroke="black"></line>
                 </g>
+                <template v-for="xVal in xScale.ticks()">
+                    <g class="reading-line">
+                        <template v-for="line in data">
+                            <text v-if="readingLine.active && readingLine.x == xVal && line.points[xVal].y" :x="xScale(xVal)" :y="yScale(line.points[xVal].y) - 5" text-anchor="middle" class="event-label">
+                                {{line.points[xVal].y}}
+                            </text>
+                        </template>
+                        <!-- <line class="event-line" :x1="readingLine.x" :x2="readingLine.x" :y1="yScale(0)" :y2="yScale(yMax)" stroke="black"></line> -->
+                    </g>
+                </template>
             </g>
         </svg>
     </div>
@@ -71,7 +78,8 @@ export default {
         return {
             xScale: xScale,
             yScale: yScale,
-            lineDrawer: lineDrawer
+            lineDrawer: lineDrawer,
+            readingLine: { x: 0, active: false }
         }
     },
     mounted: function() {
@@ -81,7 +89,7 @@ export default {
     watch: {
         width: function() {
             this.xScale.range([0, this._width()]);
-            this.drawXAxis()
+            this.drawXAxis();
         },
         height: function() {
             this.yScale.range([this._height(), 0]);
@@ -89,7 +97,7 @@ export default {
         },
         xMax: function() {
             this.xScale.domain([this.getMin('x'), this.getMax('x')]);
-            this.drawXAxis()
+            this.drawXAxis();
         },
         yMax: function() {
             this.yScale.domain([this.getMin('y'), this.getMax('y')]);
@@ -97,7 +105,7 @@ export default {
         },
         xMin: function() {
             this.xScale.domain([this.getMin('x'), this.getMax('x')]);
-            this.drawXAxis()
+            this.drawXAxis();
         },
         yMin: function() {
             this.yScale.domain([this.getMin('y'), this.getMax('y')]);
@@ -136,6 +144,17 @@ export default {
         },
         curve: function() {
             return this.options.curve || 'curveLinear';
+        },
+        showVals: function(event) {
+            let svgWidth = event.currentTarget.clientWidth,
+                xRatio = this.width / svgWidth,
+                xVal = this.xScale.invert((event.x * xRatio) - margin.left);
+
+            this.readingLine.active = true;
+            this.readingLine.x = Math.round(xVal);
+        },
+        hideVals: function() {
+            this.readingLine.active = false;
         }
     },
     computed: {
