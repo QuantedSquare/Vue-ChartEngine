@@ -151,7 +151,7 @@ export default {
         showVals: function(event) {
             let svgWidth = event.currentTarget.clientWidth,
                 xRatio = this.width / svgWidth,
-                xVal = this.xScale.invert((event.x * xRatio) - margin.left);
+                xVal = this.xScale.invert((event.offsetX * xRatio) - margin.left);
 
             this.readingLine.points = this.data.map(line => {
                 let x = this.options.isTime ? +new Date(xVal) : xVal;
