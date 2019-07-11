@@ -17,14 +17,18 @@ export default {
         Chartlines
     },
     data: function() {
+        let nbLines = Math.round(Math.random() * 2 + 2);
+        let nbPoints = Math.round(Math.random() * 15 + 3);
+
         return {
-            randomData: collection(),
+            randomData: collection(nbLines, nbPoints, 0, 100),
             chartOptions: {
                 curve: 'curveMonotoneX',
-                events: [{
-                    x: 3,
-                    label: 'An Event on 3'
-                }]
+                // events: [{
+                //     x: 3,
+                //     label: 'An Event on 3'
+                // }],
+                isTime: false
             },
             chartWidth: 720,
             chartHeight: 480
@@ -35,7 +39,8 @@ export default {
             let nbLines = Math.round(Math.random() * 2 + 2);
             let nbPoints = Math.round(Math.random() * 15 + 3)
 
-            this.randomData = collection(nbLines, nbPoints, 0, 100);
+            this.chartOptions.isTime = true;
+            this.randomData = collection(nbLines, nbPoints, 0, 100, true);
         },
         refreshSize: function() {
             this.chartWidth = Math.round(Math.random() * 420 + 300);

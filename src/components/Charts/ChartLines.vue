@@ -10,22 +10,17 @@
                     <text v-for="event in options.events" :x="xScale(event.x)" :y="yScale(yMax) - 5" text-anchor="middle" class="event-label">{{event.label}}</text>
                     <line v-for="event in options.events" class="event-line" :x1="xScale(event.x)" :x2="xScale(event.x)" :y1="yScale(0)" :y2="yScale(yMax)" stroke="black"></line>
                 </g>
-                <template v-for="xVal in xScale.ticks()">
-                    <g class="reading-line">
-                        <template v-for="line in data">
-                            <text v-if="readingLine.active && readingLine.x == xVal && line.points[xVal].y" :x="xScale(xVal)" :y="yScale(line.points[xVal].y) - 5" text-anchor="middle" class="event-label">
-                                {{line.points[xVal].y}}
-                            </text>
-                        </template>
-                        <!-- <line class="event-line" :x1="readingLine.x" :x2="readingLine.x" :y1="yScale(0)" :y2="yScale(yMax)" stroke="black"></line> -->
-                    </g>
+                <template v-for="point in readingLine.points">
+                    <text v-if="readingLine.active" :x="xScale(point.x)" :y="yScale(point.y) - 5" text-anchor="middle" class="event-label">
+                        {{point.y}}
+                    </text>
                 </template>
             </g>
         </svg>
     </div>
 </template>
 <script>
-import { select, scaleLinear, scaleTime, min, max, axisLeft, axisBottom } from 'd3'
+import { select, scaleLinear, scaleTime, min, max, axisLeft, axisBottom, scan } from 'd3'
 import * as shapes from 'd3-shape'
 
 let margin = { top: 40, right: 80, bottom: 40, left: 40 };
@@ -79,7 +74,7 @@ export default {
             xScale: xScale,
             yScale: yScale,
             lineDrawer: lineDrawer,
-            readingLine: { x: 0, active: false }
+            readingLine: { x: 0, active: false, points: [] }
         }
     },
     mounted: function() {
@@ -113,6 +108,14 @@ export default {
         },
         'options.curve': function() {
             this.lineDrawer.curve(shapes[this.curve()]);
+        },
+        'options.isTime': function() {
+            this.xScale = this.options.isTime ? scaleTime() : scaleLinear();
+            this.xScale.range([0, this._width()])
+                .domain([this.getMin('x'), this.getMax('x')]);
+
+            this.drawXAxis();
+            this.lineDrawer.x((d) => this.xScale(d.x))
         }
     },
     methods: {
@@ -150,8 +153,20 @@ export default {
                 xRatio = this.width / svgWidth,
                 xVal = this.xScale.invert((event.x * xRatio) - margin.left);
 
+            this.readingLine.points = this.data.map(line => {
+                let x = this.options.isTime ? +new Date(xVal) : xVal;
+
+                let nearestPoint = scan(line.points, (a, b) => {
+                    let aX = this.options.isTime ? +new Date(a.x) : a.x,
+                        bX = this.options.isTime ? +new Date(b.x) : b.x;
+
+                    return Math.abs(x - aX) - Math.abs(x - bX);
+                });
+
+                return line.points[nearestPoint];
+            });
+
             this.readingLine.active = true;
-            this.readingLine.x = Math.round(xVal);
         },
         hideVals: function() {
             this.readingLine.active = false;
