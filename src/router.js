@@ -26,6 +26,11 @@ let devRoutes = [
         name: 'pie',
         component: () => import('./views/charts/Pie.vue')
     },
+    {
+        path: '/pointcloud',
+        name: 'pointcloud',
+        component: () => import('./views/charts/PointCloud.vue')
+    },
     // Story Player
     {
         path: '/player',
