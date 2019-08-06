@@ -23,3 +23,9 @@ export function getIMG(svgEl) {
 
     return btoa(xml);
 }
+
+export default {
+    getMax,
+    getMin,
+    getIMG
+}

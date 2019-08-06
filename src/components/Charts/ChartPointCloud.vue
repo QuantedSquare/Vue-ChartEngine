@@ -9,7 +9,6 @@
                 </g>
             </g>
         </svg>
-        <img ref="img" src="/none" />
     </div>
 </template>
 <script>
@@ -27,7 +26,7 @@ let colorInterpolator = interpolateRgbBasis([
 
 const style = {
     pointCircle: {
-        stroke: 'black'
+        // stroke: 'black'
     }
 }
 
@@ -83,12 +82,10 @@ export default {
         this.drawYAxis();
 
         // TEST IMG
-        setTimeout(() => {
-            // console.log(this.$refs.img, this.$refs.img.src);
-            this.$refs.img.src = 'data:image/svg+xml;base64,' + getIMG(this.$refs.svg)
-
-            console.log(this.$refs.img, this.$refs.img.src);
-        }, 0)
+        // setTimeout(() => {
+        //     // console.log(this.$refs.img, this.$refs.img.src);
+        //     this.$refs.img.src = 'data:image/svg+xml;base64,' + getIMG(this.$refs.svg)
+        // }, 0);
     },
     watch: {
         width: function() {
