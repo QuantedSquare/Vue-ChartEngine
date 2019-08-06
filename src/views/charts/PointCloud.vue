@@ -1,6 +1,6 @@
 <template>
     <div class="chart">
-        <a @click="refreshData">Refresh Lines</a> |
+        <a @click="refreshData">Refresh Points</a> |
         <a @click="refreshSize">Refresh Size</a>
         <ChartPointCloud :data="randomData" :width="chartWidth" :height="chartHeight" :options="chartOptions" />
     </div>
@@ -32,8 +32,7 @@ export default {
             let nbCollections = Math.round(Math.random() * 2 + 2);
             let nbPoints = Math.round(Math.random() * 15 + 3)
 
-            this.chartOptions.isTime = true;
-            this.randomData = collection(nbCollections, nbPoints, 0, 100, true);
+            this.randomData = collection(nbCollections, nbPoints, 0, 100);
         },
         refreshSize: function() {
             this.chartWidth = Math.round(Math.random() * 420 + 300);

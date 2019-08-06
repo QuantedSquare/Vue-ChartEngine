@@ -25,7 +25,7 @@ let colorInterpolator = interpolateRgbBasis([
 ]);
 
 export default {
-    name: 'ChartLines',
+    name: 'ChartPointCloud',
     props: {
         data: {
             type: Array,
@@ -43,7 +43,6 @@ export default {
             type: Object,
             default: function() {
                 return {
-                    isTime: false,
                     // min: 0 // Fix yScale Min
                     // max: 1000 // Fix yScale Max
                 }
@@ -53,7 +52,7 @@ export default {
     data: function() {
         // console.log(this.data);
 
-        let xScale = this.options.isTime ? scaleTime() : scaleLinear(),
+        let xScale = scaleLinear(),
             yScale = scaleLinear();
 
         xScale.range([0, this._width()]);
@@ -83,6 +82,10 @@ export default {
         height: function() {
             this.yScale.range([this._height(), 0]);
             this.drawYAxis();
+        },
+        data: function() {
+            this.color.domain(this.data.map(cloud => cloud.label))
+                .range(quantize(t => colorInterpolator(t), this.data.length).reverse());
         },
         xMax: function() {
             this.xScale.domain([this.getMin('x'), this.getMax('x')]);
