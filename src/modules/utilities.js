@@ -15,3 +15,11 @@ export function getMin(data, axis, chartOptions) {
         return min(line.points, (d) => d[axis]);
     }));
 }
+
+export function getIMG(svgEl) {
+    let xml = new XMLSerializer().serializeToString(svgEl);
+
+    // console.log(xml)
+
+    return btoa(xml);
+}

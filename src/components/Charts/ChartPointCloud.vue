@@ -1,19 +1,20 @@
 <template>
     <div>
-        <svg :viewBox="'0 0 ' + width + ' ' + height">
+        <svg ref="svg" :viewBox="'0 0 ' + width + ' ' + height">
             <g :transform="display">
                 <g id="xAxis" :transform="bottomTranslate"></g>
                 <g id="yAxis"></g>
                 <g v-for="cloud in data">
-                    <circle v-for="point in cloud.points" :cx="xScale(point.x)" :cy="yScale(point.y)" r="5" :fill="color(cloud.label)" />
+                    <circle v-for="point in cloud.points" :style="style.pointCircle" :cx="xScale(point.x)" :cy="yScale(point.y)" r="5" :fill="color(cloud.label)" />
                 </g>
             </g>
         </svg>
+        <img ref="img" src="/none" />
     </div>
 </template>
 <script>
 import { select, scaleLinear, quantize, scaleOrdinal, scaleTime, axisLeft, axisBottom, scan, interpolateRgbBasis } from 'd3'
-import { getMin, getMax } from '@/modules/utilities.js'
+import { getMin, getMax, getIMG } from '@/modules/utilities.js'
 
 import * as shapes from 'd3-shape'
 
@@ -23,6 +24,12 @@ let colorInterpolator = interpolateRgbBasis([
     'rgb(162, 255, 174)', 'rgb(12, 204, 249)',
     'rgb(172, 1, 207)', 'rgb(255, 18, 120)'
 ]);
+
+const style = {
+    pointCircle: {
+        stroke: 'black'
+    }
+}
 
 export default {
     name: 'ChartPointCloud',
@@ -67,12 +74,21 @@ export default {
         return {
             xScale: xScale,
             yScale: yScale,
-            color: color
+            color: color,
+            style: style
         }
     },
     mounted: function() {
         this.drawXAxis();
         this.drawYAxis();
+
+        // TEST IMG
+        setTimeout(() => {
+            // console.log(this.$refs.img, this.$refs.img.src);
+            this.$refs.img.src = 'data:image/svg+xml;base64,' + getIMG(this.$refs.svg)
+
+            console.log(this.$refs.img, this.$refs.img.src);
+        }, 0)
     },
     watch: {
         width: function() {
@@ -149,23 +165,4 @@ export default {
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
 @import '@/assets/charts.scss';
-
-.line {
-    fill: none;
-    /*stroke: $chart-color-4-s40;*/
-    stroke-width: 1.5px;
-}
-
-.event-line {
-    stroke-dasharray: 10;
-    stroke-opacity: 0.5;
-}
-
-.event-label {
-    opacity: 0.5;
-}
-
-.line-label {
-    opacity: 0.5;
-}
 </style>
