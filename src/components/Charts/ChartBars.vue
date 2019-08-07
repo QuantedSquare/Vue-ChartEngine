@@ -33,16 +33,13 @@ export default {
             type: Number,
             default: 720
         },
-        animationTime: {
-            type: Number,
-            default: 1000
-        },
         options: {
             type: Object,
             default: function() {
                 return {
                     // min: 0 // Fix yAxix Min
                     // max: 1000 // Fix yAxis Max
+                    animationTime: 1000
                 }
             }
         }
@@ -111,8 +108,8 @@ export default {
             if (this.animationState() < 1) setTimeout(this.animate, 0);
         },
         animationState: function() {
-            if ((this.startAnimation + this.animationTime) > Date.now()) {
-                return (Date.now() - this.startAnimation) / this.animationTime;
+            if ((this.startAnimation + this.options.animationTime) > Date.now()) {
+                return (Date.now() - this.startAnimation) / this.options.animationTime;
             } else {
                 return 1;
             }

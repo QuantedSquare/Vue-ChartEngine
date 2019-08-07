@@ -1,4 +1,4 @@
-import { min, max } from 'd3'
+import { min, max, sum, ascending, descending } from 'd3'
 
 export function getMax(data, axis, chartOptions = {}) {
     let fixed = axis == 'y' && typeof(chartOptions.max) == 'number';
@@ -24,8 +24,47 @@ export function getIMG(svgEl) {
     return btoa(xml);
 }
 
+export function sortPoints(points, asc) {
+    return points.sort((a, b) => {
+        return asc ? ascending(a.y, b.y) : descending(a.y, b.y);
+    });
+}
+
+export function aggregatePoints(points, aggregationPortion, labelVal = 'y') {
+    let total = sum(points, point => point.y),
+        aggregationMax = total * aggregationPortion,
+        aggregatedVal = 0,
+        aggregationCount = 0;
+
+    sortPoints(points);
+
+    for (var i = points.length - 1; i >= 0; i--) {
+        let point = points[i];
+
+        if (aggregatedVal + point.y < aggregationMax) {
+            aggregationCount += 1;
+            aggregatedVal += point.y;
+            points.splice(points.length - 1);
+        }
+    }
+
+    if (aggregationCount > 0) {
+        let label = aggregationCount + ' others';
+
+        points.push({
+            x: label,
+            y: aggregatedVal,
+            label: labelVal == 'y' ? aggregatedVal : label
+        });
+    }
+
+    return points;
+}
+
 export default {
     getMax,
     getMin,
-    getIMG
+    getIMG,
+    sortPoints,
+    aggregatePoints
 }
