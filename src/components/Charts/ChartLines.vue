@@ -59,6 +59,10 @@ export default {
         let xScale = this.options.isTime ? scaleTime() : scaleLinear(),
             yScale = scaleLinear();
 
+        let yMax = this.getMax('y');
+
+        margin.left = (yMax.toString().length + 1) * 10;
+
         let lineDrawer = shapes.line()
             .x((d) => xScale(d.x))
             .y((d) => yScale(d.y))
@@ -68,7 +72,7 @@ export default {
         xScale.domain([this.getMin('x'), this.getMax('x')]);
 
         yScale.range([this._height(), 0]);
-        yScale.domain([this.getMin('y'), this.getMax('y')]);
+        yScale.domain([this.getMin('y'), yMax]);
 
         return {
             xScale: xScale,
