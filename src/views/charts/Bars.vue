@@ -1,6 +1,6 @@
 <template>
     <div class="chart">
-        <a @click="refreshData">Refresh Bars</a> |
+        <a @click="refreshData(10000, 15000)">Refresh Bars</a> |
         <a @click="refreshSize">Refresh Size</a>
         <ChartBars :data="randomData" :width="chartWidth" :height="chartHeight" :options="chartOptions" />
     </div>
@@ -19,7 +19,7 @@ export default {
     },
     data: function() {
         return {
-            randomData: this.refreshData(),
+            randomData: this.refreshData(100, 150),
             chartWidth: 720,
             chartHeight: 480,
             chartOptions: {
@@ -29,8 +29,9 @@ export default {
         }
     },
     methods: {
-        refreshData: function() {
-            let newData = points(3, 100, 150);
+        refreshData: function(min, max) {
+
+            let newData = points(3, min, max);
 
             let smallPoints = points(Math.round(Math.random() * 15 + 3), 1, 10);
 

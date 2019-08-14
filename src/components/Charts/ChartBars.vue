@@ -50,12 +50,16 @@ export default {
         let xScale = scaleBand(),
             yScale = scaleLinear();
 
+        let yMax = this.getMax('y');
+
+        margin.left = (yMax.toString().length + 1) * 10;
+
         xScale.range([0, this._width()]);
         xScale.domain(this.data.map(point => point.x));
         xScale.padding(0.2)
 
         yScale.range([this._height(), 0]);
-        yScale.domain([this.getMin('y'), this.getMax('y')]);
+        yScale.domain([this.getMin('y'), yMax]);
 
         return {
             xScale: xScale,
