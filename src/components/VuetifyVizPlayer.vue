@@ -7,15 +7,15 @@
         </v-flex>
         <v-flex xs8>
             <template v-for="(chart, i) in charts">
-                <v-layout wrap :key="chart.title" v-if="chartIndex == i">
-                    <v-flex class="title" xs12>
+                <v-layout column align-center :key="chart.title" v-if="chartIndex == i">
+                    <v-flex class="title" xs1>
                         <p>{{chart.title}}</p>
                     </v-flex>
-                    <v-flex class="subheading" xs12>{{chart.subTitle}}</v-flex>
-                    <v-flex xs12>
+                    <v-flex class="subheading" xs1>{{chart.subTitle}}</v-flex>
+                    <v-flex :class="'chart-layout'" xs9>
                         <component :is="chart.chartType" :data="chart.data" :options="chart.options"></component>
                     </v-flex>
-                    <v-flex class="caption" xs12>{{chart.techTitle}}</v-flex>
+                    <v-flex class="caption" xs1>{{chart.techTitle}}</v-flex>
                 </v-layout>
             </template>
         </v-flex>
@@ -52,5 +52,8 @@ export default {
     }
 }
 </script>
-<style lang="scss">
+<style scoped>
+/*.chart-layout {
+    max-width: 80vh !important;
+}*/
 </style>

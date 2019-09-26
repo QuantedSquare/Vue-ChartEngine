@@ -1,14 +1,9 @@
 <template>
-    <div>
-        <div>
-            <!-- <span>xMax: {{xMax}}, yMax: {{yMax}}, xMin: {{xMin}}, yMin: {{yMin}}</span> -->
-        </div>
-        <svg :viewBox="'0 0 ' + width + ' ' + height">
-            <g :transform="display">
-                <text class="big-number" text-anchor="middle" :textLength="textLength" :transform="center">{{displayedNumber}}</text>
-            </g>
-        </svg>
-    </div>
+    <svg :viewBox="'0 0 ' + width + ' ' + height">
+        <g :transform="display">
+            <text class="big-number" text-anchor="middle" :textLength="textLength" :transform="center">{{displayedNumber + options.unit}}</text>
+        </g>
+    </svg>
 </template>
 <script>
 import { interpolateNumber } from 'd3'
@@ -28,7 +23,8 @@ export default {
             default: function() {
                 return {
                     start: 0,
-                    animationTime: 2000
+                    animationTime: 2000,
+                    unit: ''
                 }
             }
         },
@@ -42,11 +38,12 @@ export default {
         }
     },
     data: function() {
-        // console.log(this.data)
+        // console.log(this.data, this.options);
+        let start = this.options.start || 0;
 
         return {
-            interpolatedNumber: interpolateNumber(this.options.start, this.data),
-            displayedNumber: this.options.start,
+            interpolatedNumber: interpolateNumber(start, this.data),
+            displayedNumber: 0,
             startAnimation: Date.now()
         }
     },
