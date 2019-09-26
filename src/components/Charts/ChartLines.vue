@@ -23,7 +23,7 @@
 import { select, scaleLinear, scaleTime, min, max, axisLeft, axisBottom, scan } from 'd3'
 import * as shapes from 'd3-shape'
 
-let margin = { top: 40, right: 80, bottom: 40, left: 40 };
+let margin = { top: 40, right: 100, bottom: 40, left: 40 };
 
 export default {
     name: 'ChartLines',

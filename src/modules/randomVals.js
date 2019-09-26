@@ -20,7 +20,7 @@ export function collection(nbLines = 3, nbPoints, yMin, yMax, isTime) {
     return new Array(nbLines).fill().map((l, i) => {
         return {
             points: points(nbPoints, yMin, yMax, isTime),
-            label: 'Line ' + (i + 1)
+            label: 'Line Name' + (i + 1)
         }
     });
 }
