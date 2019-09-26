@@ -1,7 +1,7 @@
 <template>
     <svg :viewBox="'0 0 ' + width + ' ' + height">
         <g :transform="display">
-            <text class="big-number" text-anchor="middle" :textLength="textLength" :transform="center">{{displayedNumber + options.unit}}</text>
+            <text class="big-number" text-anchor="middle" :textLength="textLength" :transform="center">{{displayedNumber}}{{options.unit}}</text>
         </g>
     </svg>
 </template>
@@ -43,7 +43,7 @@ export default {
 
         return {
             interpolatedNumber: interpolateNumber(start, this.data),
-            displayedNumber: 0,
+            displayedNumber: start,
             startAnimation: Date.now()
         }
     },
@@ -90,6 +90,8 @@ export default {
         },
         textLength: function() {
             let nbLength = this.displayedNumber.toString().length;
+
+            if (this.options.unit) nbLength += this.options.unit.length;
 
             if (nbLength < 3) return this._width() / 4;
             if (nbLength <= 4) return this._width() / 3;

@@ -30,7 +30,7 @@ export default {
     },
     methods: {
         refreshData: function() {
-            this.randomData = Math.round(Math.random() * 1000);
+            this.randomData = Math.round(Math.random() * 100000000);
         },
         refreshSize: function() {
             this.chartWidth = Math.round(Math.random() * 420 + 300);
