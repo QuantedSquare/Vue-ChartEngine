@@ -5,7 +5,12 @@
                 <g id="xAxis" :transform="bottomTranslate"></g>
                 <g id="yAxis"></g>
                 <g v-for="cloud in data">
-                    <circle v-for="point in cloud.points" :style="style.pointCircle" :cx="xScale(point.x)" :cy="yScale(point.y)" r="5" :fill="color(cloud.label)" />
+                    <g v-for="point in cloud.points">
+                        <circle :style="style.pointCircle" :cx="xScale(point.x)" :cy="yScale(point.y)" r="4" :fill="color(cloud.label)" />
+                        <line v-if="options.xLines" :x1="xScale(xMin)" :x2="xScale(point.x)" :y1="yScale(point.y)" :y2="yScale(point.y)" :stroke="color(cloud.label)"></line>
+                        <line v-if="options.yLines" :x1="xScale(point.x)" :x2="xScale(point.x)" :y1="yScale(yMin)" :y2="yScale(point.y)" :stroke="color(cloud.label)"></line>
+                        <text class="event-label" :x="xScale(point.x) + 5" :y="yScale(point.y) +5 ">{{point.label}}</text>
+                    </g>
                 </g>
             </g>
         </svg>
@@ -51,6 +56,8 @@ export default {
                 return {
                     // min: 0 // Fix yScale Min
                     // max: 1000 // Fix yScale Max
+                    xLines: false,
+                    yLines: false
                 }
             }
         }
@@ -68,7 +75,7 @@ export default {
         yScale.domain([this.getMin('y'), this.getMax('y')]);
 
         let color = scaleOrdinal().domain(this.data.map(cloud => cloud.label))
-            .range(quantize(t => colorInterpolator(t), this.data.length).reverse());
+            .range(quantize(t => colorInterpolator(t), this.data.length + 1).reverse());
 
         return {
             xScale: xScale,
@@ -161,5 +168,7 @@ export default {
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style lang="scss" scoped>
-@import '@/assets/charts.scss';
+.event-label {
+    opacity: 0.5;
+}
 </style>

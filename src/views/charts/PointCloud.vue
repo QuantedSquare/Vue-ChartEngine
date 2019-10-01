@@ -21,8 +21,11 @@ export default {
         let nbPoints = Math.round(Math.random() * 15 + 3);
 
         return {
-            randomData: collection(nbCollections, nbPoints, 0, 100),
-            chartOptions: {},
+            randomData: collection(1, nbPoints, 0, 100),
+            chartOptions: {
+                min: 0,
+                xLines: true
+            },
             chartWidth: 720,
             chartHeight: 480
         }

@@ -2,19 +2,19 @@
     <div class="chart">
         <a @click="refreshData">Refresh Lines</a> |
         <a @click="refreshSize">Refresh Size</a>
-        <Chartlines :data="randomData" :width="chartWidth" :height="chartHeight" :options="chartOptions" />
+        <ChartLines :data="randomData" :width="chartWidth" :height="chartHeight" :options="chartOptions" />
     </div>
 </template>
 <script>
 import { collection } from '@/modules/randomVals.js'
 
-import Chartlines from '@/components/Charts/ChartLines'
+import ChartLines from '@/components/Charts/ChartLines'
 
 
 export default {
     name: 'lines',
     components: {
-        Chartlines
+        ChartLines
     },
     data: function() {
         let nbLines = Math.round(Math.random() * 2 + 2);
