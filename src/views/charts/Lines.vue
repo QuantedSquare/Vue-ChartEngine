@@ -28,7 +28,8 @@ export default {
                 //     x: 3,
                 //     label: 'An Event on 3'
                 // }],
-                isTime: false
+                isTime: false,
+                xMin: -5
             },
             chartWidth: 720,
             chartHeight: 480

@@ -54,8 +54,10 @@ export default {
             type: Object,
             default: function() {
                 return {
-                    // min: 0 // Fix yScale Min
-                    // max: 1000 // Fix yScale Max
+                    // yMin: 0 // Fixed yScale Min
+                    // yMax: 1000 // Fixed yScale Max
+                    // xMin: 0,
+                    // xMax: 0,
                     xLines: false,
                     yLines: false
                 }

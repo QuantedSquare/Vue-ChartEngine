@@ -23,7 +23,8 @@ export default {
         return {
             randomData: collection(1, nbPoints, 0, 100),
             chartOptions: {
-                min: 0,
+                yMin: 0,
+                xMin: -2,
                 xLines: true
             },
             chartWidth: 720,

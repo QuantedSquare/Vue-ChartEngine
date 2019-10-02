@@ -21,6 +21,7 @@
 </template>
 <script>
 import { select, scaleLinear, scaleTime, min, max, axisLeft, axisBottom, scan } from 'd3'
+import { getMin, getMax } from '@/modules/utilities.js'
 import * as shapes from 'd3-shape'
 
 let margin = { top: 40, right: 100, bottom: 40, left: 40 };
@@ -47,8 +48,10 @@ export default {
                     curve: 'curveLinear',
                     // events: [{x: 2, label: An Event}] // Events create a vertical ligne on the chart.
                     isTime: false,
-                    // min: 0 // Fix yScale Min
-                    // max: 1000 // Fix yScale Max
+                    // yMin: 0 // Fixed yScale Min
+                    // yMax: 1000 // Fixed yScale Max
+                    // xMin: 0,
+                    // xMax: 0,
                 }
             }
         }
@@ -136,18 +139,10 @@ export default {
             return this.height - margin.top - margin.bottom;
         },
         getMax: function(axis) {
-            let fixed = axis == 'y' && typeof(this.options.max) == 'number';
-
-            return fixed ? this.options.max : max(this.data.map(line => {
-                return max(line.points, (d) => d[axis]);
-            }));
+            return getMax(this.data, axis, this.options);
         },
         getMin: function(axis) {
-            let fixed = axis == 'y' && typeof(this.options.min) == 'number';
-
-            return fixed ? this.options.min : min(this.data.map(line => {
-                return min(line.points, (d) => d[axis]);
-            }));
+            return getMin(this.data, axis, this.options);
         },
         curve: function() {
             return this.options.curve || 'curveLinear';
