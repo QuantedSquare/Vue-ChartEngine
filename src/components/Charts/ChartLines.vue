@@ -96,19 +96,19 @@ export default {
             this.yScale.range([this._height(), 0]);
             this.drawYAxis();
         },
-        xMax: function() {
+        _xMax: function() {
             this.xScale.domain([this.getMin('x'), this.getMax('x')]);
             this.drawXAxis();
         },
-        yMax: function() {
+        _yMax: function() {
             this.yScale.domain([this.getMin('y'), this.getMax('y')]);
             this.drawYAxis();
         },
-        xMin: function() {
+        _xMin: function() {
             this.xScale.domain([this.getMin('x'), this.getMax('x')]);
             this.drawXAxis();
         },
-        yMin: function() {
+        _yMin: function() {
             this.yScale.domain([this.getMin('y'), this.getMax('y')]);
             this.drawYAxis();
         },
@@ -119,6 +119,8 @@ export default {
             this.xScale = this.isTime ? scaleTime() : scaleLinear();
             this.xScale.range([0, this._width()])
                 .domain([this.getMin('x'), this.getMax('x')]);
+
+            console.log(this.getMin('x'), this.getMax('x'));
 
             this.drawXAxis();
             this.lineDrawer.x((d) => this.xScale(d.x))

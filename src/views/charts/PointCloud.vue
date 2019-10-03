@@ -2,7 +2,7 @@
     <div class="chart">
         <a @click="refreshData">Refresh Points</a> |
         <a @click="refreshSize">Refresh Size</a>
-        <ChartPointCloud :data="randomData" :width="chartWidth" :height="chartHeight" :options="chartOptions" />
+        <ChartPointCloud v-bind="chartOptions" />
     </div>
 </template>
 <script>
@@ -21,14 +21,14 @@ export default {
         let nbPoints = Math.round(Math.random() * 15 + 3);
 
         return {
-            randomData: collection(1, nbPoints, 0, 100),
             chartOptions: {
+                data: collection(1, nbPoints, 0, 100),
                 yMin: 0,
                 xMin: -2,
-                xLines: true
-            },
-            chartWidth: 720,
-            chartHeight: 480
+                xLines: true,
+                height: 480,
+                width: 720
+            }
         }
     },
     methods: {
@@ -36,11 +36,11 @@ export default {
             let nbCollections = Math.round(Math.random() * 2 + 2);
             let nbPoints = Math.round(Math.random() * 15 + 3)
 
-            this.randomData = collection(nbCollections, nbPoints, 0, 100);
+            this.chartOptions.data = collection(nbCollections, nbPoints, 0, 100);
         },
         refreshSize: function() {
-            this.chartWidth = Math.round(Math.random() * 420 + 300);
-            this.chartHeight = Math.round(Math.random() * 180 + 300);
+            this.chartOptions.width = Math.round(Math.random() * 420 + 300);
+            this.chartOptions.height = Math.round(Math.random() * 180 + 300);
         }
     }
 }

@@ -7,8 +7,8 @@
                 <g v-for="cloud in data">
                     <g v-for="point in cloud.points">
                         <circle :style="style.pointCircle" :cx="xScale(point.x)" :cy="yScale(point.y)" r="4" :fill="color(cloud.label)" />
-                        <line v-if="options.xLines" :x1="xScale(xMin)" :x2="xScale(point.x)" :y1="yScale(point.y)" :y2="yScale(point.y)" :stroke="color(cloud.label)"></line>
-                        <line v-if="options.yLines" :x1="xScale(point.x)" :x2="xScale(point.x)" :y1="yScale(yMin)" :y2="yScale(point.y)" :stroke="color(cloud.label)"></line>
+                        <line v-if="xLines" :x1="xScale(_xMin)" :x2="xScale(point.x)" :y1="yScale(point.y)" :y2="yScale(point.y)" :stroke="color(cloud.label)"></line>
+                        <line v-if="yLines" :x1="xScale(point.x)" :x2="xScale(point.x)" :y1="yScale(_yMin)" :y2="yScale(point.y)" :stroke="color(cloud.label)"></line>
                         <text class="event-label" :x="xScale(point.x) + 5" :y="yScale(point.y) +5 ">{{point.label}}</text>
                     </g>
                 </g>
@@ -42,6 +42,18 @@ export default {
             type: Array,
             required: true
         },
+        xMin: Number,
+        xMax: Number,
+        yMin: Number,
+        yMax: Number,
+        xLines: {
+            type: Boolean,
+            default: false
+        },
+        yLines: {
+            type: Boolean,
+            default: false
+        },
         height: {
             type: Number,
             default: 480
@@ -49,19 +61,6 @@ export default {
         width: {
             type: Number,
             default: 720
-        },
-        options: {
-            type: Object,
-            default: function() {
-                return {
-                    // yMin: 0 // Fixed yScale Min
-                    // yMax: 1000 // Fixed yScale Max
-                    // xMin: 0,
-                    // xMax: 0,
-                    xLines: false,
-                    yLines: false
-                }
-            }
         }
     },
     data: function() {
@@ -109,19 +108,19 @@ export default {
             this.color.domain(this.data.map(cloud => cloud.label))
                 .range(quantize(t => colorInterpolator(t), this.data.length).reverse());
         },
-        xMax: function() {
+        _xMax: function() {
             this.xScale.domain([this.getMin('x'), this.getMax('x')]);
             this.drawXAxis();
         },
-        yMax: function() {
+        _yMax: function() {
             this.yScale.domain([this.getMin('y'), this.getMax('y')]);
             this.drawYAxis();
         },
-        xMin: function() {
+        _xMin: function() {
             this.xScale.domain([this.getMin('x'), this.getMax('x')]);
             this.drawXAxis();
         },
-        yMin: function() {
+        _yMin: function() {
             this.yScale.domain([this.getMin('y'), this.getMax('y')]);
             this.drawYAxis();
         }
@@ -140,10 +139,10 @@ export default {
             return this.height - margin.top - margin.bottom;
         },
         getMax: function(axis) {
-            return getMax(this.data, axis, this.options);
+            return getMax(this.data, axis, { xMax: this.xMax, yMax: this.yMax });
         },
         getMin: function(axis) {
-            return getMin(this.data, axis, this.options);
+            return getMin(this.data, axis, { xMin: this.xMin, yMin: this.yMin });
         }
     },
     computed: {
@@ -153,16 +152,16 @@ export default {
         bottomTranslate: function() {
             return 'translate(0,' + this._height() + ')'
         },
-        xMax: function() {
+        _xMax: function() {
             return this.getMax('x');
         },
-        yMax: function() {
+        _yMax: function() {
             return this.getMax('y');
         },
-        xMin: function() {
+        _xMin: function() {
             return this.getMin('x');
         },
-        yMin: function() {
+        _yMin: function() {
             return this.getMin('y')
         }
     }

@@ -41,11 +41,12 @@ export default {
             let nbPoints = Math.round(Math.random() * 15 + 3)
 
             this.chartOptions.isTime = true;
-            this.randomData = collection(nbLines, nbPoints, 0, 100, true);
+            delete this.chartOptions.xMin
+            this.chartOptions.data = collection(nbLines, nbPoints, 0, 100, true);
         },
         refreshSize: function() {
-            this.chartWidth = Math.round(Math.random() * 420 + 300);
-            this.chartHeight = Math.round(Math.random() * 180 + 300);
+            this.chartOptions.width = Math.round(Math.random() * 420 + 300);
+            this.chartOptions.height = Math.round(Math.random() * 180 + 300);
         }
     }
 }
