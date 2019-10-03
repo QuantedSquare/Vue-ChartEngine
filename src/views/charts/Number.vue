@@ -25,7 +25,7 @@ export default {
                 initialValue: 10,
                 unit: '$',
                 animationTime: 2000,
-                decimalPrecision: 2
+                decimalPrecision: 0
                 // start: 0
             }
         }

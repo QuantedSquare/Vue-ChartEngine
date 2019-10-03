@@ -25,6 +25,12 @@ export default {
             type: Array,
             required: true
         },
+        min: Number, // Fix yAxix Min
+        max: Number, // Fix yAxis Max
+        animationTime: {
+            type: Number,
+            default: 1000
+        },
         height: {
             type: Number,
             default: 480
@@ -32,16 +38,6 @@ export default {
         width: {
             type: Number,
             default: 720
-        },
-        options: {
-            type: Object,
-            default: function() {
-                return {
-                    // min: 0 // Fix yAxix Min
-                    // max: 1000 // Fix yAxis Max
-                    animationTime: 1000
-                }
-            }
         }
     },
     data: function() {
@@ -112,8 +108,8 @@ export default {
             if (this.animationState() < 1) setTimeout(this.animate, 0);
         },
         animationState: function() {
-            if ((this.startAnimation + this.options.animationTime) > Date.now()) {
-                return (Date.now() - this.startAnimation) / this.options.animationTime;
+            if ((this.startAnimation + this.animationTime) > Date.now()) {
+                return (Date.now() - this.startAnimation) / this.animationTime;
             } else {
                 return 1;
             }
@@ -139,10 +135,10 @@ export default {
             return this.height - margin.top - margin.bottom;
         },
         getMax: function(axis) {
-            return this.options.max ? this.options.max : max(this.data, (d) => d[axis]);
+            return this.max ? this.max : max(this.data, (d) => d[axis]);
         },
         getMin: function(axis) {
-            return !!(this.options.min + 1) ? this.options.min : min(this.data, (d) => d[axis]);
+            return !!(this.min + 1) ? this.min : min(this.data, (d) => d[axis]);
         },
         positiveOrZero: function(nb) {
             return nb > 0 ? nb : 0;
