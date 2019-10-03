@@ -2,7 +2,7 @@
     <div class="chart">
         <a @click="refreshData">Refresh Number</a> |
         <a @click="refreshSize">Refresh Size</a>
-        <ChartNumber :data="randomData" :width="chartWidth" :height="chartHeight" :options="chartOptions" curve="curveMonotoneX" />
+        <ChartNumber v-bind="chartOptions" />
     </div>
 </template>
 <script>
@@ -18,23 +18,25 @@ export default {
     },
     data: function() {
         return {
-            randomData: Math.round(Math.random() * 100),
-            chartWidth: 720,
-            chartHeight: 480,
             chartOptions: {
+                data: Math.round(Math.random() * 100) + 0.56,
+                width: 720,
+                height: 480,
+                initialValue: 10,
                 unit: '$',
                 animationTime: 2000,
+                decimalPrecision: 2
                 // start: 0
             }
         }
     },
     methods: {
         refreshData: function() {
-            this.randomData = Math.round(Math.random() * 100000000);
+            this.chartOptions.data = Math.round(Math.random() * 1000);
         },
         refreshSize: function() {
-            this.chartWidth = Math.round(Math.random() * 420 + 300);
-            this.chartHeight = Math.round(Math.random() * 180 + 300);
+            this.chartOptions.width = Math.round(Math.random() * 420 + 300);
+            this.chartOptions.height = Math.round(Math.random() * 180 + 300);
         }
     }
 }
