@@ -2,7 +2,7 @@
     <div class="chart">
         <a @click="refreshData">Refresh Data</a> |
         <a @click="refreshSize">Refresh Size</a>
-        <ChartPie :data="randomData" :width="chartWidth" :height="chartHeight" />
+        <ChartPie v-bind="chartOptions" />
     </div>
 </template>
 <script>
@@ -18,18 +18,20 @@ export default {
     },
     data: function() {
         return {
-            randomData: points(),
-            chartWidth: 720,
-            chartHeight: 480
+            chartOptions: {
+                data: points(),
+                width: 720,
+                height: 480
+            }
         }
     },
     methods: {
         refreshData: function() {
-            this.randomData = points(Math.round(Math.random() * 15 + 3));
+            this.chartOptions.data = points(Math.round(Math.random() * 15 + 3));
         },
         refreshSize: function() {
-            this.chartWidth = Math.round(Math.random() * 420 + 300);
-            this.chartHeight = Math.round(Math.random() * 180 + 300);
+            this.chartOptions.width = Math.round(Math.random() * 420 + 300);
+            this.chartOptions.height = Math.round(Math.random() * 180 + 300);
         }
     }
 }

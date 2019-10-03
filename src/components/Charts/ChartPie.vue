@@ -48,14 +48,6 @@ export default {
         width: {
             type: Number,
             default: 720
-        },
-        options: {
-            type: Object,
-            default: function() {
-                return {
-
-                }
-            }
         }
     },
     data: function() {
