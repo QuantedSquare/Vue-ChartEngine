@@ -5,10 +5,10 @@
                 <g id="xAxis" :transform="bottomTranslate"></g>
                 <g id="yAxis"></g>
                 <path class="line chart-color4-darken-0" v-for="line in data" :d="lineDrawer(line.points)"></path>
-                <text v-for="line in data" :x="xScale(xMax) + 5" :y="yScale(line.points[line.points.length - 1].y) + 5" class="line-label">{{line.label}}</text>
-                <g v-if="options.events">
-                    <text v-for="event in options.events" :x="xScale(event.x)" :y="yScale(yMax) - 5" text-anchor="middle" class="event-label">{{event.label}}</text>
-                    <line v-for="event in options.events" class="event-line" :x1="xScale(event.x)" :x2="xScale(event.x)" :y1="yScale(0)" :y2="yScale(yMax)" stroke="black"></line>
+                <text v-for="line in data" :x="xScale(_xMax) + 5" :y="yScale(line.points[line.points.length - 1].y) + 5" class="line-label">{{line.label}}</text>
+                <g v-if="events">
+                    <text v-for="event in events" :x="xScale(event.x)" :y="yScale(_yMax) - 5" text-anchor="middle" class="event-label">{{event.label}}</text>
+                    <line v-for="event in events" class="event-line" :x1="xScale(event.x)" :x2="xScale(event.x)" :y1="yScale(0)" :y2="yScale(_yMax)" stroke="black"></line>
                 </g>
                 <template v-for="point in readingLine.points">
                     <text v-if="readingLine.active" :x="xScale(point.x)" :y="yScale(point.y) - 5" text-anchor="middle" class="event-label">
@@ -33,6 +33,19 @@ export default {
             type: Array,
             required: true
         },
+        curve: {
+            type: String,
+            default: 'curveLinear'
+        },
+        isTime: {
+            type: Boolean,
+            default: false
+        },
+        xMin: Number,
+        xMax: Number,
+        yMin: Number,
+        yMax: Number,
+        events: Array,
         height: {
             type: Number,
             default: 480
@@ -40,26 +53,12 @@ export default {
         width: {
             type: Number,
             default: 720
-        },
-        options: {
-            type: Object,
-            default: function() {
-                return {
-                    curve: 'curveLinear',
-                    // events: [{x: 2, label: An Event}] // Events create a vertical ligne on the chart.
-                    isTime: false,
-                    // yMin: 0 // Fixed yScale Min
-                    // yMax: 1000 // Fixed yScale Max
-                    // xMin: 0,
-                    // xMax: 0,
-                }
-            }
         }
     },
     data: function() {
         // console.log(this.data);
 
-        let xScale = this.options.isTime ? scaleTime() : scaleLinear(),
+        let xScale = this.isTime ? scaleTime() : scaleLinear(),
             yScale = scaleLinear();
 
         let yMax = this.getMax('y');
@@ -69,7 +68,7 @@ export default {
         let lineDrawer = shapes.line()
             .x((d) => xScale(d.x))
             .y((d) => yScale(d.y))
-            .curve(shapes[this.curve()]);
+            .curve(shapes[this.curve]);
 
         xScale.range([0, this._width()]);
         xScale.domain([this.getMin('x'), this.getMax('x')]);
@@ -113,11 +112,11 @@ export default {
             this.yScale.domain([this.getMin('y'), this.getMax('y')]);
             this.drawYAxis();
         },
-        'options.curve': function() {
-            this.lineDrawer.curve(shapes[this.curve()]);
+        curve: function() {
+            this.lineDrawer.curve(shapes[this.curve]);
         },
-        'options.isTime': function() {
-            this.xScale = this.options.isTime ? scaleTime() : scaleLinear();
+        isTime: function() {
+            this.xScale = this.isTime ? scaleTime() : scaleLinear();
             this.xScale.range([0, this._width()])
                 .domain([this.getMin('x'), this.getMax('x')]);
 
@@ -139,13 +138,10 @@ export default {
             return this.height - margin.top - margin.bottom;
         },
         getMax: function(axis) {
-            return getMax(this.data, axis, this.options);
+            return getMax(this.data, axis, { xMax: this.xMax, yMax: this.yMax });
         },
         getMin: function(axis) {
-            return getMin(this.data, axis, this.options);
-        },
-        curve: function() {
-            return this.options.curve || 'curveLinear';
+            return getMin(this.data, axis, { xMin: this.xMin, yMin: this.yMin });
         },
         showVals: function(event) {
             let svgWidth = event.currentTarget.clientWidth,
@@ -153,11 +149,11 @@ export default {
                 xVal = this.xScale.invert((event.offsetX * xRatio) - margin.left);
 
             this.readingLine.points = this.data.map(line => {
-                let x = this.options.isTime ? +new Date(xVal) : xVal;
+                let x = this.isTime ? +new Date(xVal) : xVal;
 
                 let nearestPoint = scan(line.points, (a, b) => {
-                    let aX = this.options.isTime ? +new Date(a.x) : a.x,
-                        bX = this.options.isTime ? +new Date(b.x) : b.x;
+                    let aX = this.isTime ? +new Date(a.x) : a.x,
+                        bX = this.isTime ? +new Date(b.x) : b.x;
 
                     return Math.abs(x - aX) - Math.abs(x - bX);
                 });
@@ -178,16 +174,16 @@ export default {
         bottomTranslate: function() {
             return 'translate(0,' + this._height() + ')'
         },
-        xMax: function() {
+        _xMax: function() {
             return this.getMax('x');
         },
-        yMax: function() {
+        _yMax: function() {
             return this.getMax('y');
         },
-        xMin: function() {
+        _xMin: function() {
             return this.getMin('x');
         },
-        yMin: function() {
+        _yMin: function() {
             return this.getMin('y')
         }
     }

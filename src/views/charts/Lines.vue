@@ -2,7 +2,7 @@
     <div class="chart">
         <a @click="refreshData">Refresh Lines</a> |
         <a @click="refreshSize">Refresh Size</a>
-        <ChartLines :data="randomData" :width="chartWidth" :height="chartHeight" :options="chartOptions" />
+        <ChartLines v-bind="chartOptions" />
     </div>
 </template>
 <script>
@@ -21,18 +21,18 @@ export default {
         let nbPoints = Math.round(Math.random() * 15 + 3);
 
         return {
-            randomData: collection(nbLines, nbPoints, 0, 100),
             chartOptions: {
+                data: collection(nbLines, nbPoints, 0, 100),
                 curve: 'curveMonotoneX',
-                // events: [{
-                //     x: 3,
-                //     label: 'An Event on 3'
-                // }],
+                events: [{
+                    x: 3,
+                    label: 'An Event on 3'
+                }],
                 isTime: false,
-                xMin: -5
-            },
-            chartWidth: 720,
-            chartHeight: 480
+                xMin: -5,
+                width: 720,
+                height: 480
+            }
         }
     },
     methods: {
