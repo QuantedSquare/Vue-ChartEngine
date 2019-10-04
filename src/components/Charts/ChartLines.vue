@@ -8,7 +8,7 @@
                 <text v-for="line in data" :x="xScale(_xMax) + 5" :y="yScale(line.points[line.points.length - 1].y) + 5" class="line-label">{{line.label}}</text>
                 <g v-if="events">
                     <text v-for="event in events" :x="xScale(event.x)" :y="yScale(_yMax) - 5" text-anchor="middle" class="event-label">{{event.label}}</text>
-                    <line v-for="event in events" class="event-line" :x1="xScale(event.x)" :x2="xScale(event.x)" :y1="yScale(0)" :y2="yScale(_yMax)" stroke="black"></line>
+                    <line v-for="event in events" class="event-line" :x1="xScale(event.x)" :x2="xScale(event.x)" :y1="yScale(_yMin)" :y2="yScale(_yMax)" stroke="black"></line>
                 </g>
                 <template v-for="point in readingLine.points">
                     <text v-if="readingLine.active" :x="xScale(point.x)" :y="yScale(point.y) - 5" text-anchor="middle" class="event-label">
@@ -119,8 +119,6 @@ export default {
             this.xScale = this.isTime ? scaleTime() : scaleLinear();
             this.xScale.range([0, this._width()])
                 .domain([this.getMin('x'), this.getMax('x')]);
-
-            console.log(this.getMin('x'), this.getMax('x'));
 
             this.drawXAxis();
             this.lineDrawer.x((d) => this.xScale(d.x))

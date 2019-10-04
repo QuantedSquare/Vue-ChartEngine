@@ -37,12 +37,20 @@ export default {
     },
     methods: {
         refreshData: function() {
-            let nbLines = Math.round(Math.random() * 2 + 2);
-            let nbPoints = Math.round(Math.random() * 15 + 3)
+            // let nbLines = Math.round(Math.random() * 2 + 2);
+            // let nbPoints = Math.round(Math.random() * 15 + 3)
 
-            this.chartOptions.isTime = true;
-            delete this.chartOptions.xMin
-            this.chartOptions.data = collection(nbLines, nbPoints, 0, 100, true);
+            // this.chartOptions.isTime = true;
+            // delete this.chartOptions.xMin
+            // this.chartOptions.data = collection(nbLines, nbPoints, 0, 100, true);
+
+            this.chartOptions.events = [{
+                x: 4,
+                label: 'An Event on 4'
+            }, {
+                x: 2,
+                label: 'An Event on 2'
+            }]
         },
         refreshSize: function() {
             this.chartOptions.width = Math.round(Math.random() * 420 + 300);
