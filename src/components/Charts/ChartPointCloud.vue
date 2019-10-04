@@ -5,11 +5,11 @@
                 <g id="xAxis" :transform="bottomTranslate"></g>
                 <g id="yAxis"></g>
                 <g v-for="cloud in data">
-                    <g v-for="point in cloud.points">
+                    <g v-for="point in cloud.points" @mouseenter="mouseEnter" @mouseleave="mouseLeave" class="point-group" :class="highlight ? 'hide' : ''">
                         <circle :style="style.pointCircle" :cx="xScale(point.x)" :cy="yScale(point.y)" r="4" :fill="color(cloud.label)" />
-                        <line v-if="xLines" :x1="xScale(_xMin)" :x2="xScale(point.x)" :y1="yScale(point.y)" :y2="yScale(point.y)" :stroke="color(cloud.label)"></line>
-                        <line v-if="yLines" :x1="xScale(point.x)" :x2="xScale(point.x)" :y1="yScale(_yMin)" :y2="yScale(point.y)" :stroke="color(cloud.label)"></line>
-                        <text class="event-label" :x="xScale(point.x) + 5" :y="yScale(point.y) +5 ">{{point.label}}</text>
+                        <line v-if="xLines" :x1="xScale(_xMin)" :x2="xScale(point.x) - r" :y1="yScale(point.y)" :y2="yScale(point.y)" :stroke="color(cloud.label)"></line>
+                        <line v-if="yLines" :x1="xScale(point.x)" :x2="xScale(point.x)" :y1="yScale(_yMin)" :y2="yScale(point.y) - r" :stroke="color(cloud.label)"></line>
+                        <text class="event-label" :x="xScale(xLabel(point)) + 5" :y="yScale(yLabel(point)) -3" :text-anchor="labelAnchor">{{point.label}}</text>
                     </g>
                 </g>
             </g>
@@ -46,6 +46,10 @@ export default {
         xMax: Number,
         yMin: Number,
         yMax: Number,
+        r: {
+            type: Number,
+            default: 4
+        },
         xLines: {
             type: Boolean,
             default: false
@@ -53,6 +57,22 @@ export default {
         yLines: {
             type: Boolean,
             default: false
+        },
+        xLabel: {
+            type: Function,
+            default: function(point) {
+                return point.x;
+            }
+        },
+        yLabel: {
+            type: Function,
+            default: function(point) {
+                return point.y;
+            }
+        },
+        labelAnchor: {
+            type: String,
+            default: 'left'
         },
         height: {
             type: Number,
@@ -82,7 +102,8 @@ export default {
             xScale: xScale,
             yScale: yScale,
             color: color,
-            style: style
+            style: style,
+            highlight: false
         }
     },
     mounted: function() {
@@ -143,6 +164,12 @@ export default {
         },
         getMin: function(axis) {
             return getMin(this.data, axis, { xMin: this.xMin, yMin: this.yMin });
+        },
+        mouseEnter: function() {
+            this.highlight = true;
+        },
+        mouseLeave: function() {
+            this.highlight = false;
         }
     },
     computed: {
@@ -168,8 +195,24 @@ export default {
 }
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style lang="scss" scoped>
+<style scoped>
 .event-label {
     opacity: 0.5;
+}
+
+g.point-group {
+    cursor: pointer;
+}
+
+g.hide>.event-label,
+g.hide>line,
+g.hide>circle {
+    opacity: 0.25;
+}
+
+g:hover>.event-label,
+g:hover>line,
+g:hover>circle {
+    opacity: 1 !important;
 }
 </style>

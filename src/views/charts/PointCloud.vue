@@ -24,8 +24,11 @@ export default {
             chartOptions: {
                 data: collection(1, nbPoints, 0, 100),
                 yMin: 0,
-                xMin: -2,
+                // xMin: -2,
                 xLines: true,
+                xLabel: point => point.x / 2,
+                yLabel: point => point.y,
+                labelAnchor: 'middle',
                 height: 480,
                 width: 720
             }
