@@ -115,14 +115,14 @@ export default {
             }
         },
         drawXAxis: function(withTransition) {
-            let axis = select('#xAxis');
+            let axis = select(this.$el).select('#xAxis');
 
             if (withTransition) axis = axis.transition().duration(500);
 
             axis.call(axisBottom(this.xScale));
         },
         drawYAxis: function(withTransition) {
-            let axis = select('#yAxis');
+            let axis = select(this.$el).select('#yAxis');
 
             if (withTransition) axis = axis.transition().duration(500);
 

@@ -3,6 +3,7 @@
         <a @click="refreshData">Refresh Points</a> |
         <a @click="refreshSize">Refresh Size</a>
         <ChartPointCloud v-bind="chartOptions" />
+        <ChartPointCloud v-bind="chartOptions" />
     </div>
 </template>
 <script>

@@ -3,6 +3,7 @@
         <a @click="refreshData(10000, 15000)">Refresh Bars</a> |
         <a @click="refreshSize">Refresh Size</a>
         <ChartBars v-bind="chartOptions" />
+        <ChartBars v-bind="chartOptions" />
     </div>
 </template>
 <script>

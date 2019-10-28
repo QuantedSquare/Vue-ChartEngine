@@ -126,10 +126,10 @@ export default {
     },
     methods: {
         drawXAxis: function() {
-            select('#xAxis').call(axisBottom(this.xScale))
+            select(this.$el).select('#xAxis').call(axisBottom(this.xScale))
         },
         drawYAxis: function() {
-            select('#yAxis').call(axisLeft(this.yScale))
+            select(this.$el).select('#yAxis').call(axisLeft(this.yScale))
         },
         _width: function() {
             return this.width - margin.left - margin.right;
