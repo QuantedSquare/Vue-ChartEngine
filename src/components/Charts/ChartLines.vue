@@ -20,7 +20,7 @@
     </div>
 </template>
 <script>
-import { select, scaleLinear, scaleTime, min, max, axisLeft, axisBottom, scan } from 'd3'
+import { select, scaleLinear, scaleTime, scaleOrdinal, min, max, axisLeft, axisBottom, scan } from 'd3'
 import { getMin, getMax } from '@/modules/utilities.js'
 import * as shapes from 'd3-shape'
 
@@ -41,6 +41,7 @@ export default {
             type: Boolean,
             default: false
         },
+        xTickFormat: Function,
         xMin: Number,
         xMax: Number,
         yMin: Number,
@@ -57,7 +58,7 @@ export default {
     },
     data: function() {
         // console.log(this.data);
-
+        // console.log(this.data[0].points.map(p => p.label));
         let xScale = this.isTime ? scaleTime() : scaleLinear(),
             yScale = scaleLinear();
 
@@ -71,7 +72,7 @@ export default {
             .curve(shapes[this.curve]);
 
         xScale.range([0, this._width()]);
-        xScale.domain([this.getMin('x'), this.getMax('x')]);
+        xScale.domain([this.getMin('x'), this.getMax('x')]);;
 
         yScale.range([this._height(), 0]);
         yScale.domain([this.getMin('y'), yMax]);
@@ -126,7 +127,16 @@ export default {
     },
     methods: {
         drawXAxis: function() {
-            select(this.$el).select('#xAxis').call(axisBottom(this.xScale))
+            let axis = axisBottom(this.xScale);
+
+            if (!this.isTime && this.xTickFormat) {
+                axis.tickFormat(t => {
+                    let point = this.data[0].points.find(p => p.x == t);
+                    return this.xTickFormat(point, t);
+                });
+            }
+
+            select(this.$el).select('#xAxis').call(axis)
         },
         drawYAxis: function() {
             select(this.$el).select('#yAxis').call(axisLeft(this.yScale))

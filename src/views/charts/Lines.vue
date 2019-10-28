@@ -3,7 +3,7 @@
         <a @click="refreshData">Refresh Lines</a> |
         <a @click="refreshSize">Refresh Size</a>
         <ChartLines v-bind="chartOptions" />
-        <ChartLines v-bind="chartOptions" />
+        <!-- <ChartLines v-bind="chartOptions" /> -->
     </div>
 </template>
 <script>
@@ -31,6 +31,7 @@ export default {
                 }],
                 isTime: false,
                 xMin: -5,
+                xTickFormat: (p, t) => p ? p.label : t,
                 width: 720,
                 height: 480
             }
@@ -38,12 +39,12 @@ export default {
     },
     methods: {
         refreshData: function() {
-            // let nbLines = Math.round(Math.random() * 2 + 2);
-            // let nbPoints = Math.round(Math.random() * 15 + 3)
+            let nbLines = Math.round(Math.random() * 2 + 2);
+            let nbPoints = Math.round(Math.random() * 15 + 3)
 
             // this.chartOptions.isTime = true;
-            // delete this.chartOptions.xMin
-            // this.chartOptions.data = collection(nbLines, nbPoints, 0, 100, true);
+            delete this.chartOptions.xMin
+            this.chartOptions.data = collection(nbLines, nbPoints, 0, 100);
 
             this.chartOptions.events = [{
                 x: 4,
