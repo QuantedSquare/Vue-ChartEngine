@@ -4,8 +4,13 @@
             <g :transform="display">
                 <g id="xAxis" :transform="bottomTranslate"></g>
                 <g id="yAxis"></g>
-                <path class="line chart-color4-darken-0" v-for="line in data" :d="lineDrawer(line.points)"></path>
-                <text v-for="line in data" :x="xScale(_xMax) + 5" :y="yScale(line.points[line.points.length - 1].y) + 5" class="line-label">{{line.label}}</text>
+                <g v-for="line in data">
+                    <path class="line" :style="getLineStyle(line)" :d="lineDrawer(line.points)"></path>
+                    <template v-if="dots">
+                        <circle v-for="point in line.points" :cx="xScale(point.x)" :cy="yScale(point.y)" r="4" :style="getCircleStyle(line)" />
+                    </template>
+                    <text v-if="linesLabels" :x="xScale(_xMax) + 5" :y="yScale(line.points[line.points.length - 1].y) + 5" class="line-label">{{line.label}}</text>
+                </g>
                 <g v-if="events">
                     <text v-for="event in events" :x="xScale(event.x)" :y="yScale(_yMax) - 5" text-anchor="middle" class="event-label">{{event.label}}</text>
                     <line v-for="event in events" class="event-line" :x1="xScale(event.x)" :x2="xScale(event.x)" :y1="yScale(_yMin)" :y2="yScale(_yMax)" stroke="black"></line>
@@ -20,11 +25,16 @@
     </div>
 </template>
 <script>
-import { select, scaleLinear, scaleTime, scaleOrdinal, min, max, axisLeft, axisBottom, scan } from 'd3'
+import { select, quantize, scaleOrdinal, interpolateRgbBasis, scaleLinear, scaleTime, min, max, axisLeft, axisBottom, scan } from 'd3'
 import { getMin, getMax } from '@/modules/utilities.js'
 import * as shapes from 'd3-shape'
 
-let margin = { top: 40, right: 100, bottom: 40, left: 40 };
+let margin = { top: 40, right: 40, bottom: 40, left: 40 };
+
+let colorInterpolator = interpolateRgbBasis([
+    'rgb(162, 255, 174)', 'rgb(12, 204, 249)',
+    'rgb(172, 1, 207)', 'rgb(255, 18, 120)'
+]);
 
 export default {
     name: 'ChartLines',
@@ -54,7 +64,9 @@ export default {
         width: {
             type: Number,
             default: 720
-        }
+        },
+        dots: Boolean,
+        linesLabels: Boolean
     },
     data: function() {
         // console.log(this.data);
@@ -64,6 +76,7 @@ export default {
 
         let yMax = this.getMax('y');
 
+        if (this.linesLabels) margin.right = 100;
         margin.left = (yMax.toString().length + 1) * 10;
 
         let lineDrawer = shapes.line()
@@ -77,11 +90,15 @@ export default {
         yScale.range([this._height(), 0]);
         yScale.domain([this.getMin('y'), yMax]);
 
+        let color = scaleOrdinal().domain(this.data.map(line => line.label))
+            .range(quantize(t => colorInterpolator(t), this.data.length + 1).reverse());
+
         return {
             xScale: xScale,
             yScale: yScale,
             lineDrawer: lineDrawer,
-            readingLine: { x: 0, active: false, points: [] }
+            readingLine: { x: 0, active: false, points: [] },
+            color: color
         }
     },
     mounted: function() {
@@ -89,6 +106,10 @@ export default {
         this.drawYAxis();
     },
     watch: {
+        data: function() {
+            this.color.domain(this.data.map(line => line.label))
+                .range(quantize(t => colorInterpolator(t), this.data.length).reverse());
+        },
         width: function() {
             this.xScale.range([0, this._width()]);
             this.drawXAxis();
@@ -175,6 +196,16 @@ export default {
         },
         hideVals: function() {
             this.readingLine.active = false;
+        },
+        getLineStyle: function(line) {
+            return {
+                stroke: this.color(line.label)
+            }
+        },
+        getCircleStyle: function(line) {
+            return {
+                fill: this.color(line.label)
+            }
         }
     },
     computed: {

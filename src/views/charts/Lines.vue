@@ -33,7 +33,9 @@ export default {
                 xMin: -5,
                 xTickFormat: (p, t) => p ? p.label : t,
                 width: 720,
-                height: 480
+                height: 480,
+                dots: true,
+                linesLabels: true
             }
         }
     },

@@ -117,6 +117,10 @@ export default {
         // }, 0);
     },
     watch: {
+        data: function() {
+            this.color.domain(this.data.map(cloud => cloud.label))
+                .range(quantize(t => colorInterpolator(t), this.data.length).reverse());
+        },
         width: function() {
             this.xScale.range([0, this._width()]);
             this.drawXAxis();
@@ -124,10 +128,6 @@ export default {
         height: function() {
             this.yScale.range([this._height(), 0]);
             this.drawYAxis();
-        },
-        data: function() {
-            this.color.domain(this.data.map(cloud => cloud.label))
-                .range(quantize(t => colorInterpolator(t), this.data.length).reverse());
         },
         _xMax: function() {
             this.xScale.domain([this.getMin('x'), this.getMax('x')]);
