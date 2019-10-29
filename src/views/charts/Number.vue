@@ -2,7 +2,10 @@
     <div class="chart">
         <a @click="refreshData">Refresh Number</a> |
         <a @click="refreshSize">Refresh Size</a>
-        <ChartNumber v-bind="chartOptions" />
+        <ChartNumber v-bind="chartOptions">
+            <text>TEST2</text>
+        </ChartNumber>
+        <ChartNumber v-bind="chartOptions" :textWidth="0.7" />
     </div>
 </template>
 <script>
@@ -24,9 +27,11 @@ export default {
                 height: 480,
                 initialValue: 10,
                 unit: '$',
+                preText: '+',
                 animationTime: 2000,
-                decimalPrecision: 0
+                decimalPrecision: 0,
                 // start: 0
+                // textWidth: 0.3
             }
         }
     },
@@ -41,3 +46,8 @@ export default {
     }
 }
 </script>
+<style scoped>
+.chart {
+    width: 500px;
+}
+</style>

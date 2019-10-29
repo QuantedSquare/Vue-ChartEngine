@@ -3,7 +3,7 @@
         <a @click="refreshData">Refresh Lines</a> |
         <a @click="refreshSize">Refresh Size</a>
         <ChartLines v-bind="chartOptions" />
-        <!-- <ChartLines v-bind="chartOptions" /> -->
+        <ChartLines v-bind="chartOptions" />
     </div>
 </template>
 <script>

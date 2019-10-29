@@ -2,6 +2,9 @@
     <svg :viewBox="'0 0 ' + width + ' ' + height">
         <g :transform="display">
             <text class="big-number" text-anchor="middle" :textLength="textLength" :transform="center">{{displayedString}}</text>
+            <g :transform="displayRight">
+                <slot></slot>
+            </g>
         </g>
     </svg>
 </template>
@@ -9,7 +12,7 @@
 import { interpolateNumber, scaleBand } from 'd3'
 // import * as shapes from 'd3-shape'
 
-let margin = { top: 0, right: 0, bottom: 0, left: 0 };
+let margin = { top: 20, right: 20, bottom: 20, left: 20 };
 
 function round(nb, precision) {
     let precisionFactor = Math.pow(10, precision);
@@ -40,6 +43,10 @@ export default {
             type: String,
             default: ''
         },
+        preText: {
+            type: String,
+            default: ''
+        },
         height: {
             type: Number,
             default: 480
@@ -47,6 +54,10 @@ export default {
         width: {
             type: Number,
             default: 720
+        },
+        textWidth: {
+            type: Number,
+            default: 0.5
         }
     },
     data: function() {
@@ -57,7 +68,7 @@ export default {
 
         let xScale = scaleBand();
 
-        xScale.range([0, this._width() / 2]);
+        xScale.range([0, this._width() * this.textWidth]);
         xScale.padding(0.05)
 
         return {
@@ -105,8 +116,13 @@ export default {
         display: function() {
             return 'translate(' + margin.left + ',' + margin.top + ')';
         },
+        displayRight: function() {
+            let leftMargin = (this._width() / 2) + this.textLength / 2;
+
+            return 'translate(' + leftMargin + ',' + ((this._height() + 50) / 2) + ')';
+        },
         center: function() {
-            return 'translate(' + (this._width() / 2) + ',' + (this._height() / 2) + ')';
+            return 'translate(' + (this._width() / 2) + ',' + ((this._height() + 50) / 2) + ')';
         },
         displayedString: function() {
             let displayedString = this.displayedNumber.toString(),
@@ -117,7 +133,7 @@ export default {
                 while (decimals.length < this.decimalPrecision) decimals += '0';
             }
 
-            return displayedUnits + (this.decimalPrecision ? '.' + decimals : '') + this.unit;
+            return this.preText + displayedUnits + (this.decimalPrecision ? '.' + decimals : '') + this.unit;
         },
         textLength: function() {
             this.xScale.domain(this.displayedString.split('').map((d, i) => i));
