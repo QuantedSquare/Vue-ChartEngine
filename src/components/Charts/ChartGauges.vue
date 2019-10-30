@@ -35,7 +35,7 @@ let colorInterpolator = interpolateRgbBasis([
 ]);
 
 export default {
-    name: 'ChartPie',
+    name: 'ChartGauges',
     props: {
         data: {
             type: Array,
@@ -56,17 +56,16 @@ export default {
         let _arc = arc().innerRadius(this.radius() - 30)
             .outerRadius(this.radius());
 
-        // let outerArc = arc().innerRadius(this.radius())
-        //     .outerRadius(this.radius() + 30);
-
         let _pie = pie().value(d => d.y);
 
         let color = scaleOrdinal().domain(this.data.map(d => d.x))
             .range(quantize(t => colorInterpolator(t), this.data.length).reverse());
 
+        // console.log(_arc.startAngle(), _arc.endAngle());
+        // console.log(_pie.startAngle(-1), _pie.endAngle(6.2))
+
         return {
             arc: _arc,
-            // outerArc: outerArc,
             pie: _pie,
             displayedPaths: _pie(this.data),
             color: color,
@@ -96,8 +95,8 @@ export default {
             this.arc.innerRadius(this.radius() - 30)
                 .outerRadius(this.radius());
 
-            // this.outerArc.innerRadius(this.radius())
-            //     .outerRadius(this.radius() + 30);
+            this.outerArc.innerRadius(this.radius())
+                .outerRadius(this.radius() + 30);
         },
         _width: function() {
             return this.width - margin.left - margin.right;
@@ -137,7 +136,8 @@ export default {
     }
 }
 </script>
-<style scoped>
+<!-- Add "scoped" attribute to limit CSS to this component only -->
+<style lang="scss" scoped>
 .arc-path {
     /*fill: $chart-color-2-s100;*/
     stroke: white;

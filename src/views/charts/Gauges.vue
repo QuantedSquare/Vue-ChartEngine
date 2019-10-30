@@ -2,19 +2,19 @@
     <div class="chart">
         <a @click="refreshData">Refresh Data</a> |
         <a @click="refreshSize">Refresh Size</a>
-        <ChartPie v-bind="chartOptions" />
+        <CharttGauge v-bind="chartOptions" />
     </div>
 </template>
 <script>
 import { points } from '@/modules/randomVals.js'
 
-import ChartPie from '@/components/Charts/ChartPie.vue'
+import CharttGauge from '@/components/Charts/ChartGauges.vue'
 
 
 export default {
-    name: 'pie',
+    name: 'gauges',
     components: {
-        ChartPie
+        CharttGauge
     },
     data: function() {
         return {

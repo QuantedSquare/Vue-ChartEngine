@@ -12,6 +12,11 @@ let devRoutes = [
         component: () => import('./views/charts/Bars.vue')
     },
     {
+        path: '/gauges',
+        name: 'gauges',
+        component: () => import('./views/charts/Gauges.vue')
+    },
+    {
         path: '/lines',
         name: 'lines',
         component: () => import('./views/charts/Lines.vue')
