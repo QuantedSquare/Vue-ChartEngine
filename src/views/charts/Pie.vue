@@ -3,6 +3,7 @@
         <a @click="refreshData">Refresh Data</a> |
         <a @click="refreshSize">Refresh Size</a>
         <ChartPie v-bind="chartOptions" />
+        <ChartPie v-bind="chartOptions" :cornerRadius="10" :bandWidth="10" />
     </div>
 </template>
 <script>

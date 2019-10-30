@@ -1,11 +1,5 @@
 <template>
     <svg :viewBox="'0 0 ' + width + ' ' + height">
-        <!-- <defs>
-            <filter id="text-background" x="0" y="0" width="1" height="1">
-                <feFlood flood-color="black" />
-                <feComposite in="SourceGraphic" operator="xor" />
-            </filter>
-        </defs> -->
         <g :transform="display">
             <g :transform="center">
                 <template v-for="(path, i) in displayedPaths">
@@ -41,6 +35,10 @@ export default {
             type: Array,
             required: true
         },
+        bandWidth: {
+            type: Number,
+            default: 30
+        },
         height: {
             type: Number,
             default: 480
@@ -48,16 +46,14 @@ export default {
         width: {
             type: Number,
             default: 720
-        }
+        },
+        cornerRadius: Number,
     },
     data: function() {
-        // console.log(this.data);
-
-        let _arc = arc().innerRadius(this.radius() - 30)
+        let _arc = arc().innerRadius(this.radius() - this.bandWidth)
             .outerRadius(this.radius());
 
-        // let outerArc = arc().innerRadius(this.radius())
-        //     .outerRadius(this.radius() + 30);
+        if (this.cornerRadius) _arc.cornerRadius(this.cornerRadius);
 
         let _pie = pie().value(d => d.y);
 
@@ -66,7 +62,6 @@ export default {
 
         return {
             arc: _arc,
-            // outerArc: outerArc,
             pie: _pie,
             displayedPaths: _pie(this.data),
             color: color,
@@ -93,11 +88,8 @@ export default {
     },
     methods: {
         updateArcs: function() {
-            this.arc.innerRadius(this.radius() - 30)
+            this.arc.innerRadius(this.radius() - this.bandWidth)
                 .outerRadius(this.radius());
-
-            // this.outerArc.innerRadius(this.radius())
-            //     .outerRadius(this.radius() + 30);
         },
         _width: function() {
             return this.width - margin.left - margin.right;

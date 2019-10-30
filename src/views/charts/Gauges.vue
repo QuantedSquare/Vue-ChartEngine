@@ -19,15 +19,17 @@ export default {
     data: function() {
         return {
             chartOptions: {
-                data: points(),
+                data: points(3, 10, 90),
                 width: 720,
-                height: 480
+                height: 480,
+                bandWidth: 20,
+                cornerRadius: 10
             }
         }
     },
     methods: {
         refreshData: function() {
-            this.chartOptions.data = points(Math.round(Math.random() * 15 + 3));
+            this.chartOptions.data = points(5, 10, 90);
         },
         refreshSize: function() {
             this.chartOptions.width = Math.round(Math.random() * 420 + 300);
