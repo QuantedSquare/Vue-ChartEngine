@@ -5,10 +5,16 @@
         </div>
         <svg :viewBox="'0 0 ' + width + ' ' + height">
             <g :transform="display">
+                <g>
+                    <slot name="top" v-bind="{$data, yMin, yMax}"></slot>
+                </g>
                 <g id="xAxis" :transform="bottomTranslate"></g>
                 <g id="yAxis"></g>
                 <rect class="bar chart-color2-darken-0" v-for="point in displayedBars" :x="xScale(point.x)" :y="yScale(point.y)" :width="xScale.bandwidth()" :height="positiveOrZero(_height() - yScale(point.y))"></rect>
                 <text v-for="point in displayedBars" :x="xScale(point.x) + (xScale.bandwidth()/2)" :y="yScale(point.y) - 5" text-anchor="middle" :opacity="animationState()-0.5">{{point.label}}</text>
+                <g>
+                    <slot v-bind="{$data, yMin, yMax}"></slot>
+                </g>
             </g>
         </svg>
     </div>
