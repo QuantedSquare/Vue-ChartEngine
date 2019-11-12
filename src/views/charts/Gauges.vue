@@ -22,8 +22,26 @@ export default {
                 data: points(3, 10, 90),
                 width: 720,
                 height: 480,
-                bandWidth: 20,
-                cornerRadius: 10
+                bandWidth: function(point, pointIndex) {
+                    if (!pointIndex) {
+                        return 30
+                    } else return 30;
+                },
+                innerRadius: function(point, pointIndex, radius) {
+                    if (pointIndex == 0) {
+                        return radius - 30;
+                    } else {
+                        return (radius - 30) - (pointIndex * 10)
+                    }
+                },
+                outerRadius: function(point, pointIndex, radius) {
+                    if (pointIndex == 0) {
+                        return radius;
+                    } else {
+                        return (radius - 30 - ((pointIndex - 1) * 10))
+                    }
+                },
+                cornerRadius: 100000000
             }
         }
     },

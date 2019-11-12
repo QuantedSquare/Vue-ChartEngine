@@ -39,8 +39,10 @@ export default {
             default: 100
         },
         bandWidth: {
-            type: Number,
-            default: 30
+            type: Function,
+            default: function() {
+                return 20;
+            }
         },
         height: {
             type: Number,
@@ -50,7 +52,19 @@ export default {
             type: Number,
             default: 720
         },
-        cornerRadius: Number
+        cornerRadius: Number,
+        innerRadius: {
+            type: Function,
+            default: function(point, pointIndex, radius) {
+                return radius - (pointIndex + 1) * 30;
+            }
+        },
+        outerRadius: {
+            type: Function,
+            default: function(point, pointIndex, radius) {
+                return radius - pointIndex * 30;
+            }
+        }
     },
     data: function() {
         let color = scaleOrdinal().domain(this.data.map(d => d.x))
@@ -99,9 +113,9 @@ export default {
                 text: this.data[0].label
             }
         },
-        getPointArc: function(pointIndex) {
-            let pointArc = arc().innerRadius(this.radius() - ((pointIndex + 1) * this.bandWidth))
-                .outerRadius(this.radius() - (pointIndex * this.bandWidth));
+        getPointArc: function(point, pointIndex) {
+            let pointArc = arc().innerRadius(this.innerRadius(point, pointIndex, this.radius()))
+                .outerRadius(this.outerRadius(point, pointIndex, this.radius()));
 
             if (this.cornerRadius) pointArc.cornerRadius(this.cornerRadius);
 
@@ -122,7 +136,7 @@ export default {
             let arcs = this.data.map((point, pointIndex) => {
                 return {
                     // TODO --> Change this by scaleBand. Or decreasing scaleBand.
-                    arc: this.getPointArc(pointIndex),
+                    arc: this.getPointArc(point, pointIndex),
                     angle: {
                         startAngle: 0,
                         endAngle: this.getEndAngle(point.y)
