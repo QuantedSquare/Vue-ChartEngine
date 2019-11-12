@@ -44,6 +44,14 @@ export default {
         width: {
             type: Number,
             default: 720
+        },
+        xAxis: {
+            type: Boolean,
+            default: true
+        },
+        yAxis: {
+            type: Boolean,
+            default: true
         }
     },
     data: function() {
@@ -125,14 +133,14 @@ export default {
 
             if (withTransition) axis = axis.transition().duration(500);
 
-            axis.call(axisBottom(this.xScale));
+            if (this.xAxis) axis.call(axisBottom(this.xScale));
         },
         drawYAxis: function(withTransition) {
             let axis = select(this.$el).select('#yAxis');
 
             if (withTransition) axis = axis.transition().duration(500);
 
-            axis.call(axisLeft(this.yScale));
+            if (this.yAxis) axis.call(axisLeft(this.yScale));
         },
         _width: function() {
             return this.width - margin.left - margin.right;

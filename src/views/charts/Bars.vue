@@ -2,8 +2,8 @@
     <div class="chart">
         <a @click="refreshData(10000, 15000)">Refresh Bars</a> |
         <a @click="refreshSize">Refresh Size</a>
-        <ChartBars v-bind="chartOptions" />
-        <ChartBars v-bind="chartOptions">
+        <ChartBars v-bind="chartOptions" :xAxis="false" />
+        <ChartBars v-bind="chartOptions" :yAxis="false">
             <template v-slot:default="chartData">
                 <line v-for="point in chartOptions.data" :x1="chartData.$data.xScale(point.x)" :x2="chartData.$data.xScale(point.x) + chartData.$data.xScale.bandwidth()" :y1="chartData.$data.yScale(point.y-10)" :y2="chartData.$data.yScale(point.y-10)" stroke="black"></line>
             </template>
