@@ -2,6 +2,9 @@
     <div>
         <svg :viewBox="'0 0 ' + width + ' ' + height" @mousemove="showVals" @mouseleave="hideVals">
             <g :transform="display">
+                <g>
+                    <slot name="top" v-bind="{$data, _xMin, _xMax, _yMin, _yMax}"></slot>
+                </g>
                 <g id="xAxis" :transform="bottomTranslate"></g>
                 <g id="yAxis"></g>
                 <g v-for="line in data">
@@ -21,6 +24,9 @@
                 <g v-if="events">
                     <text v-for="event in events" :x="xScale(event.x)" :y="yScale(_yMax) - 5" text-anchor="middle" class="event-label">{{event.label}}</text>
                     <line v-for="event in events" class="event-line" :x1="xScale(event.x)" :x2="xScale(event.x)" :y1="yScale(_yMin)" :y2="yScale(_yMax)" stroke="black"></line>
+                </g>
+                <g>
+                    <slot v-bind="$data"></slot>
                 </g>
                 <!-- <template v-for="point in readingLine.points">
                     <text v-if="(readingLine.active || pointsLabels)" :x="xScale(point.x)" :y="yScale(point.y) - 5" text-anchor="middle" class="event-label">
@@ -122,6 +128,8 @@ export default {
         this.drawYAxis();
 
         if (this.pointsLabels) this.showVals();
+
+        console.log(this);
     },
     watch: {
         data: function() {

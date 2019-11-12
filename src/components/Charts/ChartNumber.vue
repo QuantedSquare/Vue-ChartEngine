@@ -3,8 +3,9 @@
         <g :transform="display">
             <text class="big-number" text-anchor="middle" :textLength="textLength" :transform="center">{{displayedString}}</text>
             <g :transform="displayRight">
-                <slot></slot>
+                <slot name="right" v-bind="$data"></slot>
             </g>
+            <slot></slot>
         </g>
     </svg>
 </template>

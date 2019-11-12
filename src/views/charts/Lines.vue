@@ -3,7 +3,11 @@
         <a @click="refreshData">Refresh Lines</a> |
         <a @click="refreshSize">Refresh Size</a>
         <ChartLines v-bind="chartOptions" :yAxis="false" :pointsLabels="true" />
-        <ChartLines v-bind="chartOptions" />
+        <ChartLines v-bind="chartOptions">
+            <template v-slot:top="chartData">
+                <line v-for="x in nbPoints" :x1="chartData.$data.xScale(x-1)" :x2="chartData.$data.xScale(x-1)" :y1="chartData.$data.yScale(chartData._yMin)" :y2="chartData.$data.yScale(chartData._yMax)" stroke="black"></line>
+            </template>
+        </ChartLines>
     </div>
 </template>
 <script>
@@ -36,7 +40,8 @@ export default {
                 height: 480,
                 dots: true,
                 linesLabels: true
-            }
+            },
+            nbPoints: nbPoints
         }
     },
     methods: {

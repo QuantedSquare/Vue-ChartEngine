@@ -3,7 +3,9 @@
         <a @click="refreshData">Refresh Number</a> |
         <a @click="refreshSize">Refresh Size</a>
         <ChartNumber v-bind="chartOptions">
-            <text>TEST2</text>
+            <template v-slot:right="chartData">
+                <text>{{chartData.displayedNumber}}</text>
+            </template>
         </ChartNumber>
         <ChartNumber v-bind="chartOptions" :textWidth="0.7" />
     </div>
