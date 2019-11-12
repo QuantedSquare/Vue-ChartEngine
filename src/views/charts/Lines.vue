@@ -2,7 +2,7 @@
     <div class="chart">
         <a @click="refreshData">Refresh Lines</a> |
         <a @click="refreshSize">Refresh Size</a>
-        <ChartLines v-bind="chartOptions" />
+        <ChartLines v-bind="chartOptions" :yAxis="false" :pointsLabels="true" />
         <ChartLines v-bind="chartOptions" />
     </div>
 </template>

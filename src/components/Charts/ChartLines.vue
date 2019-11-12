@@ -6,20 +6,27 @@
                 <g id="yAxis"></g>
                 <g v-for="line in data">
                     <path class="line" :style="getLineStyle(line)" :d="lineDrawer(line.points)"></path>
-                    <template v-if="dots">
-                        <circle v-for="point in line.points" :cx="xScale(point.x)" :cy="yScale(point.y)" r="4" :style="getCircleStyle(line)" />
+                    <template v-for="point in line.points">
+                        <circle v-if="dots" :cx="xScale(point.x)" :cy="yScale(point.y)" r="4" :style="getCircleStyle(line)" />
                     </template>
                     <text v-if="linesLabels" :x="xScale(_xMax) + 5" :y="yScale(line.points[line.points.length - 1].y) + 5" class="line-label">{{line.label}}</text>
+                </g>
+                <g>
+                    <template v-for="point in readingLine.points">
+                        <text v-if="readingLine.active || pointsLabels" :x="xScale(point.x)" :y="yScale(point.y) - 5" text-anchor="middle" class="event-label">
+                            {{point.y}}
+                        </text>
+                    </template>
                 </g>
                 <g v-if="events">
                     <text v-for="event in events" :x="xScale(event.x)" :y="yScale(_yMax) - 5" text-anchor="middle" class="event-label">{{event.label}}</text>
                     <line v-for="event in events" class="event-line" :x1="xScale(event.x)" :x2="xScale(event.x)" :y1="yScale(_yMin)" :y2="yScale(_yMax)" stroke="black"></line>
                 </g>
-                <template v-for="point in readingLine.points">
-                    <text v-if="readingLine.active" :x="xScale(point.x)" :y="yScale(point.y) - 5" text-anchor="middle" class="event-label">
+                <!-- <template v-for="point in readingLine.points">
+                    <text v-if="(readingLine.active || pointsLabels)" :x="xScale(point.x)" :y="yScale(point.y) - 5" text-anchor="middle" class="event-label">
                         {{point.y}}
                     </text>
-                </template>
+                </template> -->
             </g>
         </svg>
     </div>
@@ -66,7 +73,16 @@ export default {
             default: 720
         },
         dots: Boolean,
-        linesLabels: Boolean
+        linesLabels: Boolean,
+        xAxis: {
+            type: Boolean,
+            default: true
+        },
+        yAxis: {
+            type: Boolean,
+            default: true
+        },
+        pointsLabels: Boolean
     },
     data: function() {
         // console.log(this.data);
@@ -104,6 +120,8 @@ export default {
     mounted: function() {
         this.drawXAxis();
         this.drawYAxis();
+
+        if (this.pointsLabels) this.showVals();
     },
     watch: {
         data: function() {
@@ -157,10 +175,10 @@ export default {
                 });
             }
 
-            select(this.$el).select('#xAxis').call(axis)
+            if (this.xAxis) select(this.$el).select('#xAxis').call(axis)
         },
         drawYAxis: function() {
-            select(this.$el).select('#yAxis').call(axisLeft(this.yScale))
+            if (this.yAxis) select(this.$el).select('#yAxis').call(axisLeft(this.yScale))
         },
         _width: function() {
             return this.width - margin.left - margin.right;
@@ -175,27 +193,35 @@ export default {
             return getMin(this.data, axis, { xMin: this.xMin, yMin: this.yMin });
         },
         showVals: function(event) {
-            let svgWidth = event.currentTarget.clientWidth,
-                xRatio = this.width / svgWidth,
-                xVal = this.xScale.invert((event.offsetX * xRatio) - margin.left);
+            if (this.pointsLabels) {
+                this.readingLine.points = [];
 
-            this.readingLine.points = this.data.map(line => {
-                let x = this.isTime ? +new Date(xVal) : xVal;
-
-                let nearestPoint = scan(line.points, (a, b) => {
-                    let aX = this.isTime ? +new Date(a.x) : a.x,
-                        bX = this.isTime ? +new Date(b.x) : b.x;
-
-                    return Math.abs(x - aX) - Math.abs(x - bX);
+                this.data.forEach(line => {
+                    this.readingLine.points.push(...line.points);
                 });
+            } else {
+                let svgWidth = event.currentTarget.clientWidth,
+                    xRatio = this.width / svgWidth,
+                    xVal = this.xScale.invert((event.offsetX * xRatio) - margin.left);
 
-                return line.points[nearestPoint];
-            });
+                this.readingLine.points = this.data.map(line => {
+                    let x = this.isTime ? +new Date(xVal) : xVal;
+
+                    let nearestPoint = scan(line.points, (a, b) => {
+                        let aX = this.isTime ? +new Date(a.x) : a.x,
+                            bX = this.isTime ? +new Date(b.x) : b.x;
+
+                        return Math.abs(x - aX) - Math.abs(x - bX);
+                    });
+
+                    return line.points[nearestPoint];
+                });
+            }
 
             this.readingLine.active = true;
         },
         hideVals: function() {
-            this.readingLine.active = false;
+            if (!this.pointsLabels) this.readingLine.active = false;
         },
         getLineStyle: function(line) {
             return {
