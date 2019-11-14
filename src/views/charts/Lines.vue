@@ -2,7 +2,7 @@
     <div class="chart">
         <a @click="refreshData">Refresh Lines</a> |
         <a @click="refreshSize">Refresh Size</a>
-        <ChartLines v-bind="chartOptions" :yAxis="false" :pointsLabels="true" />
+        <ChartLines v-bind="chartOptions" :yAxis="false" :pointsLabels="true" :colors="optionalColors" :coloredLabels="true" />
         <ChartLines v-bind="chartOptions">
             <template v-slot:top="chartData">
                 <line v-for="x in nbPoints" :x1="chartData.$data.xScale(x-1)" :x2="chartData.$data.xScale(x-1)" :y1="chartData.$data.yScale(chartData._yMin)" :y2="chartData.$data.yScale(chartData._yMax)" stroke="black"></line>
@@ -41,7 +41,11 @@ export default {
                 dots: true,
                 linesLabels: true
             },
-            nbPoints: nbPoints
+            nbPoints: nbPoints,
+            optionalColors: [
+                'rgb(241, 70, 35)', 'rgb(69, 219, 255)',
+                'rgb(81, 99, 101)'
+            ]
         }
     },
     methods: {

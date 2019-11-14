@@ -3,6 +3,7 @@
         <a @click="refreshData">Refresh Data</a> |
         <a @click="refreshSize">Refresh Size</a>
         <CharttGauge v-bind="chartOptions" />
+        <CharttGauge v-bind="chartOptions" :colors="optionalColors" />
     </div>
 </template>
 <script>
@@ -42,7 +43,11 @@ export default {
                     }
                 },
                 cornerRadius: 100000000
-            }
+            },
+            optionalColors: [
+                'rgb(241, 70, 35)', 'rgb(69, 219, 255)',
+                'rgb(81, 99, 101)'
+            ]
         }
     },
     methods: {

@@ -11,13 +11,16 @@
                     <path class="line" :style="getLineStyle(line)" :d="lineDrawer(line.points)"></path>
                     <template v-for="point in line.points">
                         <circle v-if="dots" :cx="xScale(point.x)" :cy="yScale(point.y)" r="4" :style="getCircleStyle(line)" />
+                        <text v-if="pointsLabels" :fill="coloredLabels ? color(line.label) : ''" :x="xScale(point.x)" :y="yScale(point.y) - 5" text-anchor="middle" class="event-label">
+                            {{point.label || point.y}}
+                        </text>
                     </template>
-                    <text v-if="linesLabels" :x="xScale(_xMax) + 5" :y="yScale(line.points[line.points.length - 1].y) + 5" class="line-label">{{line.label}}</text>
+                    <text v-if="linesLabels" :fill="coloredLabels ? color(line.label) : ''" :x="xScale(_xMax) + 5" :y="yScale(line.points[line.points.length - 1].y) + 5" class="line-label">{{line.label}}</text>
                 </g>
-                <g>
+                <g v-if="!pointsLabels">
                     <template v-for="point in readingLine.points">
-                        <text v-if="readingLine.active || pointsLabels" :x="xScale(point.x)" :y="yScale(point.y) - 5" text-anchor="middle" class="event-label">
-                            {{point.y}}
+                        <text v-if="readingLine.active" :fill="coloredLabels ? point.color : ''" :x="xScale(point.x)" :y="yScale(point.y) - 5" text-anchor="middle" class="event-label">
+                            {{point.label || point.y}}
                         </text>
                     </template>
                 </g>
@@ -28,11 +31,6 @@
                 <g>
                     <slot v-bind="$data"></slot>
                 </g>
-                <!-- <template v-for="point in readingLine.points">
-                    <text v-if="(readingLine.active || pointsLabels)" :x="xScale(point.x)" :y="yScale(point.y) - 5" text-anchor="middle" class="event-label">
-                        {{point.y}}
-                    </text>
-                </template> -->
             </g>
         </svg>
     </div>
@@ -43,11 +41,6 @@ import { getMin, getMax } from '@/modules/utilities.js'
 import * as shapes from 'd3-shape'
 
 let margin = { top: 40, right: 40, bottom: 40, left: 40 };
-
-let colorInterpolator = interpolateRgbBasis([
-    'rgb(162, 255, 174)', 'rgb(12, 204, 249)',
-    'rgb(172, 1, 207)', 'rgb(255, 18, 120)'
-]);
 
 export default {
     name: 'ChartLines',
@@ -88,7 +81,17 @@ export default {
             type: Boolean,
             default: true
         },
-        pointsLabels: Boolean
+        pointsLabels: Boolean,
+        colors: {
+            type: Array,
+            default: function() {
+                return [
+                    'rgb(162, 255, 174)', 'rgb(12, 204, 249)',
+                    'rgb(172, 1, 207)', 'rgb(255, 18, 120)'
+                ]
+            }
+        },
+        coloredLabels: false
     },
     data: function() {
         // console.log(this.data);
@@ -112,14 +115,17 @@ export default {
         yScale.range([this._height(), 0]);
         yScale.domain([this.getMin('y'), yMax]);
 
+        let colorInterpolator = interpolateRgbBasis(this.colors);
+
         let color = scaleOrdinal().domain(this.data.map(line => line.label))
-            .range(quantize(t => colorInterpolator(t), this.data.length + 1).reverse());
+            .range(quantize(t => colorInterpolator(t), this.data.length));
 
         return {
             xScale: xScale,
             yScale: yScale,
             lineDrawer: lineDrawer,
             readingLine: { x: 0, active: false, points: [] },
+            colorInterpolator: colorInterpolator,
             color: color
         }
     },
@@ -134,7 +140,7 @@ export default {
     watch: {
         data: function() {
             this.color.domain(this.data.map(line => line.label))
-                .range(quantize(t => colorInterpolator(t), this.data.length).reverse());
+                .range(quantize(t => this.colorInterpolator(t), this.data.length).reverse());
         },
         width: function() {
             this.xScale.range([0, this._width()]);
@@ -201,13 +207,7 @@ export default {
             return getMin(this.data, axis, { xMin: this.xMin, yMin: this.yMin });
         },
         showVals: function(event) {
-            if (this.pointsLabels) {
-                this.readingLine.points = [];
-
-                this.data.forEach(line => {
-                    this.readingLine.points.push(...line.points);
-                });
-            } else {
+            if (!this.pointsLabels) {
                 let svgWidth = event.currentTarget.clientWidth,
                     xRatio = this.width / svgWidth,
                     xVal = this.xScale.invert((event.offsetX * xRatio) - margin.left);
@@ -221,6 +221,8 @@ export default {
 
                         return Math.abs(x - aX) - Math.abs(x - bX);
                     });
+
+                    line.points[nearestPoint].color = this.color(line.label);
 
                     return line.points[nearestPoint];
                 });
@@ -265,9 +267,7 @@ export default {
 }
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style lang="scss" scoped>
-@import '@/assets/charts.scss';
-
+<style scoped>
 .line {
     fill: none;
     /*stroke: $chart-color-4-s40;*/

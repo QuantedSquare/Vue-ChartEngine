@@ -22,11 +22,6 @@ import { arc, pie, scaleOrdinal, quantize, interpolateRgbBasis, sum } from 'd3'
 
 let margin = { top: 40, right: 20, bottom: 40, left: 20 };
 
-let colorInterpolator = interpolateRgbBasis([
-    'rgb(162, 255, 174)', 'rgb(12, 204, 249)',
-    'rgb(172, 1, 207)', 'rgb(255, 18, 120)'
-]);
-
 export default {
     name: 'ChartGauges',
     props: {
@@ -64,13 +59,25 @@ export default {
             default: function(point, pointIndex, radius) {
                 return radius - pointIndex * 30;
             }
+        },
+        colors: {
+            type: Array,
+            default: function() {
+                return [
+                    'rgb(162, 255, 174)', 'rgb(12, 204, 249)',
+                    'rgb(172, 1, 207)', 'rgb(255, 18, 120)'
+                ]
+            }
         }
     },
     data: function() {
+        let colorInterpolator = interpolateRgbBasis(this.colors);
+
         let color = scaleOrdinal().domain(this.data.map(d => d.x))
-            .range(quantize(t => colorInterpolator(t), this.data.length).reverse());
+            .range(quantize(t => colorInterpolator(t), this.data.length));
 
         return {
+            colorInterpolator: colorInterpolator,
             color: color,
             centerData: {
                 val: this.data[0].y,
@@ -86,7 +93,7 @@ export default {
         height: function() {},
         data: function() {
             this.color.domain(this.data.map(d => d.x))
-                .range(quantize(t => colorInterpolator(t), this.data.length).reverse());
+                .range(quantize(t => this.colorInterpolator(t), this.data.length).reverse());
 
             this.hideHighlight();
         }
@@ -151,7 +158,7 @@ export default {
 }
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style lang="scss" scoped>
+<style scoped>
 .arc-path {
     /*fill: $chart-color-2-s100;*/
     stroke: white;

@@ -10,7 +10,7 @@
                 </g>
                 <g id="xAxis" :transform="bottomTranslate"></g>
                 <g id="yAxis"></g>
-                <rect class="bar chart-color2-darken-0" v-for="point in displayedBars" :x="xScale(point.x)" :y="yScale(point.y)" :width="xScale.bandwidth()" :height="positiveOrZero(_height() - yScale(point.y))"></rect>
+                <rect class="bar" :fill="color" v-for="point in displayedBars" :x="xScale(point.x)" :y="yScale(point.y)" :width="xScale.bandwidth()" :height="positiveOrZero(_height() - yScale(point.y))"></rect>
                 <text v-for="point in displayedBars" :x="xScale(point.x) + (xScale.bandwidth()/2)" :y="yScale(point.y) - 5" text-anchor="middle" :opacity="animationState()-0.5">{{point.label}}</text>
                 <g>
                     <slot v-bind="{$data, yMin, yMax}"></slot>
@@ -52,6 +52,11 @@ export default {
         yAxis: {
             type: Boolean,
             default: true
+        },
+        color: {
+            type: String,
+            // default: '#0CCCF9'
+            default: '#FF1278'
         }
     },
     data: function() {
@@ -175,9 +180,7 @@ export default {
 }
 </script>
 <!-- Add "scoped" attribute to limit CSS to this component only -->
-<style lang="scss" scoped>
-@import '@/assets/charts.scss';
-
+<style scoped>
 .bar {
     /*fill: $chart-color-2-s100;*/
     stroke: none;
