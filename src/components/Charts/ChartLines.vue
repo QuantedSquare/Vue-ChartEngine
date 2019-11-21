@@ -12,7 +12,7 @@
                     <template v-for="point in line.points">
                         <circle v-if="dots" :cx="xScale(point.x)" :cy="yScale(point.y)" r="4" :style="getCircleStyle(line)" />
                         <text v-if="pointsLabels" :fill="coloredLabels ? color(line.label) : ''" :x="xScale(point.x)" :y="yScale(point.y) - 5" text-anchor="middle" class="event-label">
-                            {{point.label || point.y}}
+                            {{(point.label || point.label == 0) ? point.label : point.y}}
                         </text>
                     </template>
                     <text v-if="linesLabels" :fill="coloredLabels ? color(line.label) : ''" :x="xScale(_xMax) + 5" :y="yScale(line.points[line.points.length - 1].y) + 5" class="line-label">{{line.label}}</text>
@@ -20,7 +20,7 @@
                 <g v-if="!pointsLabels">
                     <template v-for="point in readingLine.points">
                         <text v-if="readingLine.active" :fill="coloredLabels ? point.color : ''" :x="xScale(point.x)" :y="yScale(point.y) - 5" text-anchor="middle" class="event-label">
-                            {{point.label || point.y}}
+                            {{(point.label || point.label == 0) ? point.label : point.y}}
                         </text>
                     </template>
                 </g>
