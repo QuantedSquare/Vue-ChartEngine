@@ -1,6 +1,6 @@
 <template>
     <div class="chart">
-        <a @click="refreshData(10000, 15000)">Refresh Bars</a> |
+        <a @click="refreshData">Refresh Bars</a> |
         <a @click="refreshSize">Refresh Size</a>
         <ChartHorizontalBars v-bind="chartOptions" />
         <!-- <ChartHorizontalBars v-bind="chartOptions" :yAxis="false">
@@ -11,7 +11,7 @@
     </div>
 </template>
 <script>
-import { points } from '@/modules/randomVals.js'
+import { collection } from '@/modules/randomVals.js'
 import { aggregatePoints } from '@/modules/utilities.js'
 
 import ChartHorizontalBars from '@/components/Charts/ChartHorizontalBars.vue'
@@ -22,33 +22,25 @@ export default {
         ChartHorizontalBars
     },
     data: function() {
+        let nbLines = Math.round(Math.random() * 2 + 2);
+        let nbPoints = Math.round(Math.random() * 2 + 3);
+
         return {
             chartOptions: {
-                data: this.refreshData(100, 150),
+                data: collection(nbLines, nbPoints, 0, 100),
                 animationTime: 1000,
                 min: 0,
                 width: 720,
                 height: 480
-            },
-            nbPoints: 3
+            }
         }
     },
     methods: {
         refreshData: function(min, max) {
+            let nbLines = Math.round(Math.random() * 4 + 2);
+            let nbPoints = Math.round(Math.random() * 2 + 3);
 
-            let newData = points(3, min, max);
-
-            let smallPoints = points(Math.round(Math.random() * 15 + 3), 1, 10);
-
-            smallPoints.forEach(point => point.x += 3);
-
-            newData.push(...smallPoints);
-
-            // console.log(this.chartOptions);
-
-            if (this.chartOptions) this.chartOptions.data = aggregatePoints(newData, 0.2, 'x');
-
-            return newData;
+            this.chartOptions.data = collection(nbLines, nbPoints, 0, 100);
         },
         refreshSize: function() {
             this.chartOptions.width = Math.round(Math.random() * 420 + 300);

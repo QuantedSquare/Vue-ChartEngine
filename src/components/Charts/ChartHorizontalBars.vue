@@ -1,18 +1,15 @@
 <template>
     <div>
-        <div>
-            <!-- <span>yMax: {{yMax}}, yMin: {{yMin}}</span> -->
-        </div>
         <svg :viewBox="'0 0 ' + width + ' ' + height">
             <g :transform="display">
                 <g>
                     <slot name="top" v-bind="{$data, yMin, yMax}"></slot>
                 </g>
+                <g v-for="(bar, barIndex) in renderedBars">
+                    <rect class="bar" v-for="point in bar.points" :fill="color(point.label || point.x)" :x="yScale(point.offset)" :y="xScale(barIndex)" :width="yScale(point.y)" :height="xScale.bandwidth()"></rect>
+                </g>
                 <g id="yAxis" :transform="bottomTranslate"></g>
                 <g id="xAxis"></g>
-                <!-- <rect class="bar" :fill="color" v-for="point in displayedBars" :x="xScale(point.x)" :y="yScale(point.y)" :width="xScale.bandwidth()" :height="positiveOrZero(_height() - yScale(point.y))"></rect> -->
-                <rect class="bar" :fill="color" v-for="point in displayedBars" :x="yScale(0)+1" :y="xScale(point.x)" :width="yScale(point.y)" :height="xScale.bandwidth()"></rect>
-                <!-- <text v-for="point in displayedBars" :x="xScale(point.x) + (xScale.bandwidth()/2)" :y="yScale(point.y) - 5" text-anchor="middle" :opacity="animationState()-0.5">{{point.label}}</text> -->
                 <g>
                     <slot v-bind="{$data, yMin, yMax}"></slot>
                 </g>
@@ -21,7 +18,9 @@
     </div>
 </template>
 <script>
-import { select, scaleLinear, scaleBand, min, max, interpolateObject, axisLeft, axisBottom } from 'd3'
+import { select, quantize, scaleLinear, scaleBand, scaleOrdinal, min, max, sum, interpolateObject, interpolateRgbBasis, axisLeft, axisBottom } from 'd3'
+import { getMin, getMax } from '@/modules/utilities.js'
+
 
 let margin = { top: 40, right: 20, bottom: 40, left: 30 };
 
@@ -33,7 +32,7 @@ export default {
             required: true
         },
         min: Number, // Fix yAxix Min
-        max: Number, // Fix yAxis Max
+        max: 0, // Fix yAxis Max
         animationTime: {
             type: Number,
             default: 1000
@@ -54,10 +53,19 @@ export default {
             type: Boolean,
             default: true
         },
-        color: {
-            type: String,
-            // default: '#0CCCF9'
-            default: '#FF1278'
+        // color: {
+        //     type: String,
+        //     // default: '#0CCCF9'
+        //     default: '#FF1278'
+        // },
+        colors: {
+            type: Array,
+            default: function() {
+                return [
+                    'rgb(162, 255, 174)', 'rgb(12, 204, 249)',
+                    'rgb(172, 1, 207)', 'rgb(255, 18, 120)'
+                ]
+            }
         }
     },
     data: function() {
@@ -71,19 +79,25 @@ export default {
         margin.left = (yMax.toString().length + 1) * 10;
 
         xScale.range([0, this._height()]);
-        xScale.domain(this.data.map(point => point.x));
+        xScale.domain(this.data.map((bar, i) => i));
         xScale.padding(0.2)
 
         yScale.range([0, this._width()]);
         yScale.domain([this.getMin('y'), yMax]);
 
+        let colorInterpolator = interpolateRgbBasis(this.colors);
+
+        let barsLabels = this.getBarsLabels();
+
+        let color = scaleOrdinal().domain(barsLabels)
+            .range(quantize(t => colorInterpolator(t), barsLabels.length));
+
         return {
             xScale: xScale,
             yScale: yScale,
-            renderedBars: this.data,
-            interpolatedBars: this.data.map(b => interpolateObject({ x: b.x, y: 0 }, b)),
             displayedBars: [],
-            startAnimation: Date.now()
+            colorInterpolator: colorInterpolator,
+            color: color
         }
     },
     mounted: function() {
@@ -94,46 +108,26 @@ export default {
     },
     watch: {
         width: function() {
-            this.xScale.range([0, this._width()]);
-            this.drawXAxis()
-        },
-        height: function() {
-            this.yScale.range([this._height(), 0]);
+            this.yScale.range([0, this._width()]);
             this.drawYAxis();
         },
+        height: function() {
+            this.xScale.range([0, this._height()]);
+            this.drawXAxis();
+        },
         data: function() {
-            this.startAnimation = Date.now();
-            this.interpolatedBars = this.data.map(bar => {
-                let _bar = this.renderedBars.find(b => b.x == bar.x);
-                if (!_bar) _bar = { x: bar.x, y: this.getMax('y') }
-                return interpolateObject(_bar, bar);
-            });
+            let barsLabels = this.getBarsLabels();
 
-            this.renderedBars = this.data;
+            this.color.domain(barsLabels)
+                .range(quantize(t => this.colorInterpolator(t), barsLabels.length));
 
-            this.xScale.domain(this.data.map(point => point.x));
+            this.xScale.domain(this.data.map((bar, i) => i));
             this.yScale.domain([this.yMin, this.yMax]);
             this.drawXAxis(true);
             this.drawYAxis(true);
-
-            this.animate();
         }
     },
     methods: {
-        animate: function() {
-            this.displayedBars = this.interpolatedBars.map(interpolatedBar => {
-                return interpolatedBar(this.animationState());
-            });
-
-            if (this.animationState() < 1) setTimeout(this.animate, 0);
-        },
-        animationState: function() {
-            if ((this.startAnimation + this.animationTime) > Date.now()) {
-                return (Date.now() - this.startAnimation) / this.animationTime;
-            } else {
-                return 1;
-            }
-        },
         drawXAxis: function(withTransition) {
             let axis = select(this.$el).select('#xAxis');
 
@@ -155,16 +149,48 @@ export default {
             return this.height - margin.top - margin.bottom;
         },
         getMax: function(axis) {
-            return this.max ? this.max : max(this.data, (d) => d[axis]);
+            if (!this.max) {
+                return max(this.data.map(bar => {
+                    return sum(bar.points, p => p[axis]);
+                }));
+            } else return this.max;
         },
         getMin: function(axis) {
-            return !!(this.min + 1) ? this.min : min(this.data, (d) => d[axis]);
+            if (!this.min && this.min !== 0) {
+                return min(this.data.map(bar => {
+                    return sum(bar.points, p => p[axis]);
+                }))
+            } else return this.min;
         },
         positiveOrZero: function(nb) {
             return nb > 0 ? nb : 0;
+        },
+        getBarsLabels: function() {
+            return this.data.reduce((labels, bar) => {
+                labels.push(...bar.points.map(p => p.label || p.x).filter(label => {
+                    return labels.indexOf(label) < 0;
+                }));
+
+                return labels;
+            }, []);
         }
     },
     computed: {
+        renderedBars: function() {
+            return this.data.map(bar => {
+                let points = bar.points.reduce((_points, point, pointIndex) => {
+                    point.offset = sum(_points, p => p.y);
+
+                    _points.push(point);
+                    return _points;
+                }, []);
+
+                return {
+                    label: bar.label,
+                    points: points
+                }
+            });
+        },
         display: function() {
             return 'translate(' + margin.left + ',' + margin.top + ')';
         },

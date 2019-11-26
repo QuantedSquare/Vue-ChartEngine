@@ -70,7 +70,7 @@ export default {
         let xScale = scaleBand();
 
         xScale.range([0, this._width() * this.textWidth]);
-        xScale.padding(0.05)
+        xScale.padding(0.05);
 
         return {
             interpolatedNumber: interpolateNumber(start, this.data),
