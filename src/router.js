@@ -12,6 +12,11 @@ let devRoutes = [
         component: () => import('./views/charts/Bars.vue')
     },
     {
+        path: '/horizontalbars',
+        name: 'horizontalbars',
+        component: () => import('./views/charts/HorizontalBars.vue')
+    },
+    {
         path: '/gauges',
         name: 'gauges',
         component: () => import('./views/charts/Gauges.vue')
