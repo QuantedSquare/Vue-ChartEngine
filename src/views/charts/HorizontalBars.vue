@@ -3,11 +3,10 @@
         <a @click="refreshData">Refresh Bars</a> |
         <a @click="refreshSize">Refresh Size</a>
         <ChartHorizontalBars v-bind="chartOptions" />
-        <!-- <ChartHorizontalBars v-bind="chartOptions" :yAxis="false">
+        <ChartHorizontalBars v-bind="chartOptions" :yAxis="false" :bandHeight="20" :cornerRadius="10">
             <template v-slot:default="chartData">
-                <line v-for="point in chartOptions.data" :x1="chartData.$data.xScale(point.x)" :x2="chartData.$data.xScale(point.x) + chartData.$data.xScale.bandwidth()" :y1="chartData.$data.yScale(point.y-10)" :y2="chartData.$data.yScale(point.y-10)" stroke="black"></line>
             </template>
-        </ChartHorizontalBars> -->
+        </ChartHorizontalBars>
     </div>
 </template>
 <script>

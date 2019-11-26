@@ -6,7 +6,7 @@
                     <slot name="top" v-bind="{$data, yMin, yMax}"></slot>
                 </g>
                 <g v-for="(bar, barIndex) in renderedBars">
-                    <rect class="bar" v-for="point in bar.points" :fill="color(point.label || point.x)" :x="yScale(point.offset)" :y="xScale(barIndex)" :width="yScale(point.y)" :height="xScale.bandwidth()"></rect>
+                    <rect class="bar" v-for="point in bar.points" :fill="color(point.label || point.x)" :x="yScale(point.offset)" :y="yPos(barIndex)" :width="yScale(point.y)" :height="bandHeight || xScale.bandwidth()" :rx="cornerRadius" :ry="cornerRadius"></rect>
                 </g>
                 <g id="yAxis" :transform="bottomTranslate"></g>
                 <g id="xAxis"></g>
@@ -53,11 +53,8 @@ export default {
             type: Boolean,
             default: true
         },
-        // color: {
-        //     type: String,
-        //     // default: '#0CCCF9'
-        //     default: '#FF1278'
-        // },
+        cornerRadius: 0,
+        bandHeight: Number,
         colors: {
             type: Array,
             default: function() {
@@ -173,6 +170,11 @@ export default {
 
                 return labels;
             }, []);
+        },
+        yPos: function(barIndex) {
+            if (this.bandHeight) {
+                return this.xScale(barIndex) + (this.xScale.bandwidth() / 2) - this.bandHeight / 2;
+            } else return this.xScale(barIndex);
         }
     },
     computed: {
