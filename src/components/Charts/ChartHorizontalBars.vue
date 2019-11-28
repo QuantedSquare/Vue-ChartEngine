@@ -3,7 +3,7 @@
         <svg :viewBox="'0 0 ' + width + ' ' + height">
             <g :transform="display">
                 <g>
-                    <slot name="top" v-bind="{$data, yMin, yMax}"></slot>
+                    <slot name="top" v-bind="{$data, yMin, yMax, renderedBars}"></slot>
                 </g>
                 <g v-for="(bar, barIndex) in renderedBars">
                     <rect class="bar" v-for="point in bar.points" :fill="color(point.label || point.x)" :x="yScale(point.offset)" :y="yPos(barIndex)" :width="yScale(point.y)" :height="bandHeight || xScale.bandwidth()" :rx="cornerRadius" :ry="cornerRadius"></rect>
@@ -11,7 +11,7 @@
                 <g id="yAxis" :transform="bottomTranslate"></g>
                 <g id="xAxis"></g>
                 <g>
-                    <slot v-bind="{$data, yMin, yMax}"></slot>
+                    <slot v-bind="{$data, yMin, yMax, renderedBars}"></slot>
                 </g>
             </g>
         </svg>
