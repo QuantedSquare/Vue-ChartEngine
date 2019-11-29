@@ -32,7 +32,7 @@ export default {
             required: true
         },
         min: Number, // Fix yAxix Min
-        max: 0, // Fix yAxis Max
+        max: Number, // Fix yAxis Max
         animationTime: {
             type: Number,
             default: 1000
@@ -61,6 +61,10 @@ export default {
             type: Number,
             default: 0
         },
+        xScalePadding: {
+            type: Number,
+            default: 0.2
+        },
         bandHeight: Number,
         colors: {
             type: Array,
@@ -84,7 +88,7 @@ export default {
 
         xScale.range([0, this._height()]);
         xScale.domain(this.data.map((bar, i) => i));
-        xScale.padding(0.2)
+        xScale.padding(this.xScalePadding);
 
         yScale.range([0, this._width()]);
         yScale.domain([this.getMin('y'), yMax]);
