@@ -22,7 +22,7 @@ import { select, quantize, scaleLinear, scaleBand, scaleOrdinal, min, max, sum, 
 import { getMin, getMax } from '@/modules/utilities.js'
 
 
-let margin = { top: 80, right: 20, bottom: 100, left: 30 };
+let margin = { top: 40, right: 80, bottom: 100, left: 80 };
 
 export default {
     name: 'ChartBars',
@@ -84,7 +84,7 @@ export default {
 
         let yMax = this.getMax('y');
 
-        margin.left = (yMax.toString().length + 1) * 10;
+        // margin.left = (yMax.toString().length + 1) * 10;
 
         xScale.range([0, this._height()]);
         xScale.domain(this.data.map((bar, i) => i));
