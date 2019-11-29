@@ -6,7 +6,7 @@
                     <slot name="top" v-bind="{$data, yMin, yMax, renderedBars}"></slot>
                 </g>
                 <g v-for="(bar, barIndex) in renderedBars">
-                    <rect class="bar" v-for="point in bar.points" :fill="color(point.label || point.x)" :x="yScale(point.offset)" :y="yPos(barIndex)" :width="yScale(point.y)" :height="bandHeight || xScale.bandwidth()" :rx="cornerRadius" :ry="cornerRadius"></rect>
+                    <rect class="bar" v-for="point in bar.points" :fill="color(point.label || point.x)" :x="yScale(point.offset) + barsPadding" :y="yPos(barIndex)" :width="(yScale(point.y) - barsPadding) || 0" :height="bandHeight || xScale.bandwidth()" :rx="cornerRadius" :ry="cornerRadius"></rect>
                 </g>
                 <g id="yAxis" :transform="bottomTranslate"></g>
                 <g id="xAxis"></g>
@@ -22,7 +22,7 @@ import { select, quantize, scaleLinear, scaleBand, scaleOrdinal, min, max, sum, 
 import { getMin, getMax } from '@/modules/utilities.js'
 
 
-let margin = { top: 40, right: 20, bottom: 40, left: 30 };
+let margin = { top: 80, right: 20, bottom: 100, left: 30 };
 
 export default {
     name: 'ChartBars',
@@ -53,7 +53,14 @@ export default {
             type: Boolean,
             default: true
         },
-        cornerRadius: 0,
+        cornerRadius: {
+            type: Number,
+            default: 0
+        },
+        barsPadding: { // This make the reading unacurate if too big.
+            type: Number,
+            default: 0
+        },
         bandHeight: Number,
         colors: {
             type: Array,

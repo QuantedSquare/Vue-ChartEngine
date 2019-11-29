@@ -95,7 +95,6 @@ export default {
     },
     data: function() {
         // console.log(this.data);
-        // console.log(this.data[0].points.map(p => p.label));
         let xScale = this.isTime ? scaleTime() : scaleLinear(),
             yScale = scaleLinear();
 
@@ -134,8 +133,6 @@ export default {
         this.drawYAxis();
 
         if (this.pointsLabels) this.showVals();
-
-        console.log(this);
     },
     watch: {
         data: function() {

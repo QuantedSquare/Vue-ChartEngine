@@ -2,8 +2,8 @@
     <div class="chart">
         <a @click="refreshData">Refresh Bars</a> |
         <a @click="refreshSize">Refresh Size</a>
-        <ChartHorizontalBars v-bind="chartOptions" />
-        <ChartHorizontalBars v-bind="chartOptions" :yAxis="false" :bandHeight="20" :cornerRadius="10">
+        <ChartHorizontalBars v-bind="chartOptions" :barsPadding="10" />
+        <ChartHorizontalBars v-bind="chartOptions" :yAxis="false" :bandHeight="20" :cornerRadius="10" :barsPadding="2">
             <template v-slot:default="chartData">
             </template>
         </ChartHorizontalBars>
