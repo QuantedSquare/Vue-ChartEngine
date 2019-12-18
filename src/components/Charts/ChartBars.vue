@@ -1,23 +1,18 @@
 <template>
-    <div>
-        <div>
-            <!-- <span>yMax: {{yMax}}, yMin: {{yMin}}</span> -->
-        </div>
-        <svg :viewBox="'0 0 ' + width + ' ' + height">
-            <g :transform="display">
-                <g>
-                    <slot name="top" v-bind="{$data, yMin, yMax}"></slot>
-                </g>
-                <g id="xAxis" :transform="bottomTranslate"></g>
-                <g id="yAxis"></g>
-                <rect class="bar" :fill="color" v-for="point in displayedBars" :x="xScale(point.x)" :y="yScale(point.y)" :width="xScale.bandwidth()" :height="positiveOrZero(_height() - yScale(point.y))"></rect>
-                <text v-for="point in displayedBars" :x="xScale(point.x) + (xScale.bandwidth()/2)" :y="yScale(point.y) - 5" text-anchor="middle" :opacity="animationState()-0.5">{{point.label}}</text>
-                <g>
-                    <slot v-bind="{$data, yMin, yMax}"></slot>
-                </g>
+    <svg :viewBox="'0 0 ' + width + ' ' + height">
+        <g :transform="display">
+            <g>
+                <slot name="top" v-bind="{$data, yMin, yMax}"></slot>
             </g>
-        </svg>
-    </div>
+            <g id="xAxis" :transform="bottomTranslate"></g>
+            <g id="yAxis"></g>
+            <rect class="bar" :fill="color" v-for="point in displayedBars" :x="xScale(point.x)" :y="yScale(point.y)" :width="xScale.bandwidth()" :height="positiveOrZero(_height() - yScale(point.y))"></rect>
+            <text v-for="point in displayedBars" :x="xScale(point.x) + (xScale.bandwidth()/2)" :y="yScale(point.y) - 5" text-anchor="middle" :opacity="animationState()-0.5">{{point.label}}</text>
+            <g>
+                <slot v-bind="{$data, yMin, yMax}"></slot>
+            </g>
+        </g>
+    </svg>
 </template>
 <script>
 import { select, scaleLinear, scaleBand, min, max, interpolateObject, axisLeft, axisBottom } from 'd3'

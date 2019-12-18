@@ -1,39 +1,37 @@
 <template>
-    <div>
-        <svg :viewBox="'0 0 ' + width + ' ' + height" @mousemove="showVals" @mouseleave="hideVals">
-            <g :transform="display">
-                <g>
-                    <slot name="top" v-bind="{$data, _xMin, _xMax, _yMin, _yMax}"></slot>
-                </g>
-                <g id="xAxis" :transform="bottomTranslate"></g>
-                <g id="yAxis"></g>
-                <g v-for="line in data">
-                    <path class="line" :style="getLineStyle(line)" :d="lineDrawer(line.points)"></path>
-                    <template v-for="point in line.points">
-                        <circle v-if="dots" :cx="xScale(point.x)" :cy="yScale(point.y)" r="4" :style="getCircleStyle(line)" />
-                        <text v-if="pointsLabels" :fill="coloredLabels ? color(line.label) : ''" :x="xScale(point.x)" :y="yScale(point.y) - 5" text-anchor="middle" class="event-label">
-                            {{(point.label || point.label == 0) ? point.label : point.y}}
-                        </text>
-                    </template>
-                    <text v-if="linesLabels" :fill="coloredLabels ? color(line.label) : ''" :x="xScale(_xMax) + 5" :y="yScale(line.points[line.points.length - 1].y) + 5" class="line-label">{{line.label}}</text>
-                </g>
-                <g v-if="!pointsLabels">
-                    <template v-for="point in readingLine.points">
-                        <text v-if="readingLine.active" :fill="coloredLabels ? point.color : ''" :x="xScale(point.x)" :y="yScale(point.y) - 5" text-anchor="middle" class="event-label">
-                            {{(point.label || point.label == 0) ? point.label : point.y}}
-                        </text>
-                    </template>
-                </g>
-                <g v-if="events">
-                    <text v-for="event in events" :x="xScale(event.x)" :y="yScale(_yMax) - 5" text-anchor="middle" class="event-label">{{event.label}}</text>
-                    <line v-for="event in events" class="event-line" :x1="xScale(event.x)" :x2="xScale(event.x)" :y1="yScale(_yMin)" :y2="yScale(_yMax)" stroke="black"></line>
-                </g>
-                <g>
-                    <slot v-bind="$data"></slot>
-                </g>
+    <svg :viewBox="'0 0 ' + width + ' ' + height" @mousemove="showVals" @mouseleave="hideVals">
+        <g :transform="display">
+            <g>
+                <slot name="top" v-bind="{$data, _xMin, _xMax, _yMin, _yMax}"></slot>
             </g>
-        </svg>
-    </div>
+            <g id="xAxis" :transform="bottomTranslate"></g>
+            <g id="yAxis"></g>
+            <g v-for="line in data">
+                <path class="line" :style="getLineStyle(line)" :d="lineDrawer(line.points)"></path>
+                <template v-for="point in line.points">
+                    <circle v-if="dots" :cx="xScale(point.x)" :cy="yScale(point.y)" r="4" :style="getCircleStyle(line)" />
+                    <text v-if="pointsLabels" :fill="coloredLabels ? color(line.label) : ''" :x="xScale(point.x)" :y="yScale(point.y) - 5" text-anchor="middle" class="event-label">
+                        {{(point.label || point.label == 0) ? point.label : point.y}}
+                    </text>
+                </template>
+                <text v-if="linesLabels" :fill="coloredLabels ? color(line.label) : ''" :x="xScale(_xMax) + 5" :y="yScale(line.points[line.points.length - 1].y) + 5" class="line-label">{{line.label}}</text>
+            </g>
+            <g v-if="!pointsLabels">
+                <template v-for="point in readingLine.points">
+                    <text v-if="readingLine.active" :fill="coloredLabels ? point.color : ''" :x="xScale(point.x)" :y="yScale(point.y) - 5" text-anchor="middle" class="event-label">
+                        {{(point.label || point.label == 0) ? point.label : point.y}}
+                    </text>
+                </template>
+            </g>
+            <g v-if="events">
+                <text v-for="event in events" :x="xScale(event.x)" :y="yScale(_yMax) - 5" text-anchor="middle" class="event-label">{{event.label}}</text>
+                <line v-for="event in events" class="event-line" :x1="xScale(event.x)" :x2="xScale(event.x)" :y1="yScale(_yMin)" :y2="yScale(_yMax)" stroke="black"></line>
+            </g>
+            <g>
+                <slot v-bind="{$data, _xMin, _xMax, _yMin, _yMax}"></slot>
+            </g>
+        </g>
+    </svg>
 </template>
 <script>
 import { select, quantize, scaleOrdinal, interpolateRgbBasis, scaleLinear, scaleTime, min, max, axisLeft, axisBottom, scan } from 'd3'

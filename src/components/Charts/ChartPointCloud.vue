@@ -1,20 +1,24 @@
 <template>
-    <div>
-        <svg ref="svg" :viewBox="'0 0 ' + width + ' ' + height">
-            <g :transform="display">
-                <g id="xAxis" :transform="bottomTranslate"></g>
-                <g id="yAxis"></g>
-                <g v-for="cloud in data">
-                    <g v-for="point in cloud.points" @mouseenter="mouseEnter" @mouseleave="mouseLeave" class="point-group" :class="highlight ? 'hide' : ''">
-                        <circle :style="style.pointCircle" :cx="xScale(point.x)" :cy="yScale(point.y)" r="4" :fill="color(cloud.label)" />
-                        <line v-if="xLines" :x1="xScale(_xMin)" :x2="xScale(point.x) - r" :y1="yScale(point.y)" :y2="yScale(point.y)" :stroke="color(cloud.label)"></line>
-                        <line v-if="yLines" :x1="xScale(point.x)" :x2="xScale(point.x)" :y1="yScale(_yMin)" :y2="yScale(point.y) - r" :stroke="color(cloud.label)"></line>
-                        <text class="event-label" :x="xScale(xLabel(point)) + 5" :y="yScale(yLabel(point)) -3" :text-anchor="labelAnchor">{{point.label}}</text>
-                    </g>
+    <svg ref="svg" :viewBox="'0 0 ' + width + ' ' + height">
+        <g :transform="display">
+            <g>
+                <slot name="top" v-bind="{$data, _xMin, _xMax, _yMin, _yMax}"></slot>
+            </g>
+            <g id="xAxis" :transform="bottomTranslate"></g>
+            <g id="yAxis"></g>
+            <g v-for="cloud in data">
+                <g v-for="point in cloud.points" @mouseenter="mouseEnter" @mouseleave="mouseLeave" class="point-group" :class="highlight ? 'hide' : ''">
+                    <circle :style="style.pointCircle" :cx="xScale(point.x)" :cy="yScale(point.y)" r="4" :fill="color(cloud.label)" />
+                    <line v-if="xLines" :x1="xScale(_xMin)" :x2="xScale(point.x) - r" :y1="yScale(point.y)" :y2="yScale(point.y)" :stroke="color(cloud.label)"></line>
+                    <line v-if="yLines" :x1="xScale(point.x)" :x2="xScale(point.x)" :y1="yScale(_yMin)" :y2="yScale(point.y) - r" :stroke="color(cloud.label)"></line>
+                    <text class="event-label" :x="xScale(xLabel(point)) + 5" :y="yScale(yLabel(point)) -3" :text-anchor="labelAnchor">{{point.label}}</text>
                 </g>
             </g>
-        </svg>
-    </div>
+            <g>
+                <slot v-bind="{$data, _xMin, _xMax, _yMin, _yMax}"></slot>
+            </g>
+        </g>
+    </svg>
 </template>
 <script>
 import { select, scaleLinear, quantize, scaleOrdinal, scaleTime, axisLeft, axisBottom, scan, interpolateRgbBasis } from 'd3'

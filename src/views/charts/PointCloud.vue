@@ -3,7 +3,11 @@
         <a @click="refreshData">Refresh Points</a> |
         <a @click="refreshSize">Refresh Size</a>
         <ChartPointCloud v-bind="chartOptions" />
-        <ChartPointCloud v-bind="chartOptions" />
+        <ChartPointCloud v-bind="chartOptions">
+            <template v-slot:top="chartData">
+                <line v-for="x in nbPoints" :x1="chartData.$data.xScale(x-1)" :x2="chartData.$data.xScale(x-1)" :y1="chartData.$data.yScale(chartData._yMin)" :y2="chartData.$data.yScale(chartData._yMax)" stroke="black"></line>
+            </template>
+        </ChartPointCloud>
     </div>
 </template>
 <script>
@@ -32,7 +36,8 @@ export default {
                 labelAnchor: 'middle',
                 height: 480,
                 width: 720
-            }
+            },
+            nbPoints: nbPoints
         }
     },
     methods: {
