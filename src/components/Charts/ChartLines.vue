@@ -115,7 +115,7 @@ export default {
         let colorInterpolator = interpolateRgbBasis(this.colors);
 
         let color = scaleOrdinal().domain(this.data.map(line => line.label))
-            .range(quantize(t => colorInterpolator(t), this.data.length));
+            .range(quantize(t => colorInterpolator(t), this.data.length + 1));
 
         return {
             xScale: xScale,
@@ -135,7 +135,7 @@ export default {
     watch: {
         data: function() {
             this.color.domain(this.data.map(line => line.label))
-                .range(quantize(t => this.colorInterpolator(t), this.data.length).reverse());
+                .range(quantize(t => this.colorInterpolator(t), this.data.length + 1));
         },
         width: function() {
             this.xScale.range([0, this._width()]);

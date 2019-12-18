@@ -28,11 +28,6 @@ import * as shapes from 'd3-shape'
 
 let margin = { top: 40, right: 80, bottom: 40, left: 40 };
 
-let colorInterpolator = interpolateRgbBasis([
-    'rgb(162, 255, 174)', 'rgb(12, 204, 249)',
-    'rgb(172, 1, 207)', 'rgb(255, 18, 120)'
-]);
-
 const style = {
     pointCircle: {
         // stroke: 'black'
@@ -62,6 +57,25 @@ export default {
             type: Boolean,
             default: false
         },
+        xAxis: {
+            type: Boolean,
+            default: true
+        },
+        yAxis: {
+            type: Boolean,
+            default: true
+        },
+        pointsLabels: Boolean,
+        colors: {
+            type: Array,
+            default: function() {
+                return [
+                    'rgb(162, 255, 174)', 'rgb(12, 204, 249)',
+                    'rgb(172, 1, 207)', 'rgb(255, 18, 120)'
+                ]
+            }
+        },
+        coloredLabels: false,
         xLabel: {
             type: Function,
             default: function(point) {
@@ -99,8 +113,10 @@ export default {
         yScale.range([this._height(), 0]);
         yScale.domain([this.getMin('y'), this.getMax('y')]);
 
+        let colorInterpolator = interpolateRgbBasis(this.colors);
+
         let color = scaleOrdinal().domain(this.data.map(cloud => cloud.label))
-            .range(quantize(t => colorInterpolator(t), this.data.length + 1).reverse());
+            .range(quantize(t => colorInterpolator(t), this.data.length + 1));
 
         return {
             xScale: xScale,
@@ -123,7 +139,7 @@ export default {
     watch: {
         data: function() {
             this.color.domain(this.data.map(cloud => cloud.label))
-                .range(quantize(t => colorInterpolator(t), this.data.length).reverse());
+                .range(quantize(t => colorInterpolator(t), this.data.length + 1));
         },
         width: function() {
             this.xScale.range([0, this._width()]);
