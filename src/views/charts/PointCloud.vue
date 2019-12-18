@@ -2,8 +2,8 @@
     <div class="chart">
         <a @click="refreshData">Refresh Points</a> |
         <a @click="refreshSize">Refresh Size</a>
-        <ChartPointCloud v-bind="chartOptions" />
-        <ChartPointCloud v-bind="chartOptions">
+        <ChartPointCloud v-bind="chartOptions" :pointsLabels="true" :coloredLabels="true" :xAxis="false" />
+        <ChartPointCloud v-bind="chartOptions" :yAxis="false">
             <template v-slot:top="chartData">
                 <line v-for="x in nbPoints" :x1="chartData.$data.xScale(x-1)" :x2="chartData.$data.xScale(x-1)" :y1="chartData.$data.yScale(chartData._yMin)" :y2="chartData.$data.yScale(chartData._yMax)" stroke="black"></line>
             </template>

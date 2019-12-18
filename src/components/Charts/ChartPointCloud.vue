@@ -11,7 +11,7 @@
                     <circle :style="style.pointCircle" :cx="xScale(point.x)" :cy="yScale(point.y)" r="4" :fill="color(cloud.label)" />
                     <line v-if="xLines" :x1="xScale(_xMin)" :x2="xScale(point.x) - r" :y1="yScale(point.y)" :y2="yScale(point.y)" :stroke="color(cloud.label)"></line>
                     <line v-if="yLines" :x1="xScale(point.x)" :x2="xScale(point.x)" :y1="yScale(_yMin)" :y2="yScale(point.y) - r" :stroke="color(cloud.label)"></line>
-                    <text class="event-label" :x="xScale(xLabel(point)) + 5" :y="yScale(yLabel(point)) -3" :text-anchor="labelAnchor">{{point.label}}</text>
+                    <text v-if="pointsLabels" class="event-label" :x="xScale(xLabel(point)) + 5" :y="yScale(yLabel(point)) -3" :text-anchor="labelAnchor" :fill="coloredLabels ? color(cloud.label) : ''">{{point.label}}</text>
                 </g>
             </g>
             <g>
@@ -168,10 +168,10 @@ export default {
     },
     methods: {
         drawXAxis: function() {
-            select(this.$el).select('#xAxis').call(axisBottom(this.xScale))
+            if (this.xAxis) select(this.$el).select('#xAxis').call(axisBottom(this.xScale))
         },
         drawYAxis: function() {
-            select(this.$el).select('#yAxis').call(axisLeft(this.yScale))
+            if (this.yAxis) select(this.$el).select('#yAxis').call(axisLeft(this.yScale))
         },
         _width: function() {
             return this.width - margin.left - margin.right;
