@@ -26,7 +26,7 @@ import { getMin, getMax, getIMG } from '@/modules/utilities.js'
 
 import * as shapes from 'd3-shape'
 
-let margin = { top: 40, right: 80, bottom: 40, left: 40 };
+let margin = { top: 40, right: 60, bottom: 40, left: 60 };
 
 const style = {
     pointCircle: {
@@ -214,13 +214,12 @@ export default {
     }
 }
 </script>
-<!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
 .event-label {
     opacity: 0.5;
 }
 
-g.point-group {
+/*g.point-group {
     cursor: pointer;
 }
 
@@ -234,5 +233,5 @@ g:hover>.event-label,
 g:hover>line,
 g:hover>circle {
     opacity: 1 !important;
-}
+}*/
 </style>
