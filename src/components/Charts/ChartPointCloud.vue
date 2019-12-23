@@ -121,6 +121,7 @@ export default {
         return {
             xScale: xScale,
             yScale: yScale,
+            colorInterpolator: colorInterpolator,
             color: color,
             style: style,
             highlight: false
@@ -139,7 +140,7 @@ export default {
     watch: {
         data: function() {
             this.color.domain(this.data.map(cloud => cloud.label))
-                .range(quantize(t => colorInterpolator(t), this.data.length + 1));
+                .range(quantize(t => this.colorInterpolator(t), this.data.length + 1));
         },
         width: function() {
             this.xScale.range([0, this._width()]);
