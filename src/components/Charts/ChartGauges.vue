@@ -93,7 +93,7 @@ export default {
         height: function() {},
         data: function() {
             this.color.domain(this.data.map(d => d.x))
-                .range(quantize(t => this.colorInterpolator(t), this.data.length).reverse());
+                .range(quantize(t => this.colorInterpolator(t), this.data.length));
 
             this.hideHighlight();
         }
