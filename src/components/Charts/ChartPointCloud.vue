@@ -8,10 +8,10 @@
             <g id="yAxis"></g>
             <g v-for="cloud in data">
                 <g v-for="point in cloud.points" @mouseenter="mouseEnter" @mouseleave="mouseLeave" class="point-group" :class="highlight ? 'hide' : ''">
-                    <circle :style="style.pointCircle" :cx="xScale(point.x)" :cy="yScale(point.y)" r="4" :fill="color(point.color || cloud.label)" />
-                    <line v-if="xLines" :x1="xScale(_xMin)" :x2="xScale(point.x) - r" :y1="yScale(point.y)" :y2="yScale(point.y)" :stroke="color(cloud.label)"></line>
-                    <line v-if="yLines" :x1="xScale(point.x)" :x2="xScale(point.x)" :y1="yScale(_yMin)" :y2="yScale(point.y) - r" :stroke="color(cloud.label)"></line>
-                    <text v-if="pointsLabels" class="event-label" :x="xScale(xLabel(point)) + 5" :y="yScale(yLabel(point)) -3" :text-anchor="labelAnchor" :fill="coloredLabels ? color(cloud.label) : ''">{{point.label}}</text>
+                    <circle :style="style.pointCircle" :cx="xScale(point.x)" :cy="yScale(point.y)" r="4" :fill="point.color || color(cloud.label)" />
+                    <line v-if="xLines" :x1="xScale(_xMin)" :x2="xScale(point.x) - r" :y1="yScale(point.y)" :y2="yScale(point.y)" :stroke="point.color || color(cloud.label)"></line>
+                    <line v-if="yLines" :x1="xScale(point.x)" :x2="xScale(point.x)" :y1="yScale(_yMin)" :y2="yScale(point.y) - r" :stroke="point.color || color(cloud.label)"></line>
+                    <text v-if="pointsLabels" class="event-label" :x="xScale(xLabel(point)) + 5" :y="yScale(yLabel(point)) -3" :text-anchor="labelAnchor" :fill="coloredLabels ? (point.color || color(cloud.label)) : ''">{{point.label}}</text>
                 </g>
             </g>
             <g>
