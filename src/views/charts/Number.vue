@@ -7,7 +7,7 @@
                 <text>{{chartData.displayedNumber}}</text>
             </template>
         </ChartNumber>
-        <ChartNumber v-bind="chartOptions" :textWidth="0.7" />
+        <ChartNumber v-bind="chartOptions" :data="'Toto'" :textWidth="0" />
     </div>
 </template>
 <script>
@@ -27,7 +27,7 @@ export default {
                 data: Math.round(Math.random() * 100) + 0.56,
                 width: 720,
                 height: 480,
-                initialValue: 10,
+                // initialValue: 10,
                 unit: '$',
                 preText: '+',
                 animationTime: 2000,

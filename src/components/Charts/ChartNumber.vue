@@ -1,7 +1,7 @@
 <template>
     <svg :viewBox="'0 0 ' + width + ' ' + height">
         <g :transform="display">
-            <text class="big-number" text-anchor="middle" :textLength="textLength" :transform="center">{{displayedString}}</text>
+            <text class="big-number" text-anchor="middle" :textLength="textWidth ? textLength : null" :transform="center">{{displayedString}}</text>
             <g :transform="displayRight">
                 <slot name="right" v-bind="$data"></slot>
             </g>
@@ -25,7 +25,6 @@ export default {
     name: 'ChartNumber',
     props: {
         data: {
-            type: Number,
             required: true
         },
         animationTime: {
@@ -126,15 +125,19 @@ export default {
             return 'translate(' + (this._width() / 2) + ',' + ((this._height() + 50) / 2) + ')';
         },
         displayedString: function() {
-            let displayedString = this.displayedNumber.toString(),
-                displayedUnits = displayedString.split(".")[0],
-                decimals = displayedString.split(".")[1] || '';
+            // console.log(this.data, this.preText, this.preText + this.data);
 
-            if (this.decimalPrecision > 0) {
-                while (decimals.length < this.decimalPrecision) decimals += '0';
-            }
+            if (typeof(this.data) == 'number') {
+                let displayedString = this.displayedNumber.toString(),
+                    displayedUnits = displayedString.split(".")[0],
+                    decimals = displayedString.split(".")[1] || '';
 
-            return this.preText + displayedUnits + (this.decimalPrecision ? '.' + decimals : '') + this.unit;
+                if (this.decimalPrecision > 0) {
+                    while (decimals.length < this.decimalPrecision) decimals += '0';
+                }
+
+                return this.preText + displayedUnits + (this.decimalPrecision ? '.' + decimals : '') + this.unit;
+            } else return this.preText + this.data;
         },
         textLength: function() {
             this.xScale.domain(this.displayedString.split('').map((d, i) => i));
