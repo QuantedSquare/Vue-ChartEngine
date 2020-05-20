@@ -10,33 +10,32 @@ export default new Router({
     routes: [{
             path: '/',
             name: 'home',
-            component: Home
+            component: () => import('./views/Assemblee.vue')
         },
-        {
-            path: '/about',
-            name: 'about',
-            // route level code-splitting
-            // this generates a separate chunk (about.[hash].js) for this route
-            // which is lazy-loaded when the route is visited.
-            component: () => import( /* webpackChunkName: "about" */ './views/About.vue')
-        },
-        // Charts
-        {
-            path: '/lines',
-            name: 'lines',
-            component: () => import('./views/Lines.vue')
-        },
-        {
-            path: '/bars',
-            name: 'bars',
-            component: () => import('./views/Bars.vue')
-        },
-        {
-            path: '/donut',
-            name: 'donut',
-            component: () => import('./views/Donut.vue')
-        },
-        ,
+        // {
+        //     path: '/about',
+        //     name: 'about',
+        //     // route level code-splitting
+        //     // this generates a separate chunk (about.[hash].js) for this route
+        //     // which is lazy-loaded when the route is visited.
+        //     component: () => import( /* webpackChunkName: "about" */ './views/About.vue')
+        // },
+        // // Charts
+        // {
+        //     path: '/lines',
+        //     name: 'lines',
+        //     component: () => import('./views/Lines.vue')
+        // },
+        // {
+        //     path: '/bars',
+        //     name: 'bars',
+        //     component: () => import('./views/Bars.vue')
+        // },
+        // {
+        //     path: '/donut',
+        //     name: 'donut',
+        //     component: () => import('./views/Donut.vue')
+        // },
         {
             path: '/assemblee',
             name: 'assemblee',
